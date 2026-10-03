@@ -1,1 +1,2 @@
-pyTooling >= 9.0, < 11.0
+pyTooling[terminal] @ git+https://github.com/pyTooling/pyTooling.git@dev
+ruamel.yaml ~= 0.19.1

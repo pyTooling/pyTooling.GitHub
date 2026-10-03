@@ -174,6 +174,8 @@ extensions = [
 	"sphinx_autodoc_typehints",
 	"autoapi.sphinx",
 # User defined extensions
+	"pyTooling.Sphinx",
+	"pyTooling.GitHub.Sphinx",
 ]
 
 
