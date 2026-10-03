@@ -1,0 +1,37 @@
+[![Sourcecode on GitHub](https://img.shields.io/badge/pyTooling-GitHub-63bf7f?longCache=true&style=flat-square&longCache=true&logo=GitHub)](https://GitHub.com/pyTooling/pyTooling.GitHub)
+[![Sourcecode License](https://img.shields.io/pypi/l/pyTooling.GitHub?longCache=true&style=flat-square&logo=Apache&label=code)](LICENSE.md)
+[![Documentation](https://img.shields.io/website?longCache=true&style=flat-square&label=pyTooling.github.io%2FpyTooling.GitHub&logo=GitHub&logoColor=fff&up_color=blueviolet&up_message=Read%20now%20%E2%9E%9A&url=https%3A%2F%2FpyTooling.github.io%2FpyTooling.GitHub%2Findex.html)](https://pyTooling.github.io/pyTooling.GitHub/)
+[![Documentation License](https://img.shields.io/badge/doc-CC--BY%204.0-green?longCache=true&style=flat-square&logo=CreativeCommons&logoColor=fff)](doc/Doc-License.rst)  
+[![PyPI](https://img.shields.io/pypi/v/pyTooling.GitHub?longCache=true&style=flat-square&logo=PyPI&logoColor=FBE072)](https://pypi.org/project/pyTooling.GitHub/)
+![PyPI - Status](https://img.shields.io/pypi/status/pyTooling.GitHub?longCache=true&style=flat-square&logo=PyPI&logoColor=FBE072)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyTooling.GitHub?longCache=true&style=flat-square&logo=PyPI&logoColor=FBE072)  
+[![GitHub Workflow - Build and Test Status](https://img.shields.io/github/actions/workflow/status/pyTooling/pyTooling.GitHub/Pipeline.yml?branch=main&longCache=true&style=flat-square&label=build%20and%20test&logo=GitHub%20Actions&logoColor=FFFFFF)](https://GitHub.com/pyTooling/pyTooling.GitHub/actions/workflows/Pipeline.yml)
+[![Libraries.io status for latest release](https://img.shields.io/librariesio/release/pypi/pyTooling.GitHub?longCache=true&style=flat-square&logo=Libraries.io&logoColor=fff)](https://libraries.io/github/pyTooling/pyTooling.GitHub)
+[![Codecov - Branch Coverage](https://img.shields.io/codecov/c/github/pyTooling/pyTooling.GitHub?longCache=true&style=flat-square&logo=Codecov)](https://codecov.io/gh/pyTooling/pyTooling.GitHub)
+
+# pyTooling.GitHub
+
+**pyTooling.GitHub** works with GitHub Actions pipelines: it reads workflow and action files into a data model,
+reads the runs of a pipeline from GitHub's REST API, and converts them into traces - e.g. OpenTelemetry's OTLP/JSON
+or a Gantt chart of the jobs and steps. A Sphinx domain `gha` documents workflows and their inputs, outputs and
+secrets taken straight from the workflow files.
+
+It builds on [pyTooling](https://GitHub.com/pyTooling/pyTooling)'s generic CI pipeline model and tracing, and on
+[pyTooling.Sphinx](https://GitHub.com/pyTooling/pyTooling.Sphinx) for its documentation extensions.
+
+
+## Contributors
+
+* [Patrick Lehmann](https://GitHub.com/Paebbels) (Maintainer)
+* [and more...](https://GitHub.com/pyTooling/pyTooling.GitHub/graphs/contributors)
+
+
+## License
+
+This Python package (source code) is licensed under [Apache License 2.0](LICENSE.md).  
+The accompanying documentation is licensed under [Creative Commons - Attribution 4.0 (CC-BY 4.0)](doc/Doc-License.rst).
+
+
+-------------------------
+
+SPDX-License-Identifier: Apache-2.0
