@@ -1,10 +1,10 @@
 # ==================================================================================================================== #
-#             _____           _ _             _____               _                                                    #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _|_   _| __ __ _  ___(_)_ __   __ _                                        #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` | | || '__/ _` |/ __| | '_ \ / _` |                                       #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| |_| || | | (_| | (__| | | | | (_| |                                       #
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)_||_|  \__,_|\___|_|_| |_|\__, |                                       #
-# |_|    |___/                          |___/                             |___/                                        #
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
+# |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
 #   Patrick Lehmann                                                                                                    #
@@ -31,22 +31,22 @@
 """
 Unit tests for :mod:`pyTooling.Tracing.CI` and :mod:`pyTooling.GitHub.Tracing`.
 """
-from datetime                    import datetime, timedelta, timezone
-from json                        import dumps as json_dumps
-from typing                      import Any, Optional as Nullable
-from unittest                    import mock
-from urllib.error                import HTTPError
+from datetime                 import datetime, timedelta, timezone
+from json                     import dumps as json_dumps
+from typing                   import Any, Optional as Nullable
+from unittest                 import mock
+from urllib.error             import HTTPError
 
-from pyTooling.GitHub            import GitHubError
-from pyTooling.Common            import parseISO8601Timestamp
-from pyTooling.Exceptions        import ToolingException
-from pyTooling.REST              import RESTError
-from pyTooling.Tracing           import Span, Trace
-from pyTooling.Tracing.CI        import CI, JobSpan, OTLP, PipelineTrace, Result, SpanKind, StepSpan
-from pyTooling.Tracing.CI        import TaskSpan, WorkflowSpan
-from pyTooling.GitHub.Tracing    import GitHub, WorkflowRunReader, WorkflowRunTrace
-from pyTooling.Tracing.Render    import GanttLayout, ciSpanFilter
-from pyTooling.Testing           import Testcase
+from pyTooling.GitHub         import GitHubError
+from pyTooling.Common         import parseISO8601Timestamp
+from pyTooling.Exceptions     import ToolingException
+from pyTooling.REST           import RESTError
+from pyTooling.Tracing        import Span, Trace
+from pyTooling.Tracing.CI     import CI, JobSpan, OTLP, PipelineTrace, Result, SpanKind, StepSpan
+from pyTooling.Tracing.CI     import TaskSpan, WorkflowSpan
+from pyTooling.GitHub.Tracing import GitHub, WorkflowRunReader, WorkflowRunTrace
+from pyTooling.Tracing.Render import GanttLayout, ciSpanFilter
+from pyTooling.Testing        import Testcase
 
 
 if __name__ == "__main__":  # pragma: no cover

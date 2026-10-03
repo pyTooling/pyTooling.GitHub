@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____ ___                                                               #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___|_ _|                                                              #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |    | |                                                               #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| || |___ | |                                                               #
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|___|                                                              #
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -31,21 +31,21 @@
 """
 Unit tests for :mod:`pyTooling.GitHub.WorkflowFile`.
 """
-from pathlib                          import Path
-from tempfile                         import TemporaryDirectory
-from textwrap                         import dedent, indent
-from typing                           import Any
+from pathlib                       import Path
+from tempfile                      import TemporaryDirectory
+from textwrap                      import dedent, indent
+from typing                        import Any
 
-from pyTooling.CI                     import Matrix as CIMatrix, NeedDependencyCycleError, Pipeline as CIPipeline
-from pyTooling.GitHub                 import Pipeline as GitHubPipeline
+from pyTooling.CI                  import Matrix as CIMatrix, NeedDependencyCycleError, Pipeline as CIPipeline
+from pyTooling.GitHub              import Pipeline as GitHubPipeline
 from pyTooling.GitHub.WorkflowFile import AccessLevel, Base, InputType, Workflow, WorkflowError, WorkflowResolver
 from pyTooling.GitHub.WorkflowFile import Input, Job, Matrix, Output, Permission, PermissionScope, Secret
 from pyTooling.GitHub.WorkflowFile import UsesReference, DefinedJob, DefinedMatrix, DefinedMatrixJob
-from pyTooling.GitHub.WorkflowFile    import DefinedMatrixWorkflow, DefinedPipeline, DefinedWorkflow, Action, Step
-from pyTooling.Graph                  import Graph
-from pyTooling.Testing                import Testcase
+from pyTooling.GitHub.WorkflowFile import DefinedMatrixWorkflow, DefinedPipeline, DefinedWorkflow, Action, Step
+from pyTooling.Graph               import Graph
+from pyTooling.Testing             import Testcase
 
-from ruamel.yaml                      import YAML
+from ruamel.yaml                   import YAML
 
 
 if __name__ == "__main__":  # pragma: no cover

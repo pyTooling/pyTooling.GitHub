@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____                                        _        _   _             #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  |  _ \  ___   ___ _   _ _ __ ___   ___ _ __ | |_ __ _| |_(_) ___  _ __  #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` | | | | |/ _ \ / __| | | | '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \ #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| |_| |_| | (_) | (__| |_| | | | | | |  __/ | | | || (_| | |_| | (_) | | | |#
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|#
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -82,30 +82,30 @@ The workflow files are read with ``ruamel.yaml`` when a directive runs, not when
    :mod:`pyTooling.GitHub.Sphinx.Reference`
       |rarr| The directives summarizing a workflow: its parameters, its interface, its YAML.
 """
-from __future__                                import annotations
+from __future__                      import annotations
 
-from pathlib                                   import Path
-from typing                                    import TYPE_CHECKING, Any, ClassVar, Iterable, Optional as Nullable
+from pathlib                         import Path
+from typing                          import TYPE_CHECKING, Any, ClassVar, Iterable, Optional as Nullable
 
-from docutils                                  import nodes
-from docutils.nodes                            import Element, Node, fully_normalize_name
-from docutils.parsers.rst                      import directives
-from sphinx                                    import addnodes
-from sphinx.application                        import Sphinx
-from sphinx.builders                           import Builder
-from sphinx.domains                            import Domain, ObjType
-from sphinx.environment                        import BuildEnvironment
-from sphinx.roles                              import XRefRole
-from sphinx.util.logging                       import getLogger
-from sphinx.util.nodes                         import make_id, make_refnode
+from docutils                        import nodes
+from docutils.nodes                  import Element, Node, fully_normalize_name
+from docutils.parsers.rst            import directives
+from sphinx                          import addnodes
+from sphinx.application              import Sphinx
+from sphinx.builders                 import Builder
+from sphinx.domains                  import Domain, ObjType
+from sphinx.environment              import BuildEnvironment
+from sphinx.roles                    import XRefRole
+from sphinx.util.logging             import getLogger
+from sphinx.util.nodes               import make_id, make_refnode
 
-from pyTooling.Common                          import getFullyQualifiedName
-from pyTooling.Decorators                      import export, readonly
-from pyTooling.Sphinx.Directives               import BaseDirective
+from pyTooling.Common                import getFullyQualifiedName
+from pyTooling.Decorators            import export, readonly
+from pyTooling.Sphinx                import BaseDirective
 
 if TYPE_CHECKING:  # pragma: no cover
-	from pyTooling.GitHub.WorkflowFile        import Input, Output, Parameter, Secret, ValueT, Workflow
-	from pyTooling.GitHub.WorkflowFile        import WorkflowResolver
+	from pyTooling.GitHub.WorkflowFile import Input, Output, Parameter, Secret, ValueT, Workflow
+	from pyTooling.GitHub.WorkflowFile import WorkflowResolver
 
 
 __all__ = ["NO_DEFAULT", "WARNING_TYPE", "LEADING_FIELDS"]
@@ -848,7 +848,7 @@ def setup(sphinx: Sphinx) -> dict[str, Any]:
 	"""
 	Register the domain ``gha``, its directives and its configuration values with Sphinx.
 
-	The directives derive from :class:`~pyTooling.Sphinx.Directives.BaseDirective` and draw graphs with
+	The directives derive from :class:`~pyTooling.Sphinx.BaseDirective` and draw graphs with
 	:mod:`sphinx.ext.graphviz`, so the extension :mod:`pyTooling.Sphinx` is set up first.
 
 	:param sphinx: The Sphinx application to register with.

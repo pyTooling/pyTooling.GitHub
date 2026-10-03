@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____                                        _        _   _             #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  |  _ \  ___   ___ _   _ _ __ ___   ___ _ __ | |_ __ _| |_(_) ___  _ __  #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` | | | | |/ _ \ / __| | | | '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \ #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| |_| |_| | (_) | (__| |_| | | | | | |  __/ | | | || (_| | |_| | (_) | | | |#
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|#
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -34,11 +34,11 @@ Unit tests for :mod:`pyTooling.GitHub.Sphinx.Reference`, the directives summariz
 Every testcase builds a small Sphinx project in a temporary directory - see
 :class:`~tests.unit.Sphinx.Domain.Project` - and checks the HTML and the warnings.
 """
-from html                  import unescape
-from re                    import findall, sub
-from textwrap              import dedent, indent
+from html     import unescape
+from re       import findall, sub
+from textwrap import dedent, indent
 
-from .Domain               import Project
+from .Domain  import Project
 
 
 if __name__ == "__main__":  # pragma: no cover

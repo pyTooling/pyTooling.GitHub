@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____                                        _        _   _             #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  |  _ \  ___   ___ _   _ _ __ ___   ___ _ __ | |_ __ _| |_(_) ___  _ __  #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` | | | | |/ _ \ / __| | | | '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \ #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| |_| |_| | (_) | (__| |_| | | | | | |  __/ | | | || (_| | |_| | (_) | | | |#
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|#
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -66,25 +66,25 @@ When a document was read, an input of its workflow without an entry is a ``gha.d
    :mod:`pyTooling.GitHub.Sphinx`
       |rarr| The domain ``gha``, its workflows and parameter entries.
 """
-from __future__                                   import annotations
+from __future__                      import annotations
 
-from typing                                       import TYPE_CHECKING, Any, Callable, Iterable, Optional as Nullable
-from typing                                       import TypeVar
+from typing                          import TYPE_CHECKING, Any, Callable, Iterable, Optional as Nullable
+from typing                          import TypeVar
 
-from docutils                                     import nodes
-from docutils.parsers.rst                         import directives
-from sphinx                                       import addnodes
-from sphinx.application                           import Sphinx
-from sphinx.directives.code                       import container_wrapper
-from sphinx.transforms                            import SphinxTransform
-from sphinx.util.logging                          import getLogger
+from docutils                        import nodes
+from docutils.parsers.rst            import directives
+from sphinx                          import addnodes
+from sphinx.application              import Sphinx
+from sphinx.directives.code          import container_wrapper
+from sphinx.transforms               import SphinxTransform
+from sphinx.util.logging             import getLogger
 
-from pyTooling.Decorators                         import export
-from pyTooling.Sphinx.Directives                  import BaseDirective, SphinxExtensionError, strip
-from pyTooling.GitHub.Sphinx                      import NO_DEFAULT, WARNING_TYPE, InputDirective, formatValue
+from pyTooling.Decorators            import export
+from pyTooling.Sphinx                import BaseDirective, SphinxExtensionError, strip
+from pyTooling.GitHub.Sphinx         import NO_DEFAULT, WARNING_TYPE, InputDirective, formatValue
 
 if TYPE_CHECKING:  # pragma: no cover
-	from pyTooling.GitHub.WorkflowFile           import UsesReference, ValueT, Workflow
+	from pyTooling.GitHub.WorkflowFile import UsesReference, ValueT, Workflow
 
 
 __all__ = ["KINDS", "SECTIONS", "MAX_DEFAULT_LENGTH"]

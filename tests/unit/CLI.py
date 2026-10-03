@@ -1,10 +1,10 @@
 # ==================================================================================================================== #
-#               _____           _ _               ____ _     ___                                                       #
-#    _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___| |   |_ _|                                                      #
-#   | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |   | |    | |                                                       #
-#   | |_) | |_| || | (_) | (_) | | | | | | (_| || |___| |___ | |                                                       #
-#   | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_____|___|                                                      #
-#   |_|    |___/                          |___/                                                                        #
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
+# |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
 #   Patrick Lehmann                                                                                                    #
@@ -31,18 +31,18 @@
 """
 Unit tests for :mod:`pyTooling.GitHub.CLI`: the program's commands and the parser they are declared with.
 """
-from io                 import StringIO
-from argparse           import Namespace
-from contextlib         import redirect_stdout
-from datetime           import datetime, timedelta, timezone
-from json               import loads as json_loads
-from os                 import environ
-from pathlib            import Path
-from sys                import argv as sys_argv
-from tempfile           import TemporaryDirectory
-from typing             import ClassVar, Iterable
-from unittest           import skipUnless
-from unittest.mock      import patch
+from io                            import StringIO
+from argparse                      import Namespace
+from contextlib                    import redirect_stdout
+from datetime                      import datetime, timedelta, timezone
+from json                          import loads as json_loads
+from os                            import environ
+from pathlib                       import Path
+from sys                           import argv as sys_argv
+from tempfile                      import TemporaryDirectory
+from typing                        import ClassVar, Iterable
+from unittest                      import skipUnless
+from unittest.mock                 import patch
 
 from pyTooling.Attributes.ArgParse import splitFormat
 from pyTooling.GitHub.CLI          import Application, main

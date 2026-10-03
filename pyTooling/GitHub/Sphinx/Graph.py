@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____                                        _        _   _             #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  |  _ \  ___   ___ _   _ _ __ ___   ___ _ __ | |_ __ _| |_(_) ___  _ __  #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` | | | | |/ _ \ / __| | | | '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \ #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| |_| |_| | (_) | (__| |_| | | | | | |  __/ | | | || (_| | |_| | (_) | | | |#
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|#
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -52,28 +52,28 @@ HTML, a node links to the page documenting its reusable workflow, if the ``gha``
    :mod:`pyTooling.Sphinx.SchemaGraph`
       |rarr| The other graph directives of the extension.
 """
-from __future__                                import annotations
+from __future__                      import annotations
 
-from html                                      import escape as html_escape
-from pathlib                                   import Path, PurePosixPath
-from re                                        import Match, compile as re_compile
-from typing                                    import TYPE_CHECKING, Any, Optional as Nullable
+from html                            import escape as html_escape
+from pathlib                         import Path, PurePosixPath
+from re                              import Match, compile as re_compile
+from typing                          import TYPE_CHECKING, Any, Optional as Nullable
 
-from docutils                                  import nodes
-from docutils.parsers.rst                      import directives
-from sphinx.application                        import Sphinx
-from sphinx.ext.graphviz                       import align_spec, figure_wrapper, graphviz
-from sphinx.util.logging                       import getLogger
+from docutils                        import nodes
+from docutils.parsers.rst            import directives
+from sphinx.application              import Sphinx
+from sphinx.ext.graphviz             import align_spec, figure_wrapper, graphviz
+from sphinx.util.logging             import getLogger
 
-from pyTooling.CI                              import Base as CIBase, Matrix as CIMatrix, Workflow as CIWorkflow
-from pyTooling.Common                          import getFullyQualifiedName
-from pyTooling.Decorators                      import export, readonly
-from pyTooling.Graph                           import Vertex
-from pyTooling.MetaClasses                     import ExtendedType
-from pyTooling.Sphinx.Directives               import BaseDirective, SphinxExtensionError, strip, stripAndNormalize
+from pyTooling.CI                    import Base as CIBase, Matrix as CIMatrix, Workflow as CIWorkflow
+from pyTooling.Common                import getFullyQualifiedName
+from pyTooling.Decorators            import export, readonly
+from pyTooling.Graph                 import Vertex
+from pyTooling.MetaClasses           import ExtendedType
+from pyTooling.Sphinx                import BaseDirective, SphinxExtensionError, strip, stripAndNormalize
 
 if TYPE_CHECKING:  # pragma: no cover
-	from pyTooling.GitHub.WorkflowFile        import Job, Workflow, WorkflowResolver
+	from pyTooling.GitHub.WorkflowFile import Job, Workflow, WorkflowResolver
 
 
 __all__ = ["GRAPH_ATTRIBUTES", "CSS_CLASS", "LINK_MARKER"]

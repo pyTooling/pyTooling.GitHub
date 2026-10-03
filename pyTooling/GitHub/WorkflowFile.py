@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____ ___                                                               #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___|_ _|                                                              #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |    | |                                                               #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| || |___ | |                                                               #
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|___|                                                              #
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -62,21 +62,21 @@ The model is independent of :mod:`pyTooling.GitHub`, which models a workflow *ru
 elements link back to the jobs they were built from, and :meth:`Workflow.ApplyNeeds` gives a run the dependencies
 its workflow file declares.
 """
-from __future__            import annotations
+from __future__               import annotations
 
-from functools             import cached_property
-from itertools             import product
-from json                  import dumps as json_dumps
-from pathlib               import Path, PurePosixPath
-from typing                import Any, ClassVar, Generic, Hashable, Iterable, Iterator, Mapping, Optional as Nullable
-from typing                import Self, TypeVar, Union
+from functools                import cached_property
+from itertools                import product
+from json                     import dumps as json_dumps
+from pathlib                  import Path, PurePosixPath
+from typing                   import Any, ClassVar, Generic, Hashable, Iterable, Iterator, Mapping, Optional as Nullable
+from typing                   import Self, TypeVar, Union
 
-from pyTooling.CI          import CIError, DependencyMixin, JobGroup, Matrix as CIMatrix, MatrixInstanceMixin
-from pyTooling.CI          import MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow
-from pyTooling.CI          import Job as CIJob, Pipeline as CIPipeline, Step as CIStep, Workflow as CIWorkflow
-from pyTooling.Common      import getFullyQualifiedName, StringEnum
-from pyTooling.Decorators  import export, readonly
-from pyTooling.MetaClasses import ExtendedType, abstractclass
+from pyTooling.CI             import CIError, DependencyMixin, JobGroup, Matrix as CIMatrix, MatrixInstanceMixin
+from pyTooling.CI             import MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow
+from pyTooling.CI             import Job as CIJob, Pipeline as CIPipeline, Step as CIStep, Workflow as CIWorkflow
+from pyTooling.Common         import getFullyQualifiedName, StringEnum
+from pyTooling.Decorators     import export, readonly
+from pyTooling.MetaClasses    import ExtendedType, abstractclass
 
 from ruamel.yaml              import YAML, YAMLError
 from ruamel.yaml.comments     import CommentedMap, CommentedSeq

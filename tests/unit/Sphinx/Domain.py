@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____                                        _        _   _             #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  |  _ \  ___   ___ _   _ _ __ ___   ___ _ __ | |_ __ _| |_(_) ___  _ __  #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` | | | | |/ _ \ / __| | | | '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \ #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| |_| |_| | (_) | (__| |_| | | | | | |  __/ | | | || (_| | |_| | (_) | | | |#
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|#
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -34,17 +34,17 @@ Unit tests for the Sphinx domain ``gha`` of :mod:`pyTooling.GitHub.Sphinx`.
 Every testcase builds a small Sphinx project in a temporary directory and checks the HTML, the domain's data and the
 warnings.
 """
-from io                    import StringIO
-from os                    import sep
-from pathlib               import Path
-from sys                   import version_info
-from tempfile              import TemporaryDirectory
-from textwrap              import dedent
-from typing                import Any
+from io                import StringIO
+from os                import sep
+from pathlib           import Path
+from sys               import version_info
+from tempfile          import TemporaryDirectory
+from textwrap          import dedent
+from typing            import Any
 
-from pytest                import mark
+from pytest            import mark
 
-from pyTooling.Testing     import Testcase
+from pyTooling.Testing import Testcase
 
 # 'pyTooling.Sphinx' requires Sphinx 9.1, which requires Python 3.12.
 sphinxIsSupported = version_info >= (3, 12)

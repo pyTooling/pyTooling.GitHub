@@ -1,9 +1,9 @@
 # ==================================================================================================================== #
-#             _____           _ _               ____                                        _        _   _             #
-#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  |  _ \  ___   ___ _   _ _ __ ___   ___ _ __ | |_ __ _| |_(_) ___  _ __  #
-# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` | | | | |/ _ \ / __| | | | '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \ #
-# | |_) | |_| || | (_) | (_) | | | | | | (_| |_| |_| | (_) | (__| |_| | | | | | |  __/ | | | || (_| | |_| | (_) | | | |#
-# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|#
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
 # |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
@@ -34,17 +34,17 @@ Unit tests for :mod:`pyTooling.GitHub.Sphinx.Graph`, the ``gha:pipeline-graph`` 
 A graph is checked as DOT source, not as a picture: every testcase builds a small Sphinx project around three workflow
 files and reads the code handed to :mod:`sphinx.ext.graphviz`.
 """
-from io                      import StringIO
-from pathlib                 import Path
-from shutil                  import which
-from subprocess              import run as subprocess_run
-from sys                     import version_info
-from tempfile                import TemporaryDirectory
-from textwrap                import dedent
+from io                import StringIO
+from pathlib           import Path
+from shutil            import which
+from subprocess        import run as subprocess_run
+from sys               import version_info
+from tempfile          import TemporaryDirectory
+from textwrap          import dedent
 
-from pytest                  import mark
+from pytest            import mark
 
-from pyTooling.Testing       import Testcase
+from pyTooling.Testing import Testcase
 
 # 'pyTooling[sphinx]' requires Sphinx 9.1, which requires Python 3.12 - see 'tests/unit/Documentation.py'. No signature
 # below may name one of these imports.

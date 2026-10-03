@@ -1,10 +1,10 @@
 # ==================================================================================================================== #
-#               _____           _ _               ____ _     ___                                                       #
-#    _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___| |   |_ _|                                                      #
-#   | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |   | |    | |                                                       #
-#   | |_) | |_| || | (_) | (_) | | | | | | (_| || |___| |___ | |                                                       #
-#   | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_____|___|                                                      #
-#   |_|    |___/                          |___/                                                                        #
+#             _____           _ _               ____ _ _   _   _       _                                               #
+#  _ __  _   |_   _|__   ___ | (_)_ __   __ _  / ___(_) |_| | | |_   _| |__                                            #
+# | '_ \| | | || |/ _ \ / _ \| | | '_ \ / _` || |  _| | __| |_| | | | | '_ \                                           #
+# | |_) | |_| || | (_) | (_) | | | | | | (_| || |_| | | |_|  _  | |_| | |_) |                                          #
+# | .__/ \__, ||_|\___/ \___/|_|_|_| |_|\__, (_)____|_|\__|_| |_|\__,_|_.__/                                           #
+# |_|    |___/                          |___/                                                                          #
 # ==================================================================================================================== #
 # Authors:                                                                                                             #
 #   Patrick Lehmann                                                                                                    #
@@ -31,13 +31,13 @@
 """
 The commands of the :program:`pytooling-github` program, run as the installed console script.
 """
-from json       import loads as json_loads
-from os         import environ
-from pathlib    import Path
-from re         import search
-from subprocess import CompletedProcess
-from tempfile   import TemporaryDirectory
-from typing     import ClassVar
+from json                 import loads as json_loads
+from os                   import environ
+from pathlib              import Path
+from re                   import search
+from subprocess           import CompletedProcess
+from tempfile             import TemporaryDirectory
+from typing               import ClassVar
 
 from pyTooling.TerminalUI import TerminalApplication
 from pyTooling.Testing    import ApplicationTestcase, stripANSIColorCodes
