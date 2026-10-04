@@ -22,6 +22,62 @@ It builds on [pyTooling](https://GitHub.com/pyTooling/pyTooling)'s generic CI pi
 [pyTooling.Sphinx](https://GitHub.com/pyTooling/pyTooling.Sphinx) for its documentation extensions.
 
 
+> [!IMPORTANT]
+> pyTooling.GitHub requires **Python 3.11 or newer**. The Sphinx domain `gha` requires pyTooling.Sphinx, and thus
+> Python 3.12 or newer.
+
+The package is installed from PyPI, with the extras `diagram` (matplotlib, for Gantt charts) and `sphinx`
+(pyTooling.Sphinx, for the domain `gha`):
+
+```bash
+pip install pyTooling.GitHub[diagram,sphinx]
+```
+
+The domain is enabled in `conf.py`; it sets up pyTooling.Sphinx itself:
+
+```python
+# doc/conf.py
+extensions = [
+  ...,
+  "pyTooling.GitHub.Sphinx",
+]
+```
+
+
+## Features
+
+### Data models
+
+* [Workflow runs][Run] - A GitHub Actions workflow run - pipeline, workflows, matrices, jobs and steps with their
+  times and outcomes - read from the GitHub REST API's payloads.
+* [Workflow files][WorkflowFile] - A workflow file: triggers, inputs, outputs, secrets, permissions and jobs with their
+  dependencies, read with line numbers, and converted into a pipeline graph.
+
+### Traces
+
+* [GitHub Actions trace reader][Tracing] - Reads a workflow run through the GitHub REST API into a trace, written as
+  OpenTelemetry's OTLP/JSON.
+
+### Sphinx domain `gha`
+
+* [Workflows and their parameters][GHA] - `gha:workflow`, `gha:input`, `gha:output`, `gha:secret` and
+  `gha:autoinputs`, taken straight from the workflow file; roles to reference them.
+* [Tables and listings][GHA] - `gha:parameter-table`, `gha:interface`, `gha:dependencies` and `gha:yaml`.
+* [Pipeline graph][GHA] - `gha:pipeline-graph` draws the jobs of a workflow and their `needs` as a Graphviz graph,
+  with the reusable workflows it calls expanded.
+
+### Program
+
+* [pytooling-github][CLI] - The command `pipeline` reads a pipeline run into a trace, writes it, and draws it as a
+  Gantt chart.
+
+[Run]: https://pyTooling.github.io/pyTooling.GitHub/Run.html
+[WorkflowFile]: https://pyTooling.github.io/pyTooling.GitHub/WorkflowFile.html
+[Tracing]: https://pyTooling.github.io/pyTooling.GitHub/Tracing.html
+[GHA]: https://pyTooling.github.io/pyTooling.GitHub/GHA/index.html
+[CLI]: https://pyTooling.github.io/pyTooling.GitHub/CLI.html
+
+
 ## Contributors
 
 * [Patrick Lehmann](https://GitHub.com/Paebbels) (Maintainer)
