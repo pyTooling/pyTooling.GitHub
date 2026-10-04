@@ -15,7 +15,7 @@
 
 **pyTooling.GitHub** works with GitHub Actions pipelines: it reads workflow and action files into a data model,
 reads the runs of a pipeline from GitHub's REST API, and converts them into traces - e.g. OpenTelemetry's OTLP/JSON
-or a Gantt chart of the jobs and steps. A Sphinx domain `gha` documents workflows and their inputs, outputs and
+or a Gantt chart of the jobs and steps. A Sphinx domain `ghactions` documents workflows and their inputs, outputs and
 secrets taken straight from the workflow files.
 
 It builds on [pyTooling](https://GitHub.com/pyTooling/pyTooling)'s generic CI pipeline model and tracing, and on
@@ -23,7 +23,7 @@ It builds on [pyTooling](https://GitHub.com/pyTooling/pyTooling)'s generic CI pi
 
 
 > [!IMPORTANT]
-> The Sphinx domain `gha` in `pyTooling.GitHub.Sphinx` requires [pyTooling.Sphinx][pyTooling.Sphinx], and thus
+> The Sphinx domain `ghactions` in `pyTooling.GitHub.Sphinx` requires [pyTooling.Sphinx][pyTooling.Sphinx], and thus
 > **Python 3.12 or newer**, because Sphinx 9.1 requires Python 3.12.
 
 The package is installed from PyPI:
@@ -44,7 +44,7 @@ pip install pyTooling.GitHub
 * [Action files][ActionFile] - An action's file: how it runs, and the steps of a composite action with the actions
   they run in turn.
 
-### Sphinx domain `gha`
+### Sphinx domain `ghactions`
 
 The domain needs the extra `sphinx`, which installs pyTooling.Sphinx:
 
@@ -62,14 +62,15 @@ extensions = [
 ]
 ```
 
-* [Workflows and their parameters][GHAWorkflows] - `gha:workflow`, `gha:input`, `gha:output`, `gha:secret` and
-  `gha:autoinputs`, taken straight from the workflow file; roles to reference them.
-* [Summaries][GHASummaries] - `gha:parameter-table`, `gha:interface`, `gha:dependencies` and `gha:yaml`.
+* [Workflows and their parameters][GHAWorkflows] - `ghactions:workflow`, `ghactions:input`, `ghactions:output`,
+  `ghactions:secret` and `ghactions:autoinputs`, taken straight from the workflow file; roles to reference them.
+* [Summaries][GHASummaries] - `ghactions:parameter-table`, `ghactions:interface`, `ghactions:dependencies` and
+  `ghactions:yaml`.
 
 ### Visualization
 
-* [Pipeline graph][PipelineGraph] - `gha:pipeline-graph` draws the jobs of a workflow and their `needs` as a Graphviz
-  graph, with the reusable workflows it calls expanded.
+* [Pipeline graph][PipelineGraph] - `ghactions:pipeline-graph` draws the jobs of a workflow and their `needs` as a
+  Graphviz graph, with the reusable workflows it calls expanded.
 * [Pipeline trace diagram][PipelineTrace] - Reads a workflow run through the GitHub REST API into a trace, written as
   OpenTelemetry's OTLP/JSON or drawn as a Gantt chart.
 
@@ -100,7 +101,7 @@ pip install pyTooling.GitHub[diagram]
 This layer is used by:
 
 * 🚧 [pyTooling/Actions](https://GitHub.com/pyTooling/Actions) - its documentation of the job templates will use the
-  `gha` domain.
+  `ghactions` domain.
 
 
 ## Contributors

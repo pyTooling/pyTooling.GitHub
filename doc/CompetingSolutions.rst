@@ -133,11 +133,10 @@ sphinx-gha
 ==========
 
 Source: `sphinx-gha <https://sphinx-gha.readthedocs.io/>`__, on PyPI as
-`sphinx-gha <https://pypi.org/project/sphinx-gha/>`__, compared to the :ref:`gha domain <GHA>`.
+`sphinx-gha <https://pypi.org/project/sphinx-gha/>`__, compared to the :ref:`ghactions domain <GHA>`.
 
 .. rubric:: Disadvantages
 
-* It registers its Sphinx domain under the same name, ``gha``, so the two extensions can't be enabled in one project.
 * What an action's file can't say - an example, an environment variable - is written into the YAML file, as keys
   prefixed with ``x-``.
 * Its documentation names neither a graph of the jobs nor summaries of a workflow's permissions or dependencies.
@@ -154,7 +153,7 @@ github-actions-docs
 ===================
 
 Source: :gh:`github-actions-docs <rzjfr/github-actions-docs>`, on PyPI as
-`github-actions-docs <https://pypi.org/project/github-actions-docs/>`__, compared to the :ref:`gha domain <GHA>`.
+`github-actions-docs <https://pypi.org/project/github-actions-docs/>`__, compared to the :ref:`ghactions domain <GHA>`.
 
 .. rubric:: Disadvantages
 

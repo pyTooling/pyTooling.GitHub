@@ -36,12 +36,12 @@ workflow file:
 
 .. code-block:: ReST
 
-   .. gha:pipeline-graph:: ../.github/workflows/CompletePipeline.yml
+   .. ghactions:pipeline-graph:: ../.github/workflows/CompletePipeline.yml
       :depth: 1
 
 A job is a node labelled with its name and, if it calls a reusable workflow, that workflow's file. A reusable workflow
 of the documented repository is expanded into a cluster of its own jobs, as many levels deep as ``:depth:`` says. In
-HTML, a node links to the page documenting its reusable workflow, if the ``gha`` domain knows one.
+HTML, a node links to the page documenting its reusable workflow, if the ``ghactions`` domain knows one.
 
 .. seealso::
 
@@ -92,11 +92,11 @@ GRAPH_ATTRIBUTES = (
 )
 
 #: CSS class of a pipeline graph's ``graphviz`` node, which is also how :func:`resolveLinks` finds it.
-CSS_CLASS = "gha-pipeline-graph"
+CSS_CLASS = "ghactions-pipeline-graph"
 
 #: A DOT comment, and the whitespace before it, standing where a job's link belongs, until :func:`resolveLinks`
 #: replaces it by the link or removes it.
-LINK_MARKER = re_compile(r"(?P<space>\s*)/\*gha-link:(?P<stem>[^*]*)\*/")
+LINK_MARKER = re_compile(r"(?P<space>\s*)/\*ghactions-link:(?P<stem>[^*]*)\*/")
 
 _logger = getLogger(__name__)
 
@@ -342,7 +342,7 @@ class PipelineDotGraph(metaclass=ExtendedType, slots=True):
 			statement += f", tooltip={self._Quote(tooltip)}"
 
 		if self._link and uses is not None and self._resolver.CanResolve(uses):
-			statement += f" /*gha-link:{uses.Stem}*/"
+			statement += f" /*ghactions-link:{uses.Stem}*/"
 
 		self._statements.append(f"{statement}];")
 
@@ -398,7 +398,7 @@ class PipelineDotGraph(metaclass=ExtendedType, slots=True):
 					self._workflows.append(element.CalledWorkflow)
 
 				if self._link:
-					self._statements.append(f"{indent}\t/*gha-link:{element.Definition.Uses.Stem}*/")
+					self._statements.append(f"{indent}\t/*ghactions-link:{element.Definition.Uses.Stem}*/")
 
 			entryNode, exitNode = self._DrawVertices(
 				[link.Destination for link in vertex.OutboundLinks], f"{identifier}/", f"{indent}\t"
@@ -450,20 +450,21 @@ class PipelineDotGraph(metaclass=ExtendedType, slots=True):
 @export
 class PipelineGraph(BaseDirective):
 	"""
-	The ``gha:pipeline-graph`` directive: the pipeline of a workflow, drawn from the workflow file.
+	The ``ghactions:pipeline-graph`` directive: the pipeline of a workflow, drawn from the workflow file.
 
 	One argument, the path of the workflow file relative to the document using the directive.
 
-	The documented repository and the directory of its workflow files are the configuration values ``gha_repository``
-	and ``gha_workflow_directory`` - relative to the source directory, and by default the directory of the drawn
-	workflow file. A job calling a reusable workflow of that repository is expanded, while ``:depth:`` allows, and
-	checked against the ref ``gha_ref``, if that is configured.
+	The documented repository and the directory of its workflow files are the configuration values
+	``ghactions_repository`` and ``ghactions_workflow_directory`` - relative to the source directory, and by default the
+	directory of the drawn workflow file. A job calling a reusable workflow of that repository is expanded, while
+	``:depth:`` allows, and checked against the ref ``ghactions_ref``, if that is configured.
 
-	The workflow files are read by the resolver of the ``gha`` domain, which reads every file once per build. Without
-	``gha_workflow_directory``, a resolver of its own maps ``gha_repository`` to the drawn file's directory.
+	The workflow files are read by the resolver of the ``ghactions`` domain, which reads every file once per build.
+	Without ``ghactions_workflow_directory``, a resolver of its own maps ``ghactions_repository`` to the drawn file's
+	directory.
 	"""
 
-	directiveName: str = "gha:pipeline-graph"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:pipeline-graph"  #: Name the directive is invoked by.
 
 	has_content =               False  #: A boolean; ``True`` if content is allowed.
 	required_arguments =        1      #: Number of required directive arguments: the workflow file's path.
@@ -488,7 +489,7 @@ class PipelineGraph(BaseDirective):
 		Read the workflow file and hand its pipeline to :mod:`sphinx.ext.graphviz` for rendering.
 
 		Every workflow file drawn becomes a dependency of the document. A job calling a reusable workflow of the
-		documented repository at another ref than ``gha_ref`` is reported as a warning of type ``gha.ref``.
+		documented repository at another ref than ``ghactions_ref`` is reported as a warning of type ``ghactions.ref``.
 
 		:returns: A ``graphviz`` node, wrapped in a figure when a caption was given, or an error node when the options or
 		          the workflow files are wrong.
@@ -499,8 +500,8 @@ class PipelineGraph(BaseDirective):
 
 		from pyTooling.GitHub.WorkflowFile import WorkflowError, WorkflowResolver
 
-		repository = self.config.gha_repository
-		ref =        self.config.gha_ref
+		repository = self.config.ghactions_repository
+		ref =        self.config.ghactions_ref
 
 		try:
 			direction = self._ParseStringOption("direction", "LR", "(?i)(LR|TB)$").upper()
@@ -510,10 +511,10 @@ class PipelineGraph(BaseDirective):
 			return [self.state.document.reporter.error(str(ex), line=self.lineno)]
 
 		try:
-			if repository is not None and self.config.gha_workflow_directory is None:
+			if repository is not None and self.config.ghactions_workflow_directory is None:
 				resolver = WorkflowResolver({repository: workflowFile.parent})
 			else:
-				resolver = self.env.get_domain("gha").Resolver
+				resolver = self.env.get_domain("ghactions").Resolver
 
 			graph = PipelineDotGraph(
 				resolver.Load(workflowFile), resolver, direction, self.options.get("depth", 0), reduce, link
@@ -538,7 +539,7 @@ class PipelineGraph(BaseDirective):
 						f"{self.directiveName}: Job '{job.Name}' calls '{uses.FileName}' at ref '{uses.Reference}', but the "
 						f"documentation describes ref '{ref}' ({uses.Location}).",
 						location=(self.env.docname, self.lineno),
-						type="gha",
+						type="ghactions",
 						subtype="ref"
 					)
 
@@ -565,8 +566,8 @@ def resolveLinks(sphinx: Sphinx, doctree: nodes.document, docname: str) -> None:
 	Call-back for Sphinx' ``doctree-resolved`` event, linking the jobs of a pipeline graph to their reusable workflows.
 
 	A job calling a reusable workflow of the documented repository links to the page documenting that workflow, as the
-	``gha`` domain resolves the workflow's file stem with ``ResolveWorkflow``. Without a page for the workflow, or in a
-	format other than HTML, the job has no link.
+	``ghactions`` domain resolves the workflow's file stem with ``ResolveWorkflow``. Without a page for the workflow, or
+	in a format other than HTML, the job has no link.
 
 	:param sphinx:  The Sphinx application.
 	:param doctree: The resolved document.
@@ -579,7 +580,7 @@ def resolveLinks(sphinx: Sphinx, doctree: nodes.document, docname: str) -> None:
 
 		return
 
-	domain = sphinx.env.get_domain("gha")
+	domain = sphinx.env.get_domain("ghactions")
 
 	def link(match: Match[str]) -> str:
 		"""

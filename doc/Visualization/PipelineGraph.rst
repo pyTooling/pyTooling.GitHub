@@ -3,15 +3,15 @@
 Pipeline Graph
 ##############
 
-The jobs of a workflow and their ``needs`` form a graph. The ``gha`` domain draws it in a Sphinx documentation, so the
-domain has to be enabled - see :ref:`GHA`.
+The jobs of a workflow and their ``needs`` form a graph. The ``ghactions`` domain draws it in a Sphinx documentation, so
+the domain has to be enabled - see :ref:`GHA`.
 
 .. grid:: 2
 
    .. grid-item::
       :columns: 6
 
-      The ``gha:pipeline-graph`` directive draws the pipeline of a GitHub Actions workflow - its jobs and their
+      The ``ghactions:pipeline-graph`` directive draws the pipeline of a GitHub Actions workflow - its jobs and their
       ``needs`` - from the workflow file itself:
 
       * a job is a node labelled with its name and the file of the reusable workflow it calls;
@@ -34,18 +34,18 @@ domain has to be enabled - see :ref:`GHA`.
 
       .. code-block:: ReST
 
-         .. gha:pipeline-graph:: Workflows/Pipeline.yml
+         .. ghactions:pipeline-graph:: Workflows/Pipeline.yml
             :depth: 1
             :caption: The pipeline of Pipeline.yml.
 
 This is how the example renders, drawn from :download:`Workflows/Pipeline.yml` and
 :download:`Workflows/Test.yml`:
 
-.. gha:pipeline-graph:: Workflows/Pipeline.yml
+.. ghactions:pipeline-graph:: Workflows/Pipeline.yml
    :depth: 1
    :caption: The pipeline of Pipeline.yml.
 
-.. rst:directive:: .. gha:pipeline-graph:: <path of a workflow file>
+.. rst:directive:: .. ghactions:pipeline-graph:: <path of a workflow file>
 
    Draws the workflow the argument names, relative to the document.
 
@@ -92,18 +92,18 @@ A reusable workflow is called by a reference like ``pyTooling/Actions/.github/wo
 .. code-block:: Python
 
    # doc/conf.py
-   gha_repository =         "pyTooling/Actions"
-   gha_workflow_directory = "../.github/workflows"
-   gha_ref =                "r8"
+   ghactions_repository =         "pyTooling/Actions"
+   ghactions_workflow_directory = "../.github/workflows"
+   ghactions_ref =                "r8"
 
 The graph reads the configuration values of the domain (:ref:`GHA/Config`), and its workflow files
 through the domain, which reads every file once per build:
 
-* The reusable workflows of :confval:`gha_repository` are expanded and linked, whatever the ref they are called at.
-  Without it, only local references like ``./.github/workflows/Test.yml`` are.
-* Without :confval:`gha_workflow_directory`, they are read from the directory of the drawn workflow file.
-* A job calling a reusable workflow of the documented repository at another ref than :confval:`gha_ref` is a warning
-  of type ``gha.ref``. Without it, refs aren't checked.
+* The reusable workflows of :confval:`ghactions_repository` are expanded and linked, whatever the ref they are called
+  at. Without it, only local references like ``./.github/workflows/Test.yml`` are.
+* Without :confval:`ghactions_workflow_directory`, they are read from the directory of the drawn workflow file.
+* A job calling a reusable workflow of the documented repository at another ref than :confval:`ghactions_ref` is a
+  warning of type ``ghactions.ref``. Without it, refs aren't checked.
 
-A job links to the page the ``gha`` domain documents its reusable workflow on. Without such a page, and in a format
-other than HTML, the job has no link.
+A job links to the page the ``ghactions`` domain documents its reusable workflow on. Without such a page, and in a
+format other than HTML, the job has no link.

@@ -72,5 +72,5 @@ Actions a Step Runs
 * :meth:`~pyTooling.GitHub.WorkflowFile.WorkflowResolver.LoadAction` reads an action's file by its path. Every file is
   read once; reading it again returns the same :class:`~pyTooling.GitHub.WorkflowFile.Action`.
 
-The ``gha`` domain's :ref:`GHA/Dependencies` lists a composite action with the actions its steps run, and a Docker
+The ``ghactions`` domain's :ref:`GHA/Dependencies` lists a composite action with the actions its steps run, and a Docker
 action with its image, as read this way.

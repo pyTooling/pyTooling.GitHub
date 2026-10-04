@@ -16,7 +16,7 @@ Glossary
 
    Domain
      A `Sphinx domain <https://www.sphinx-doc.org/en/master/usage/domains/index.html>`__ groups the directives and roles
-     describing objects of one kind, under a name like ``py`` or ``gha``. See :ref:`GHA`.
+     describing objects of one kind, under a name like ``py`` or ``ghactions``. See :ref:`GHA`.
 
    DOT
      The `graph description language <https://graphviz.org/doc/info/lang.html>`__ of Graphviz, which the

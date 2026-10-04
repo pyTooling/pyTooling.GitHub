@@ -57,10 +57,10 @@ option need:
 
 .. _DEP/sphinx:
 
-Sphinx Domain ``gha`` (Optional)
-********************************
+Sphinx Domain ``ghactions`` (Optional)
+**************************************
 
-When installed as ``pyTooling.GitHub[sphinx]``, which the :ref:`gha domain <GHA>` needs. pyTooling.Sphinx requires
+When installed as ``pyTooling.GitHub[sphinx]``, which the :ref:`ghactions domain <GHA>` needs. pyTooling.Sphinx requires
 Python 3.12 or newer, because Sphinx 9.1 does.
 
 .. The extra isn't on PyPI yet, which 'dependency-table' reads extras from. Replace this table by

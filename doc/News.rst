@@ -18,7 +18,7 @@ Version 0.x (2026)
      :doc:`pyTooling <pyTool:index>` v10.0.0).
    * Data models: :ref:`pipeline runs <DATA/PipelineRun>` read from the GitHub REST API, :ref:`workflow files
      <DATA/Workflow>` and :ref:`action files <DATA/Action>`.
-   * The Sphinx domain :ref:`gha <GHA>` documents workflows and their parameters from the workflow files.
+   * The Sphinx domain :ref:`ghactions <GHA>` documents workflows and their parameters from the workflow files.
    * Visualization: the :ref:`pipeline graph <VIS/PipelineGraph>` of a workflow, and the :ref:`trace of a pipeline run
      <VIS/PipelineTrace>` as OTLP/JSON and as a Gantt chart.
    * The program :ref:`pytooling-github <CLI>` reads a pipeline run into a trace, writes it, and draws it.
