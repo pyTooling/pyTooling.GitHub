@@ -34,12 +34,11 @@ It builds on `pyTooling <https://GitHub.com/pyTooling/pyTooling>`__'s generic CI
    The Sphinx domain ``gha`` in :mod:`pyTooling.GitHub.Sphinx` requires :doc:`pyTooling.Sphinx <pyToolSphinx:index>`,
    and thus **Python 3.12 or newer**, because Sphinx 9.1 requires Python 3.12.
 
-The package is installed from PyPI, with the extras ``diagram`` (matplotlib, for Gantt charts) and ``sphinx``
-(pyTooling.Sphinx, for the domain ``gha``):
+The package is installed from PyPI:
 
 .. code-block:: bash
 
-   pip install pyTooling.GitHub[diagram,sphinx]
+   pip install pyTooling.GitHub
 
 
 .. _FEATURES:
@@ -66,7 +65,13 @@ Traces
 Sphinx domain ``gha``
 =====================
 
-The domain is enabled in :file:`conf.py`; it sets up pyTooling.Sphinx itself:
+The domain needs the extra ``sphinx``, which installs pyTooling.Sphinx:
+
+.. code-block:: bash
+
+   pip install pyTooling.GitHub[sphinx]
+
+It is enabled in :file:`conf.py`, and sets up pyTooling.Sphinx itself:
 
 .. code-block:: Python
 
@@ -87,6 +92,12 @@ The domain is enabled in :file:`conf.py`; it sets up pyTooling.Sphinx itself:
 
 Program
 =======
+
+Gantt charts need the extra ``diagram``, which installs matplotlib:
+
+.. code-block:: bash
+
+   pip install pyTooling.GitHub[diagram]
 
 :ref:`pytooling-github <CLI>`
   |rarr| The command ``pipeline`` reads a pipeline run into a trace, writes it, and draws it as a Gantt chart.
