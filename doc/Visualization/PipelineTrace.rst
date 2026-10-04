@@ -134,5 +134,5 @@ The drawing needs the extra ``diagram`` (see :ref:`DEP/diagram`). The program dr
    :alt: Gantt chart of a pyTooling.GitHub pipeline run
    :width: 100%
 
-   A run of pyTooling.GitHub's own pipeline (`run 37187783003
-   <https://github.com/pyTooling/pyTooling.GitHub/actions/runs/37187783003>`__), drawn as above.
+   A run of pyTooling.GitHub's own pipeline
+   (:gh:`run 37187783003 <pyTooling/pyTooling.GitHub/actions/runs/37187783003>`), drawn as above.

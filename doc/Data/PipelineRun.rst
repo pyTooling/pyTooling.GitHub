@@ -102,7 +102,7 @@ answers it without a search:
    GitHub reports about it - not its YAML file, not the ``@ref`` the caller pinned it at, and not the repository it
    lives in when that differs from the caller's. Neither the runs nor the jobs payload holds any of it, so filling
    it in means reading the caller's workflow file and resolving its ``uses:`` entries, which is a different source
-   than this model reads. `Issue #408 <https://github.com/pyTooling/pyTooling/issues/408>`__ describes what is
+   than this model reads. :gh:`Issue #408 <pyTooling/pyTooling/issues/408>` describes what is
    missing and how it could be supplied.
 
 * **A reusable workflow may call another**, and a job's name carries the whole caller chain, so the tree nests as

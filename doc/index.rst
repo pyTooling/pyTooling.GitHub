@@ -25,8 +25,8 @@ reads the runs of a pipeline from GitHub's REST API, and converts them into trac
 or a Gantt chart of the jobs and steps. A Sphinx domain ``ghactions`` documents workflows and their inputs, outputs and
 secrets taken straight from the workflow files.
 
-It builds on `pyTooling <https://GitHub.com/pyTooling/pyTooling>`__'s generic CI pipeline model and tracing, and on
-`pyTooling.Sphinx <https://GitHub.com/pyTooling/pyTooling.Sphinx>`__ for its documentation extensions.
+It builds on :gh:`pyTooling <pyTooling/pyTooling>`'s generic CI pipeline model and tracing, and on
+:gh:`pyTooling.Sphinx <pyTooling/pyTooling.Sphinx>` for its documentation extensions.
 
 
 .. attention::
@@ -113,7 +113,7 @@ Consumers
 
 This layer is used by:
 
-* 🚧 `pyTooling/Actions <https://GitHub.com/pyTooling/Actions>`__ - its documentation of the job templates will use the
+* 🚧 :gh:`pyTooling/Actions <pyTooling/Actions>` - its documentation of the job templates will use the
   ``ghactions`` domain.
 
 
@@ -123,7 +123,7 @@ Contributors
 ************
 
 * :gh:`Patrick Lehmann <Paebbels>` (Maintainer)
-* `and more... <https://GitHub.com/pyTooling/pyTooling.GitHub/graphs/contributors>`__
+* :gh:`and more... <pyTooling/pyTooling.GitHub/graphs/contributors>`
 
 
 .. _LICENSE:
