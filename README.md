@@ -22,6 +22,74 @@ It builds on [pyTooling](https://GitHub.com/pyTooling/pyTooling)'s generic CI pi
 [pyTooling.Sphinx](https://GitHub.com/pyTooling/pyTooling.Sphinx) for its documentation extensions.
 
 
+> [!IMPORTANT]
+> The Sphinx domain `gha` in `pyTooling.GitHub.Sphinx` requires [pyTooling.Sphinx][pyTooling.Sphinx], and thus
+> **Python 3.12 or newer**, because Sphinx 9.1 requires Python 3.12.
+
+The package is installed from PyPI:
+
+```bash
+pip install pyTooling.GitHub
+```
+
+
+## Features
+
+### Data models
+
+* [Pipeline runs][PipelineRun] - A GitHub Actions workflow run - pipeline, workflows, matrices, jobs and steps with
+  their times and outcomes - read from the GitHub REST API's payloads.
+* [Workflow files][WorkflowFile] - A workflow file: triggers, inputs, outputs, secrets, permissions and jobs with their
+  dependencies, read with line numbers, and converted into a pipeline graph.
+
+### Traces
+
+* [GitHub Actions trace reader][Tracing] - Reads a workflow run through the GitHub REST API into a trace, written as
+  OpenTelemetry's OTLP/JSON.
+
+### Sphinx domain `gha`
+
+The domain needs the extra `sphinx`, which installs pyTooling.Sphinx:
+
+```bash
+pip install pyTooling.GitHub[sphinx]
+```
+
+It is enabled in `conf.py`, and sets up pyTooling.Sphinx itself:
+
+```python
+# doc/conf.py
+extensions = [
+  ...,
+  "pyTooling.GitHub.Sphinx",
+]
+```
+
+* [Workflows and their parameters][GHA] - `gha:workflow`, `gha:input`, `gha:output`, `gha:secret` and
+  `gha:autoinputs`, taken straight from the workflow file; roles to reference them.
+* [Tables and listings][GHA] - `gha:parameter-table`, `gha:interface`, `gha:dependencies` and `gha:yaml`.
+* [Pipeline graph][GHA] - `gha:pipeline-graph` draws the jobs of a workflow and their `needs` as a Graphviz graph,
+  with the reusable workflows it calls expanded.
+
+### Program
+
+Gantt charts need the extra `diagram`, which installs matplotlib:
+
+```bash
+pip install pyTooling.GitHub[diagram]
+```
+
+* [pytooling-github][CLI] - The command `pipeline` reads a pipeline run into a trace, writes it, and draws it as a
+  Gantt chart.
+
+[PipelineRun]: https://pyTooling.github.io/pyTooling.GitHub/PipelineRun.html
+[WorkflowFile]: https://pyTooling.github.io/pyTooling.GitHub/WorkflowFile.html
+[Tracing]: https://pyTooling.github.io/pyTooling.GitHub/Tracing.html
+[GHA]: https://pyTooling.github.io/pyTooling.GitHub/GHA/index.html
+[CLI]: https://pyTooling.github.io/pyTooling.GitHub/CLI.html
+[pyTooling.Sphinx]: https://pyTooling.github.io/pyTooling.Sphinx/
+
+
 ## Contributors
 
 * [Patrick Lehmann](https://GitHub.com/Paebbels) (Maintainer)

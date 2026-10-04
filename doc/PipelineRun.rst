@@ -1,4 +1,4 @@
-.. _DATA/Run:
+.. _DATA/PipelineRun:
 
 GitHub Actions
 ##############
@@ -16,7 +16,7 @@ GitHub Actions
      print(f"  {job.Name:<20} queued {job.QueueDuration} s, ran {job.Duration} s on {job.Labels}")
 
 
-.. _DATA/Run/Tree:
+.. _DATA/PipelineRun/Tree:
 
 The Tree
 ********
@@ -132,7 +132,7 @@ answers it without a search:
   at all, and its matrix stays invisible.
 
 
-.. _DATA/Run/Strings:
+.. _DATA/PipelineRun/Strings:
 
 Strings Become Enumerations
 ***************************
@@ -150,7 +150,7 @@ Timestamps are parsed once, and a timestamp without a time zone is read as UTC, 
 compared with every other.
 
 
-.. _DATA/Run/Commit:
+.. _DATA/PipelineRun/Commit:
 
 Several Pipelines per Commit
 ****************************

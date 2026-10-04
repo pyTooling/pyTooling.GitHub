@@ -4,7 +4,7 @@ GitHub Actions Workflow Files
 #############################
 
 :mod:`pyTooling.GitHub.WorkflowFile` models a **GitHub Actions workflow file** - the YAML file below
-:file:`.github/workflows`, not a run of it (that's :ref:`DATA/Run`):
+:file:`.github/workflows`, not a run of it (that's :ref:`DATA/PipelineRun`):
 
 .. code-block:: python
 
@@ -17,7 +17,7 @@ GitHub Actions Workflow Files
    for job in workflow.IterateJobs():
      print(f"  {job.Name:<24} {job.Uses or job.RunsOn}  needs {', '.join(job.NeedNames)}")
 
-The file is read with ``ruamel.yaml``, so the module needs the ``github`` extra - see :ref:`DEP`.
+The file is read with ``ruamel.yaml``, a requirement of this package.
 
 
 .. _DATA/Workflow/Tree:
@@ -220,7 +220,7 @@ expanding the workflows its jobs call as far as a resolver reads them and ``dept
 Linking a Run
 *************
 
-A run read from the GitHub REST API (:ref:`DATA/Run`) has no ``needs``: the API doesn't report them.
+A run read from the GitHub REST API (:ref:`DATA/PipelineRun`) has no ``needs``: the API doesn't report them.
 :meth:`~pyTooling.GitHub.WorkflowFile.Workflow.ApplyNeeds` gives a run the dependencies its workflow file - named by
 :attr:`Pipeline.Path <pyTooling.GitHub.Pipeline.Path>` - declares:
 
