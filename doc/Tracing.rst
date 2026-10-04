@@ -25,7 +25,7 @@ or lasts as long as a ``Retry-After`` header demands, up to a minute. HTTP 401, 
 
 :meth:`WorkflowRunTrace.FromJSON <pyTooling.GitHub.Tracing.WorkflowRunTrace.FromJSON>` does the conversion alone,
 for a run and jobs that were fetched another way. It is a class method, so converting needs no reader and therefore
-no token. It reads both payloads into a :class:`~pyTooling.GitHub.Pipeline` - see :ref:`DATA/Run` - and hands
+no token. It reads both payloads into a :class:`~pyTooling.GitHub.Pipeline` - see :ref:`DATA/PipelineRun` - and hands
 that to :meth:`~pyTooling.GitHub.Tracing.WorkflowRunTrace.FromPipeline`, which is the entry point when the model
 was built elsewhere. Reading the payloads is therefore the model's job, and a field GitHub doesn't document raises
 :exc:`~pyTooling.GitHub.GitHubError` - as does an answer the reader itself can't read, so everything GitHub says
@@ -76,7 +76,7 @@ the attribute keys, and skipping what the service doesn't report - is
 
 What the payloads *say* is the model's, including the two facts a timeline depends on: a group's elements come in
 the order they were queued, and a job's times contain its steps, because GitHub reports both in whole seconds and a
-step is sometimes reported as running outside the job holding it - see :ref:`DATA/Run`.
+step is sometimes reported as running outside the job holding it - see :ref:`DATA/PipelineRun`.
 
 GitHub reports timestamps in whole seconds. A step shorter than a second lasts zero seconds, and an end reported a
 second before its begin is moved to the begin.

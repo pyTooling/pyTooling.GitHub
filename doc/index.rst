@@ -31,8 +31,8 @@ It builds on `pyTooling <https://GitHub.com/pyTooling/pyTooling>`__'s generic CI
 
 .. attention::
 
-   pyTooling.GitHub requires **Python 3.11 or newer**. The Sphinx domain ``gha`` requires pyTooling.Sphinx, and thus
-   Python 3.12 or newer.
+   The Sphinx domain ``gha`` in :mod:`pyTooling.GitHub.Sphinx` requires :doc:`pyTooling.Sphinx <pyToolSphinx:index>`,
+   and thus **Python 3.12 or newer**, because Sphinx 9.1 requires Python 3.12.
 
 The package is installed from PyPI, with the extras ``diagram`` (matplotlib, for Gantt charts) and ``sphinx``
 (pyTooling.Sphinx, for the domain ``gha``):
@@ -40,6 +40,31 @@ The package is installed from PyPI, with the extras ``diagram`` (matplotlib, for
 .. code-block:: bash
 
    pip install pyTooling.GitHub[diagram,sphinx]
+
+
+.. _FEATURES:
+
+Features
+********
+
+Data models
+===========
+
+:ref:`Pipeline runs <DATA/PipelineRun>`
+  |rarr| A GitHub Actions workflow run - pipeline, workflows, matrices, jobs and steps with their times and outcomes -
+  read from the GitHub REST API's payloads.
+:ref:`Workflow files <DATA/Workflow>`
+  |rarr| A workflow file: triggers, inputs, outputs, secrets, permissions and jobs with their dependencies, read with
+  line numbers, and converted into a pipeline graph.
+
+Traces
+======
+
+:ref:`GitHub Actions trace reader <TRACING/CI/GitHub>`
+  |rarr| Reads a workflow run through the GitHub REST API into a trace, written as OpenTelemetry's OTLP/JSON.
+
+Sphinx domain ``gha``
+=====================
 
 The domain is enabled in :file:`conf.py`; it sets up pyTooling.Sphinx itself:
 
@@ -51,28 +76,6 @@ The domain is enabled in :file:`conf.py`; it sets up pyTooling.Sphinx itself:
      "pyTooling.GitHub.Sphinx",
    ]
 
-
-.. _HIGHLIGHTS:
-
-Features
-********
-
-.. rubric:: Data models
-
-:ref:`Workflow runs <DATA/Run>`
-  |rarr| A GitHub Actions workflow run - pipeline, workflows, matrices, jobs and steps with their times and outcomes -
-  read from the GitHub REST API's payloads.
-:ref:`Workflow files <DATA/Workflow>`
-  |rarr| A workflow file: triggers, inputs, outputs, secrets, permissions and jobs with their dependencies, read with
-  line numbers, and converted into a pipeline graph.
-
-.. rubric:: Traces
-
-:ref:`GitHub Actions trace reader <TRACING/CI/GitHub>`
-  |rarr| Reads a workflow run through the GitHub REST API into a trace, written as OpenTelemetry's OTLP/JSON.
-
-.. rubric:: Sphinx domain ``gha``
-
 :ref:`Workflows and their parameters <GHA/Workflow>`
   |rarr| ``gha:workflow``, ``gha:input``, ``gha:output``, ``gha:secret`` and ``gha:autoinputs``, taken straight from
   the workflow file; roles to reference them.
@@ -82,7 +85,8 @@ Features
   |rarr| ``gha:pipeline-graph`` draws the jobs of a workflow and their ``needs`` as a Graphviz graph, with the
   reusable workflows it calls expanded.
 
-.. rubric:: Program
+Program
+=======
 
 :ref:`pytooling-github <CLI>`
   |rarr| The command ``pipeline`` reads a pipeline run into a trace, writes it, and draws it as a Gantt chart.
@@ -129,7 +133,7 @@ License
    :caption: Features
    :hidden:
 
-   Run
+   PipelineRun
    WorkflowFile
    Tracing
    GHA/index

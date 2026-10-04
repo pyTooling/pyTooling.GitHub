@@ -190,9 +190,10 @@ extensions = [
 # Sphinx.Ext.InterSphinx
 # ==============================================================================
 intersphinx_mapping = {
-	"python":  ("https://docs.python.org/3", None),
-	"pyTool":  ("https://pyTooling.github.io/pyTooling/", None),
-	"sphinx":  ("https://www.sphinx-doc.org/en/master", None),
+	"python":       ("https://docs.python.org/3", None),
+	"pyTool":       ("https://pyTooling.github.io/pyTooling/", None),
+	"pyToolSphinx": ("https://pyTooling.github.io/pyTooling.Sphinx/", None),
+	"sphinx":       ("https://www.sphinx-doc.org/en/master", None),
 }
 
 
