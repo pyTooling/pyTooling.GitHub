@@ -1,29 +1,21 @@
-.. include:: shields.inc
-
-.. image:: _static/logo.png
-   :height: 90 px
-   :align: center
-   :target: https://GitHub.com/pyTooling/pyTooling.GitHub
-
-.. raw:: html
-
-    <br>
-
 .. raw:: latex
 
    \part{Introduction}
 
-.. only:: html
+.. shields::
+   :github:                pyTooling/pyTooling.GitHub
+   :pypi:                  pyTooling.GitHub
+   :codacy:                e56604e36cf04f6090e0b171e948c1fa
+   :source-license:        github:LICENSE.md
+   :documentation-license: CC-BY-4.0 github:doc/Doc-License.rst
+   :github-action:         Pipeline.yml@main
+   :documentation:         github-pages
 
-   |  |SHIELD:svg:GitHub-github| |SHIELD:svg:GitHub-src-license| |SHIELD:svg:GitHub-ghp-doc| |SHIELD:svg:GitHub-doc-license|
-   |  |SHIELD:svg:GitHub-pypi-tag| |SHIELD:svg:GitHub-pypi-status| |SHIELD:svg:GitHub-pypi-python|
-   |  |SHIELD:svg:GitHub-gha-test| |SHIELD:svg:GitHub-lib-status| |SHIELD:svg:GitHub-codecov-coverage|
+   github, src-license, ghp-doc, doc-license
+   pypi-tag, pypi-status, pypi-python
+   github-action, lib-status, codacy-quality, codacy-coverage, codecov-coverage
 
-.. only:: latex
-
-   |SHIELD:png:GitHub-github| |SHIELD:png:GitHub-src-license| |SHIELD:png:GitHub-ghp-doc| |SHIELD:png:GitHub-doc-license|
-   |SHIELD:png:GitHub-pypi-tag| |SHIELD:png:GitHub-pypi-status| |SHIELD:png:GitHub-pypi-python|
-   |SHIELD:png:GitHub-gha-test| |SHIELD:png:GitHub-lib-status| |SHIELD:png:GitHub-codecov-coverage|
+--------------------------------------------------------------------------------
 
 The pyTooling.GitHub Documentation
 ##################################
@@ -66,7 +58,7 @@ License
 .. toctree::
    :hidden:
 
-   Used as a layer of pyTooling ➚ <https://pyTooling.github.io/pyTooling/>
+   Subnamespace of pyTooling ➚ <https://pyTooling.github.io/pyTooling/>
 
 .. toctree::
    :caption: Introduction
