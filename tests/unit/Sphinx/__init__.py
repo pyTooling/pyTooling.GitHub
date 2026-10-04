@@ -29,38 +29,8 @@
 # ==================================================================================================================== #
 #
 """
-Package installer for 'Working with GitHub pipelines - workflow files, action files, convert pipeline runs to (OTLP)
-traces'.
+Unit tests for the Sphinx extension :mod:`pyTooling.GitHub.Sphinx`, each built in a small Sphinx project.
+
+The package itself declares no code; its members are tested per module, e.g. in
+:mod:`tests.unit.Sphinx.Domain`.
 """
-from setuptools          import setup
-
-from pathlib             import Path
-from pyTooling.Packaging import DescribePythonPackageHostedOnGitHub
-
-gitHubNamespace =        "pyTooling"
-packageName =            "pyTooling.GitHub"
-packageDirectory =       packageName.replace(".", "/")
-packageInformationFile = Path(f"{packageDirectory}/__init__.py")
-
-setup(
-	**DescribePythonPackageHostedOnGitHub(
-		packageName=packageName,
-		description="Working with GitHub pipelines - workflow files, action files, convert pipeline runs to (OTLP) traces.",
-		gitHubNamespace=gitHubNamespace,
-		unittestRequirementsFile=Path("tests/requirements.txt"),
-		sourceFileWithVersion=packageInformationFile,
-		developmentStatus="alpha",
-		pythonVersions=("3.11", "3.12", "3.13", "3.14"),
-		additionalRequirements={
-			"diagram": ["matplotlib >= 3.10"],
-			"sphinx":  ["pyTooling.Sphinx @ git+https://github.com/pyTooling/pyTooling.Sphinx.git@dev"],
-		},
-		consoleScripts={
-			"pytooling-github": "pyTooling.GitHub.CLI:main"
-		},
-		dataFiles={
-			packageName: ["py.typed"]
-		},
-		debug=True
-	)
-)

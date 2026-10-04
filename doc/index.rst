@@ -74,6 +74,16 @@ License
 
    Installation
 
+.. toctree::
+   :caption: Features
+   :hidden:
+
+   Run
+   WorkflowFile
+   Tracing
+   GHA/index
+   CLI
+
 .. raw:: latex
 
    \part{References and Reports}

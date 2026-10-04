@@ -29,38 +29,10 @@
 # ==================================================================================================================== #
 #
 """
-Package installer for 'Working with GitHub pipelines - workflow files, action files, convert pipeline runs to (OTLP)
-traces'.
+Application tests for the :program:`pytooling-github` program: the installed console script, run as a user runs it.
+
+The unit tests in :mod:`tests.unit.CLI` construct :class:`~pyTooling.GitHub.CLI.Application` in-process and call it,
+which covers the handlers but not the packaging around them. These tests run the program as a separate process, so what
+is under test includes the ``console_scripts`` entry point :file:`setup.py` registers, the wheel that carries it,
+:data:`sys.argv` parsing and the exit codes the shell sees.
 """
-from setuptools          import setup
-
-from pathlib             import Path
-from pyTooling.Packaging import DescribePythonPackageHostedOnGitHub
-
-gitHubNamespace =        "pyTooling"
-packageName =            "pyTooling.GitHub"
-packageDirectory =       packageName.replace(".", "/")
-packageInformationFile = Path(f"{packageDirectory}/__init__.py")
-
-setup(
-	**DescribePythonPackageHostedOnGitHub(
-		packageName=packageName,
-		description="Working with GitHub pipelines - workflow files, action files, convert pipeline runs to (OTLP) traces.",
-		gitHubNamespace=gitHubNamespace,
-		unittestRequirementsFile=Path("tests/requirements.txt"),
-		sourceFileWithVersion=packageInformationFile,
-		developmentStatus="alpha",
-		pythonVersions=("3.11", "3.12", "3.13", "3.14"),
-		additionalRequirements={
-			"diagram": ["matplotlib >= 3.10"],
-			"sphinx":  ["pyTooling.Sphinx @ git+https://github.com/pyTooling/pyTooling.Sphinx.git@dev"],
-		},
-		consoleScripts={
-			"pytooling-github": "pyTooling.GitHub.CLI:main"
-		},
-		dataFiles={
-			packageName: ["py.typed"]
-		},
-		debug=True
-	)
-)
