@@ -1,7 +1,21 @@
+.. _VIS/PipelineTrace:
 .. _TRACING/CI/GitHub:
 
-GitHub Actions
-==============
+Pipeline Trace Diagram
+######################
+
+A pipeline run read into a **trace** - a timespan for the run, every called workflow, matrix, job and step - is written
+as OpenTelemetry's OTLP/JSON, which trace viewers read, or drawn as a Gantt chart.
+
+.. contents:: Contents of this page
+   :local:
+   :depth: 1
+
+
+.. _VIS/PipelineTrace/Reading:
+
+Reading a Run
+*************
 
 :class:`~pyTooling.GitHub.Tracing.WorkflowRunReader` reads a workflow run through the GitHub REST API, using the
 standard library only:
@@ -31,6 +45,11 @@ was built elsewhere. Reading the payloads is therefore the model's job, and a fi
 :exc:`~pyTooling.GitHub.GitHubError` - as does an answer the reader itself can't read, so everything GitHub says
 that can't be made sense of is one exception type. A request that *fails* is a
 :exc:`~pyTooling.REST.RESTError`, because nothing about GitHub's answer was wrong - there wasn't one.
+
+.. _VIS/PipelineTrace/Timespans:
+
+Timespans and Attributes
+************************
 
 The run becomes the trace, and every timespan below it is marked by :attr:`~pyTooling.Tracing.CI.CI.Span.Kind` with a
 member of :class:`~pyTooling.Tracing.CI.SpanKind`. Each kind is a class of its own - a
@@ -80,3 +99,41 @@ step is sometimes reported as running outside the job holding it - see :ref:`DAT
 
 GitHub reports timestamps in whole seconds. A step shorter than a second lasts zero seconds, and an end reported a
 second before its begin is moved to the begin.
+
+
+.. _VIS/PipelineTrace/Gantt:
+
+Gantt Chart
+***********
+
+pyTooling lays a trace out as a Gantt chart and draws it with matplotlib - see
+:external+pyTool:ref:`pyTooling's rendering <TRACING/Render>`. :func:`~pyTooling.Tracing.Render.ciSpanFilter`
+selects what a pipeline's chart shows:
+
+.. code-block:: python
+
+   from pyTooling.Tracing.Render            import GanttLayout, ciSpanFilter
+   from pyTooling.Tracing.Render.Matplotlib import MatplotlibRenderer
+
+   layout = GanttLayout(trace, spanFilter=ciSpanFilter())
+   MatplotlibRenderer(layout).Write(Path("report/Pipeline.svg"))
+
+* A row per job, below the rows of the called workflow and the matrix it belongs to. The time a job waited for a runner
+  is drawn in light gray in front of the time it ran, colored per runner image.
+* The legend carries the statistics per runner image: the number of jobs, and the shortest, average and longest
+  waiting and running times.
+* The steps are left out - a pipeline of 52 jobs has hundreds of them. ``excludeSteps=StepExclusion.Skipped`` shows
+  the steps that ran, ``excludeSteps=False`` every step. Skipped jobs are left out too, unless
+  ``excludeSkippedJobs=False``.
+* ``MatplotlibRenderer(layout, collapsible=True)`` writes an SVG file whose rows of called workflows and jobs can be
+  collapsed and expanded with a click.
+
+The drawing needs the extra ``diagram`` (see :ref:`DEP/diagram`). The program draws the same chart with
+``--gantt`` - see :ref:`CLI/Pipeline/Gantt`.
+
+.. figure:: Pipeline.svg
+   :alt: Gantt chart of a pyTooling.GitHub pipeline run
+   :width: 100%
+
+   A run of pyTooling.GitHub's own pipeline (`run 37187783003
+   <https://github.com/pyTooling/pyTooling.GitHub/actions/runs/37187783003>`__), drawn as above.
