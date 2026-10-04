@@ -81,7 +81,7 @@ License
    Run
    WorkflowFile
    Tracing
-   Sphinx
+   GHA/index
    CLI
 
 .. raw:: latex

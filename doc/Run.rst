@@ -1,4 +1,4 @@
-.. _CI/GitHub:
+.. _DATA/Run:
 
 GitHub Actions
 ##############
@@ -16,7 +16,7 @@ GitHub Actions
      print(f"  {job.Name:<20} queued {job.QueueDuration} s, ran {job.Duration} s on {job.Labels}")
 
 
-.. _CI/GitHub/Tree:
+.. _DATA/Run/Tree:
 
 The Tree
 ********
@@ -51,7 +51,7 @@ belongs to in :attr:`~pyTooling.CI.Base.Pipeline` - so reaching the run from any
    **The REST API reports no dependencies.** A run's jobs, matrices and called workflows have no
    :attr:`~pyTooling.CI.DependencyMixin.Needs` until they are added - from the ``needs:`` of the workflow file
    :attr:`~pyTooling.GitHub.Pipeline.Path` names - with :meth:`~pyTooling.CI.DependencyMixin.AddNeed`, or all at once
-   with :meth:`Workflow.ApplyNeeds <pyTooling.GitHub.WorkflowFile.Workflow.ApplyNeeds>` (:ref:`CI/Workflow/Run`).
+   with :meth:`Workflow.ApplyNeeds <pyTooling.GitHub.WorkflowFile.Workflow.ApplyNeeds>` (:ref:`DATA/Workflow/Run`).
 
 :meth:`~pyTooling.CI.JobGroup.IterateElements` yields what a group contains one level down: a workflow its
 jobs, its matrices and the workflows it calls, a matrix its instances; :meth:`~pyTooling.CI.Job.IterateSteps`
@@ -132,7 +132,7 @@ answers it without a search:
   at all, and its matrix stays invisible.
 
 
-.. _CI/GitHub/Strings:
+.. _DATA/Run/Strings:
 
 Strings Become Enumerations
 ***************************
@@ -150,7 +150,7 @@ Timestamps are parsed once, and a timestamp without a time zone is read as UTC, 
 compared with every other.
 
 
-.. _CI/GitHub/Commit:
+.. _DATA/Run/Commit:
 
 Several Pipelines per Commit
 ****************************

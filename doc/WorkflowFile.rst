@@ -1,10 +1,10 @@
-.. _CI/Workflow:
+.. _DATA/Workflow:
 
 GitHub Actions Workflow Files
 #############################
 
 :mod:`pyTooling.GitHub.WorkflowFile` models a **GitHub Actions workflow file** - the YAML file below
-:file:`.github/workflows`, not a run of it (that's :ref:`CI/GitHub`):
+:file:`.github/workflows`, not a run of it (that's :ref:`DATA/Run`):
 
 .. code-block:: python
 
@@ -20,7 +20,7 @@ GitHub Actions Workflow Files
 The file is read with ``ruamel.yaml``, so the module needs the ``github`` extra - see :ref:`DEP`.
 
 
-.. _CI/Workflow/Tree:
+.. _DATA/Workflow/Tree:
 
 The Tree
 ********
@@ -69,7 +69,7 @@ The Tree
   not evaluated.
 
 
-.. _CI/Workflow/Lines:
+.. _DATA/Workflow/Lines:
 
 Source Lines
 ************
@@ -88,13 +88,13 @@ and the line in :attr:`~pyTooling.GitHub.WorkflowFile.WorkflowError.Path` and
 :attr:`~pyTooling.GitHub.WorkflowFile.WorkflowError.Line`, and names both in a note.
 
 
-.. _CI/Workflow/Graph:
+.. _DATA/Workflow/Graph:
 
 Dependencies Between Jobs
 *************************
 
 :attr:`Job.Needs <pyTooling.GitHub.WorkflowFile.Job.Needs>` resolves the names of ``needs`` to the jobs. The pipeline
-they form is built by :meth:`~pyTooling.GitHub.WorkflowFile.Workflow.ToPipeline` (see :ref:`CI/Workflow/Pipeline`)
+they form is built by :meth:`~pyTooling.GitHub.WorkflowFile.Workflow.ToPipeline` (see :ref:`DATA/Workflow/Pipeline`)
 and converted into a :class:`~pyTooling.Graph.Graph` by :meth:`~pyTooling.CI.Workflow.ToGraph`, whose edges read
 *needs*, and which by default drops a dependency a longer path already implies:
 
@@ -105,7 +105,7 @@ and converted into a :class:`~pyTooling.Graph.Graph` by :meth:`~pyTooling.CI.Wor
                                         (Local --> Prepare is implied)
 
 
-.. _CI/Workflow/Resolver:
+.. _DATA/Workflow/Resolver:
 
 Called Workflows
 ****************
@@ -138,7 +138,7 @@ its ``action.yml``, so the actions a composite action runs in turn are known:
   workflow or action.
 
 
-.. _CI/Workflow/Permissions:
+.. _DATA/Workflow/Permissions:
 
 Permissions
 ***********
@@ -159,7 +159,7 @@ When several elements declare a scope, the permission granting the most access i
 where that access is asked for.
 
 
-.. _CI/Workflow/Pipeline:
+.. _DATA/Workflow/Pipeline:
 
 Building a Pipeline
 *******************
@@ -215,12 +215,12 @@ expanding the workflows its jobs call as far as a resolver reads them and ``dept
 * A workflow calling itself, directly or through others, raises :exc:`~pyTooling.GitHub.WorkflowFile.WorkflowError`.
 
 
-.. _CI/Workflow/Run:
+.. _DATA/Workflow/Run:
 
 Linking a Run
 *************
 
-A run read from the GitHub REST API (:ref:`CI/GitHub`) has no ``needs``: the API doesn't report them.
+A run read from the GitHub REST API (:ref:`DATA/Run`) has no ``needs``: the API doesn't report them.
 :meth:`~pyTooling.GitHub.WorkflowFile.Workflow.ApplyNeeds` gives a run the dependencies its workflow file - named by
 :attr:`Pipeline.Path <pyTooling.GitHub.Pipeline.Path>` - declares:
 
@@ -249,7 +249,7 @@ A run read from the GitHub REST API (:ref:`CI/GitHub`) has no ``needs``: the API
   workflow the job ``Local`` calls.
 
 
-.. _CI/Workflow/Competitors:
+.. _DATA/Workflow/Competitors:
 
 Competing Solutions
 *******************
@@ -263,7 +263,7 @@ security problems, as a template injection or an unpinned action. :gh:`actionlin
 checks a file's syntax and expressions, the ``needs`` of its jobs and the inputs of the reusable workflows it calls.
 Both are installed from PyPI as command line tools, so a Python program gets their findings, not a model.
 
-.. _CI/Workflow/JSONSchema:
+.. _DATA/Workflow/JSONSchema:
 
 JSON Schema
 ===========
@@ -282,7 +282,7 @@ Source: the schemas of `SchemaStore <https://www.schemastore.org/github-workflow
 
 * The schema is used by editors too, so a file is checked the same way while it is written.
 
-.. _CI/Workflow/Generators:
+.. _DATA/Workflow/Generators:
 
 Workflow Generators
 ===================

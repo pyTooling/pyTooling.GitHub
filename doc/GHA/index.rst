@@ -1,4 +1,4 @@
-.. _DOC/Sphinx/GHA:
+.. _GHA:
 
 GitHub Actions Domain
 #####################
@@ -25,7 +25,7 @@ installed with the extra ``sphinx``: ``pyTooling.GitHub[sphinx]``.
    :depth: 1
 
 
-.. _DOC/Sphinx/GHA/Config:
+.. _GHA/Config:
 
 Configuration
 *************
@@ -61,10 +61,10 @@ Configuration
 .. confval:: gha_label_prefix
 
    The root of the ``:ref:`` labels the directives register besides their targets - see
-   :ref:`DOC/Sphinx/GHA/Labels`. ``None`` registers none. Default: ``"JOBTMPL"``.
+   :ref:`GHA/Labels`. ``None`` registers none. Default: ``"JOBTMPL"``.
 
 
-.. _DOC/Sphinx/GHA/Workflow:
+.. _GHA/Workflow:
 
 Workflows
 *********
@@ -94,7 +94,7 @@ Workflows
 A document using the workflow is read again, when the workflow file changed.
 
 
-.. _DOC/Sphinx/GHA/Parameters:
+.. _GHA/Parameters:
 
 Inputs, Outputs and Secrets
 ***************************
@@ -162,7 +162,7 @@ Inputs, Outputs and Secrets
       .. gha:autoinputs::
 
 
-.. _DOC/Sphinx/GHA/Summaries:
+.. _GHA/Summaries:
 
 Summaries
 *********
@@ -171,7 +171,7 @@ The directives below summarize the current workflow. Like the entries, they read
 drift from it.
 
 
-.. _DOC/Sphinx/GHA/ParameterTable:
+.. _GHA/ParameterTable:
 
 Parameter Tables
 ================
@@ -219,7 +219,7 @@ Parameter Tables
       none, is a table saying so.
 
 
-.. _DOC/Sphinx/GHA/Interface:
+.. _GHA/Interface:
 
 Interface
 =========
@@ -254,7 +254,7 @@ Interface
    Summarizes the contract of the current workflow with its caller.
 
 
-.. _DOC/Sphinx/GHA/Dependencies:
+.. _GHA/Dependencies:
 
 Dependencies
 ============
@@ -315,7 +315,7 @@ Dependencies
    ``gha.workflow``, and its item has no nested list.
 
 
-.. _DOC/Sphinx/GHA/YAML:
+.. _GHA/YAML:
 
 YAML Excerpts
 =============
@@ -362,7 +362,7 @@ YAML Excerpts
       A label to reference the code block by.
 
 
-.. _DOC/Sphinx/GHA/Roles:
+.. _GHA/Roles:
 
 Roles
 *****
@@ -385,7 +385,7 @@ Roles
    A target that isn't documented is a warning.
 
 
-.. _DOC/Sphinx/GHA/PipelineGraph:
+.. _GHA/PipelineGraph:
 
 Pipeline Graph
 **************
@@ -410,7 +410,7 @@ Pipeline Graph
       * the ``needs`` are the edges, without those a longer path implies.
 
       The workflow is read with :mod:`pyTooling.GitHub.WorkflowFile`, converted into a :mod:`pyTooling.CI` model
-      and its :class:`~pyTooling.Graph.Graph` (:ref:`CI/Workflow/Pipeline`), and drawn by :mod:`sphinx.ext.graphviz`.
+      and its :class:`~pyTooling.Graph.Graph` (:ref:`DATA/Workflow/Pipeline`), and drawn by :mod:`sphinx.ext.graphviz`.
       Every workflow file drawn becomes a dependency of the page.
 
    .. grid-item::
@@ -477,7 +477,7 @@ A reusable workflow is called by a reference like ``pyTooling/Actions/.github/wo
    gha_workflow_directory = "../.github/workflows"
    gha_ref =                "r8"
 
-The graph reads the configuration values of the domain (:ref:`DOC/Sphinx/GHA/Config`), and its workflow files
+The graph reads the configuration values of the domain (:ref:`GHA/Config`), and its workflow files
 through the domain, which reads every file once per build:
 
 * The reusable workflows of :confval:`gha_repository` are expanded and linked, whatever the ref they are called at.
@@ -490,7 +490,7 @@ A job links to the page the ``gha`` domain documents its reusable workflow on. W
 other than HTML, the job has no link.
 
 
-.. _DOC/Sphinx/GHA/Labels:
+.. _GHA/Labels:
 
 Labels of Existing Pages
 ************************
@@ -509,7 +509,7 @@ A parameter's section carries the anchor of its label, and the anchor docutils d
 the hand-written page lands on the same entry. A label still declared by hand next to the directive is a duplicate.
 
 
-.. _DOC/Sphinx/GHA/Warnings:
+.. _GHA/Warnings:
 
 Warnings
 ********
@@ -530,7 +530,7 @@ A workflow file that can't be found or read is a warning of type ``gha.workflow`
 directive without a preceding ``gha:workflow``.
 
 
-.. _DOC/Sphinx/GHA/API:
+.. _GHA/API:
 
 Extending the Domain
 ********************
