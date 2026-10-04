@@ -46,7 +46,7 @@ sub-span per step. The time a job waited for a runner is a separate timespan in 
 
 .. hint::
 
-   See :ref:`high-level help <TRACING/CI/GitHub>` for explanations and usage examples.
+   See :ref:`high-level help <VIS/PipelineTrace>` for explanations and usage examples.
 """
 from datetime                  import datetime
 from typing                    import Any, ClassVar, Iterable, Optional as Nullable, Self, Union

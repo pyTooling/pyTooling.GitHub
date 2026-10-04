@@ -1,7 +1,7 @@
 .. _DATA/PipelineRun:
 
-GitHub Actions
-##############
+Pipeline Run
+############
 
 :mod:`pyTooling.GitHub` models a **GitHub Actions workflow run**:
 

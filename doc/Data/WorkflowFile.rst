@@ -1,10 +1,11 @@
 .. _DATA/Workflow:
 
-GitHub Actions Workflow Files
-#############################
+Workflow File
+#############
 
 :mod:`pyTooling.GitHub.WorkflowFile` models a **GitHub Actions workflow file** - the YAML file below
-:file:`.github/workflows`, not a run of it (that's :ref:`DATA/PipelineRun`):
+:file:`.github/workflows`, not a run of it (that's :ref:`DATA/PipelineRun`). The actions its steps run are read by the
+same module, see :ref:`DATA/Action`:
 
 .. code-block:: python
 
@@ -39,10 +40,6 @@ The Tree
        +-- Step             a step of the job
            +-- UsesReference    the action the step runs
 
-   Action                   an action's file, 'action.yml'
-   +-- Step                 a step of a composite action
-       +-- UsesReference    the action the step runs
-
 * A workflow is named by its file's stem - ``CompletePipeline`` - because a caller names it that way in ``uses``.
   The ``name`` key is :attr:`~pyTooling.GitHub.WorkflowFile.Workflow.DisplayName`.
 * An input keeps the type its default is written with - ``'3.14'`` is a string, ``false`` a boolean - and a
@@ -62,9 +59,6 @@ The Tree
   known at run time only, as for ``include: ${{ fromJson(inputs.jobs) }}``.
 * A job's :attr:`~pyTooling.GitHub.WorkflowFile.Job.Container` and
   :attr:`~pyTooling.GitHub.WorkflowFile.Job.Services` are the images of the containers it runs in.
-* An action is named by its directory - ``ComputeRequirements`` for ``.github/actions/ComputeRequirements/action.yml``.
-  Of a composite action, the steps are read; of a Docker action, the
-  :attr:`~pyTooling.GitHub.WorkflowFile.Action.Image`.
 * Expressions - ``if``, ``runs-on: ${{ matrix.runs-on }}``, an output's ``value`` - are kept as written and are
   not evaluated.
 
@@ -74,7 +68,7 @@ The Tree
 Source Lines
 ************
 
-Every element knows the file it was read from - a workflow's or an action's - and the line it starts at, so a message
+Every element knows the file it was read from and the line it starts at, so a message
 can say where a finding comes from:
 
 .. code-block:: python
@@ -129,13 +123,7 @@ repository, whatever the ref:
 * A repository without a directory answers ``None``: its files are not fetched.
 * Every file is read once; resolving it again returns the same :class:`~pyTooling.GitHub.WorkflowFile.Workflow`.
 
-:meth:`~pyTooling.GitHub.WorkflowFile.WorkflowResolver.ResolveAction` reads the action a step runs the same way, from
-its ``action.yml``, so the actions a composite action runs in turn are known:
-
-* An action of a mapped repository - ``pyTooling/Actions/.github/actions/ComputeRequirements@r8`` - is read from the
-  repository's root, the directory holding the ``.github`` directory the mapped directory is in.
-* A local action - ``./.github/actions/ComputeRequirements`` - is read from the root of the repository of the calling
-  workflow or action.
+The resolver reads the actions the steps run too - see :ref:`DATA/Action/Resolver`.
 
 
 .. _DATA/Workflow/Permissions:
@@ -247,49 +235,3 @@ A run read from the GitHub REST API (:ref:`DATA/PipelineRun`) has no ``needs``: 
   condition may have been skipped in the run, so it isn't reported when it's missing. Every other job missing in the
   run is returned by its qualified name, as the run would name it: ``Local / Static`` for the job ``Static`` of the
   workflow the job ``Local`` calls.
-
-
-.. _DATA/Workflow/Competitors:
-
-Competing Solutions
-*******************
-
-No package on PyPI reads a workflow file into a Python object model. The packages below check a workflow file, or
-write one.
-
-Outside Python, :gh:`zizmor <zizmorcore/zizmor>` has typed models of workflows, actions and Dependabot files - the
-Rust crate `github-actions-models <https://crates.io/crates/github-actions-models>`__ - and checks a workflow for
-security problems, as a template injection or an unpinned action. :gh:`actionlint <rhysd/actionlint>`, written in Go,
-checks a file's syntax and expressions, the ``needs`` of its jobs and the inputs of the reusable workflows it calls.
-Both are installed from PyPI as command line tools, so a Python program gets their findings, not a model.
-
-.. _DATA/Workflow/JSONSchema:
-
-JSON Schema
-===========
-
-Source: the schemas of `SchemaStore <https://www.schemastore.org/github-workflow.json>`__, checked by
-`check-jsonschema <https://pypi.org/project/check-jsonschema/>`__.
-
-.. rubric:: Disadvantages
-
-* A file is validated against the schema. A program reading it gets nested dictionaries and lists.
-* Classes generated from the schema - e.g. by
-  `datamodel-code-generator <https://pypi.org/project/datamodel-code-generator/>`__ - are typed, but know neither the
-  line of an element nor its parent, and don't check the ``needs`` of a job.
-
-.. rubric:: Advantages
-
-* The schema is used by editors too, so a file is checked the same way while it is written.
-
-.. _DATA/Workflow/Generators:
-
-Workflow Generators
-===================
-
-Source: `github-actions-cdk <https://pypi.org/project/github-actions-cdk/>`__,
-`pygha <https://pypi.org/project/pygha/>`__.
-
-.. rubric:: Disadvantages
-
-* They write a workflow file from Python code, but don't read one.

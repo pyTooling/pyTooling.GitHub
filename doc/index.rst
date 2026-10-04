@@ -55,12 +55,8 @@ Data models
 :ref:`Workflow files <DATA/Workflow>`
   |rarr| A workflow file: triggers, inputs, outputs, secrets, permissions and jobs with their dependencies, read with
   line numbers, and converted into a pipeline graph.
-
-Traces
-======
-
-:ref:`GitHub Actions trace reader <TRACING/CI/GitHub>`
-  |rarr| Reads a workflow run through the GitHub REST API into a trace, written as OpenTelemetry's OTLP/JSON.
+:ref:`Action files <DATA/Action>`
+  |rarr| An action's file: how it runs, and the steps of a composite action with the actions they run in turn.
 
 Sphinx domain ``gha``
 =====================
@@ -84,11 +80,18 @@ It is enabled in :file:`conf.py`, and sets up pyTooling.Sphinx itself:
 :ref:`Workflows and their parameters <GHA/Workflow>`
   |rarr| ``gha:workflow``, ``gha:input``, ``gha:output``, ``gha:secret`` and ``gha:autoinputs``, taken straight from
   the workflow file; roles to reference them.
-:ref:`Tables and listings <GHA/ParameterTable>`
+:ref:`Summaries <GHA/Summaries>`
   |rarr| ``gha:parameter-table``, ``gha:interface``, ``gha:dependencies`` and ``gha:yaml``.
-:ref:`Pipeline graph <GHA/PipelineGraph>`
+
+Visualization
+=============
+
+:ref:`Pipeline graph <VIS/PipelineGraph>`
   |rarr| ``gha:pipeline-graph`` draws the jobs of a workflow and their ``needs`` as a Graphviz graph, with the
   reusable workflows it calls expanded.
+:ref:`Pipeline trace diagram <VIS/PipelineTrace>`
+  |rarr| Reads a workflow run through the GitHub REST API into a trace, written as OpenTelemetry's OTLP/JSON or drawn
+  as a Gantt chart.
 
 Program
 =======
@@ -101,6 +104,17 @@ Gantt charts need the extra ``diagram``, which installs matplotlib:
 
 :ref:`pytooling-github <CLI>`
   |rarr| The command ``pipeline`` reads a pipeline run into a trace, writes it, and draws it as a Gantt chart.
+
+
+.. _CONSUMERS:
+
+Consumers
+*********
+
+This layer is used by:
+
+* 🚧 `pyTooling/Actions <https://GitHub.com/pyTooling/Actions>`__ - its documentation of the job templates will use the
+  ``gha`` domain.
 
 
 .. _CONTRIBUTORS:
@@ -138,16 +152,42 @@ License
    :caption: Introduction
    :hidden:
 
+   News
    Installation
+   Dependency
+   CompetingSolutions
+
+.. raw:: latex
+
+   \part{Main Documentation}
 
 .. toctree::
-   :caption: Features
+   :caption: Data Models
    :hidden:
 
-   PipelineRun
-   WorkflowFile
-   Tracing
+   Data/PipelineRun
+   Data/WorkflowFile
+   Data/ActionFile
+
+.. toctree::
+   :caption: gha Domain
+   :hidden:
+
    GHA/index
+   GHA/Workflows
+   GHA/Summaries
+
+.. toctree::
+   :caption: Visualization
+   :hidden:
+
+   Visualization/PipelineGraph
+   Visualization/PipelineTrace
+
+.. toctree::
+   :caption: Program
+   :hidden:
+
    CLI
 
 .. raw:: latex
@@ -159,6 +199,11 @@ License
    :hidden:
 
    Python Class Reference <pyTooling.GitHub/pyTooling.GitHub>
+   unittests/index
+   coverage/index
+   CodeCoverage
+   Doc. Coverage Report <DocCoverage>
+   Static Type Check Report ➚ <typing/index>
 
 .. raw:: latex
 
@@ -170,5 +215,7 @@ License
 
    License
    Doc-License
+   Glossary
    genindex
    Python Module Index <modindex>
+   TODO

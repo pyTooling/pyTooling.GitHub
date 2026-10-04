@@ -1,7 +1,7 @@
 .. _CLI:
 
-Overview
-########
+pytooling-github
+################
 
 pyTooling.GitHub installs a program: :program:`pytooling-github`. It is the command line front-end to what the package
 models - reading a GitHub Actions pipeline run into a trace, writing that trace, rendering it - so a pipeline job can
@@ -28,7 +28,7 @@ registers, so it is on the path after :pycode:`pip install pyTooling.GitHub`.
 .. _CLI/Structure:
 
 How a command is declared
-#########################
+*************************
 
 The program is a :class:`~pyTooling.TerminalUI.TerminalApplication` **and** an
 :class:`~pyTooling.Attributes.ArgParse.ArgParseHelperMixin`, so it prints like the first and parses like the
@@ -60,7 +60,7 @@ same construction :program:`pyedaa-outputfilter` uses.
 .. _CLI/Errors:
 
 What a failure looks like
-#########################
+*************************
 
 :func:`~pyTooling.GitHub.CLI.main` runs the program inside a ``try ... except``, so a user of the program sees a message
 and a non-zero exit code rather than a traceback. A :exc:`~pyTooling.Exceptions.ToolingException` is printed with
@@ -77,7 +77,7 @@ package and every command line installing it, and reports no bug, because nothin
 .. _CLI/Pipeline:
 
 The ``pipeline`` command
-########################
+************************
 
 :pycode:`pytooling-github pipeline` reads one run of a CI pipeline into a :class:`~pyTooling.Tracing.Trace` and writes
 what was asked of it. Reading and writing are separate steps: the trace is the intermediate every output is
