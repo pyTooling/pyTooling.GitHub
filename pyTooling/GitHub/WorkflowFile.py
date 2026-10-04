@@ -1470,6 +1470,7 @@ class Job(Base[Workflow]):
 		runsOn = mapping.get("runs-on", ())
 		if isinstance(runsOn, dict):
 			runsOn = runsOn.get("labels", ())
+
 		if isinstance(runsOn, str):
 			runsOn = (runsOn, )
 
@@ -1540,6 +1541,7 @@ class Job(Base[Workflow]):
 			for serviceName, service in serviceMap.items():
 				if isinstance(service, CommentedMap):
 					service = service.get("image", None)
+
 				if service is not None:
 					services[str(serviceName)] = str(service)
 
