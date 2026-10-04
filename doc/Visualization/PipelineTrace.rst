@@ -1,5 +1,4 @@
 .. _VIS/PipelineTrace:
-.. _TRACING/CI/GitHub:
 
 Pipeline Trace Diagram
 ######################

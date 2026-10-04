@@ -1,5 +1,4 @@
 .. _VIS/PipelineGraph:
-.. _GHA/PipelineGraph:
 
 Pipeline Graph
 ##############
