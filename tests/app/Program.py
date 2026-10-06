@@ -32,7 +32,6 @@
 The commands of the :program:`pytooling-github` program, run as the installed console script.
 """
 from json                 import loads as json_loads
-from os                   import environ
 from pathlib              import Path
 from re                   import search
 from subprocess           import CompletedProcess
@@ -49,17 +48,18 @@ if __name__ == "__main__":  # pragma: no cover
 	exit(1)
 
 
-def environmentWithout(*names: str) -> dict[str, str]:
+def environmentWithout(*names: str) -> dict[str, None]:
 	"""
-	Return this process's environment without the given variables.
+	Return the environment changes removing the given variables from the program's environment.
 
 	The ``pipeline`` command falls back to the variables a workflow sets, and these tests run inside such a
-	workflow, so the fallback has to be taken away to see what the command does without it.
+	workflow, so the fallback has to be taken away to see what the command does without it. ``RunEntrypoint`` merges
+	the given variables into this process's environment, and removes those whose value is ``None``.
 
-	:param names: Names of the variables to leave out.
-	:returns:     The environment to run the program in.
+	:param names: Names of the variables to remove.
+	:returns:     The variables mapped to ``None``.
 	"""
-	return {name: value for name, value in environ.items() if name not in names}
+	return {name: None for name in names}
 
 
 class ProgramMixin:
