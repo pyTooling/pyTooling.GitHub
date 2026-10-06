@@ -32,7 +32,6 @@
 The commands of the :program:`pytooling-github` program, run as the installed console script.
 """
 from json                 import loads as json_loads
-from os                   import environ
 from pathlib              import Path
 from re                   import search
 from subprocess           import CompletedProcess
@@ -47,19 +46,6 @@ if __name__ == "__main__":  # pragma: no cover
 	print("ERROR: you called a testcase declaration file as an executable module.")
 	print("Use: 'python -m unittest <testcase module>'")
 	exit(1)
-
-
-def environmentWithout(*names: str) -> dict[str, str]:
-	"""
-	Return this process's environment without the given variables.
-
-	The ``pipeline`` command falls back to the variables a workflow sets, and these tests run inside such a
-	workflow, so the fallback has to be taken away to see what the command does without it.
-
-	:param names: Names of the variables to leave out.
-	:returns:     The environment to run the program in.
-	"""
-	return {name: value for name, value in environ.items() if name not in names}
 
 
 class ProgramMixin:
@@ -186,7 +172,7 @@ class PipelineCommand(ProgramMixin, ApplicationTestcase):
 		"""Without '--github-repository' and without $GITHUB_REPOSITORY, the command says which one to set."""
 		result = self.RunEntrypoint(
 			"pipeline", "--github-pipeline-id=35479251694",
-			environment=environmentWithout("GITHUB_REPOSITORY")
+			environment={"GITHUB_REPOSITORY": None}
 		)
 
 		self.assertExitCode(result, 2)
@@ -198,7 +184,7 @@ class PipelineCommand(ProgramMixin, ApplicationTestcase):
 		"""Without '--github-pipeline-id' and without $GITHUB_RUN_ID, the command says which one to set."""
 		result = self.RunEntrypoint(
 			"pipeline", "--github-repository=pyTooling/pyTooling",
-			environment=environmentWithout("GITHUB_RUN_ID")
+			environment={"GITHUB_RUN_ID": None}
 		)
 
 		self.assertExitCode(result, 2)

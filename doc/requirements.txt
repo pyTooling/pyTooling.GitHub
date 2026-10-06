@@ -1,7 +1,7 @@
 -r ../requirements.txt
 
-# The extensions the documentation uses: pyTooling.Sphinx, and this package's domain 'gha'
-pyTooling.Sphinx @ git+https://github.com/pyTooling/pyTooling.Sphinx.git@dev
+# The extensions the documentation uses: pyTooling.Sphinx with its domain 'report', and domain 'ghactions'
+pyTooling.Sphinx[reports] @ git+https://github.com/pyTooling/pyTooling.Sphinx.git@dev
 
 # Enforce latest version on ReadTheDocs
 sphinx ~= 9.1
@@ -16,4 +16,3 @@ autoapi >= 2.0.1
 sphinx_design ~= 0.7.0
 sphinx-copybutton >= 0.5.2
 sphinx_autodoc_typehints ~= 3.13
-sphinx_reports ~= 0.11.0
