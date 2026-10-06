@@ -48,20 +48,6 @@ if __name__ == "__main__":  # pragma: no cover
 	exit(1)
 
 
-def environmentWithout(*names: str) -> dict[str, None]:
-	"""
-	Return the environment changes removing the given variables from the program's environment.
-
-	The ``pipeline`` command falls back to the variables a workflow sets, and these tests run inside such a
-	workflow, so the fallback has to be taken away to see what the command does without it. ``RunEntrypoint`` merges
-	the given variables into this process's environment, and removes those whose value is ``None``.
-
-	:param names: Names of the variables to remove.
-	:returns:     The variables mapped to ``None``.
-	"""
-	return {name: None for name in names}
-
-
 class ProgramMixin:
 	"""
 	What every testcase here runs, and how it reads what the program printed.
@@ -186,7 +172,7 @@ class PipelineCommand(ProgramMixin, ApplicationTestcase):
 		"""Without '--github-repository' and without $GITHUB_REPOSITORY, the command says which one to set."""
 		result = self.RunEntrypoint(
 			"pipeline", "--github-pipeline-id=35479251694",
-			environment=environmentWithout("GITHUB_REPOSITORY")
+			environment={"GITHUB_REPOSITORY": None}
 		)
 
 		self.assertExitCode(result, 2)
@@ -198,7 +184,7 @@ class PipelineCommand(ProgramMixin, ApplicationTestcase):
 		"""Without '--github-pipeline-id' and without $GITHUB_RUN_ID, the command says which one to set."""
 		result = self.RunEntrypoint(
 			"pipeline", "--github-repository=pyTooling/pyTooling",
-			environment=environmentWithout("GITHUB_RUN_ID")
+			environment={"GITHUB_RUN_ID": None}
 		)
 
 		self.assertExitCode(result, 2)
