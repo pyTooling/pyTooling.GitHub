@@ -29,7 +29,7 @@
 # ==================================================================================================================== #
 #
 """
-Unit tests for the Sphinx domain ``gha`` of :mod:`pyTooling.GitHub.Sphinx`.
+Unit tests for the Sphinx domain ``ghactions`` of :mod:`pyTooling.GitHub.Sphinx`.
 
 Every testcase builds a small Sphinx project in a temporary directory and checks the HTML, the domain's data and the
 warnings.
@@ -106,7 +106,7 @@ WORKFLOW = dedent("""\
 
 
 PAGE = dedent("""\
-	.. gha:workflow:: Package
+	.. ghactions:workflow:: Package
 
 	Package
 	#######
@@ -114,28 +114,28 @@ PAGE = dedent("""\
 	Inputs
 	******
 
-	.. gha:input:: package_name
+	.. ghactions:input:: package_name
 
 	   :Possible Values: Any Python package name.
 	   :Example:         ``myPackage``
 
-	.. gha:input:: python_version
+	.. ghactions:input:: python_version
 
 	   :Description: Python version used by jobs needing one.
 
-	.. gha:input:: dry_run
+	.. ghactions:input:: dry_run
 
-	.. gha:input:: pages_on
+	.. ghactions:input:: pages_on
 
 	Secrets
 	*******
 
-	.. gha:secret:: PYPI_TOKEN
+	.. ghactions:secret:: PYPI_TOKEN
 
 	Outputs
 	*******
 
-	.. gha:output:: version
+	.. ghactions:output:: version
 
 	   :Type: string
 """)
@@ -190,7 +190,7 @@ class Project(Testcase):
 			if name != "index":
 				(source / f"{name}.rst").write_text(content, encoding="utf-8")
 
-		overrides = {"gha_repository": "owner/repo", "gha_workflow_directory": "../workflows"}
+		overrides = {"ghactions_repository": "owner/repo", "ghactions_workflow_directory": "../workflows"}
 		overrides.update(config)
 		self._warnings = StringIO()
 		app = SphinxTestApp(
@@ -236,18 +236,18 @@ class Workflows(Project):
 		self._workflow("Package")
 		app = self._build({"Package": PAGE})
 
-		domain = app.env.get_domain("gha")
-		self.assertEqual(("Package", "gha-workflow-Package"), domain.ResolveWorkflow("Package"))
+		domain = app.env.get_domain("ghactions")
+		self.assertEqual(("Package", "ghactions-workflow-Package"), domain.ResolveWorkflow("Package"))
 		self.assertIsNone(domain.ResolveWorkflow("Unknown"))
 		self.assertEqual([], self._warningLines())
 
 		html = self._html("Package")
-		self.assertIn('id="gha-workflow-Package"', html)
+		self.assertIn('id="ghactions-workflow-Package"', html)
 		self.assertIn('id="jobtmpl-package"', html)
 
 	def test_Target_Parameters(self) -> None:
 		self._workflow("Package")
-		domain = self._build({"Package": PAGE}).env.get_domain("gha")
+		domain = self._build({"Package": PAGE}).env.get_domain("ghactions")
 
 		for arguments, exceptionType, message in (
 			((None, ), ValueError, "Parameter 'name' is None."),
@@ -283,19 +283,21 @@ class Workflows(Project):
 		path = self._workflow("Other")
 		(self._path / "src" / "yaml").mkdir()
 		path.rename(self._path / "src" / "yaml" / "Package.yml")
-		page = PAGE.replace(".. gha:workflow:: Package\n", ".. gha:workflow:: Package\n   :file: yaml/Package.yml\n")
-		app = self._build({"Package": page}, gha_workflow_directory=None)
+		page = PAGE.replace(
+			".. ghactions:workflow:: Package\n", ".. ghactions:workflow:: Package\n   :file: yaml/Package.yml\n"
+		)
+		app = self._build({"Package": page}, ghactions_workflow_directory=None)
 
 		self.assertEqual([], self._warningLines())
 		self.assertIn("<p>yes</p>", self._html("Package"))
-		self.assertIn(("input", "Package.package_name"), app.env.get_domain("gha").Objects)
+		self.assertIn(("input", "Package.package_name"), app.env.get_domain("ghactions").Objects)
 
 	def test_NoFile(self) -> None:
-		self._build({"Package": PAGE}, gha_workflow_directory=None)
+		self._build({"Package": PAGE}, ghactions_workflow_directory=None)
 
 		self.assertIn(
-			"src/Package.rst:1: WARNING: gha:workflow 'Package' has no file: give option ':file:' or set "
-			"'gha_workflow_directory'. [gha.workflow]",
+			"src/Package.rst:1: WARNING: ghactions:workflow 'Package' has no file: give option ':file:' or set "
+			"'ghactions_workflow_directory'. [ghactions.workflow]",
 			self._warningLines()
 		)
 
@@ -303,31 +305,34 @@ class Workflows(Project):
 		self._build({"Package": PAGE})
 
 		self.assertIn(
-			"src/Package.rst:1: WARNING: gha:workflow 'Package': file 'workflows/Package.yml' doesn't exist. "
-			"[gha.workflow]",
+			"src/Package.rst:1: WARNING: ghactions:workflow 'Package': file 'workflows/Package.yml' doesn't exist. "
+			"[ghactions.workflow]",
 			self._warningLines()
 		)
 
 	def test_Malformed(self) -> None:
 		self._workflow("Package", "on: push\njobs:\n  Build:\n    runs-on: x\n    needs: Missing\n")
-		self._build({"Package": ".. gha:workflow:: Package\n\nPackage\n#######\n"})
+		self._build({"Package": ".. ghactions:workflow:: Package\n\nPackage\n#######\n"})
 
 		self.assertEqual(
 			[
-				"workflows/Package.yml:3: WARNING: gha:workflow 'Package': Job 'Build' needs job 'Missing', which the "
-				"workflow doesn't have. [gha.workflow]"
+				"workflows/Package.yml:3: WARNING: ghactions:workflow 'Package': Job 'Build' needs job 'Missing', which the "
+				"workflow doesn't have. [ghactions.workflow]"
 			],
 			self._warningLines()
 		)
 
 	def test_OtherName(self) -> None:
 		self._workflow("Package")
-		page = PAGE.replace(".. gha:workflow:: Package\n", ".. gha:workflow:: Build\n   :file: ../workflows/Package.yml\n")
+		page = PAGE.replace(
+			".. ghactions:workflow:: Package\n", ".. ghactions:workflow:: Build\n   :file: ../workflows/Package.yml\n"
+		)
 		self._build({"Package": page})
 
 		self.assertIn(
-			"src/Package.rst:1: WARNING: gha:workflow 'Build' reads file 'Package.yml', which names workflow 'Package'. "
-			"[gha.workflow]",
+			"src/Package.rst:1: WARNING: ghactions:workflow 'Build' reads file 'Package.yml', "
+			"which names workflow 'Package'. "
+			"[ghactions.workflow]",
 			self._warningLines()
 		)
 
@@ -339,7 +344,7 @@ class Workflows(Project):
 		self.assertEqual(
 			[
 				"workflows/Package.yml:8: WARNING: Input 'python_version' of workflow 'Package' is required and has a "
-				"default, which is never used. [gha.drift]"
+				"default, which is never used. [ghactions.drift]"
 			],
 			self._warningLines()
 		)
@@ -348,16 +353,16 @@ class Workflows(Project):
 		self._workflow("Package")
 		app = self._build({"Package": PAGE})
 
-		self.assertIsNone(app.config.gha_ref)
-		self.assertEqual("JOBTMPL", app.config.gha_label_prefix)
+		self.assertIsNone(app.config.ghactions_ref)
+		self.assertEqual("JOBTMPL", app.config.ghactions_label_prefix)
 
-		app = self._build({"Package": PAGE}, gha_ref="r8")
+		app = self._build({"Package": PAGE}, ghactions_ref="r8")
 
-		self.assertEqual("r8", app.config.gha_ref)
+		self.assertEqual("r8", app.config.ghactions_ref)
 
 	def test_LabelPrefix(self) -> None:
 		self._workflow("Package")
-		self._build({"Package": PAGE}, gha_label_prefix=None)
+		self._build({"Package": PAGE}, ghactions_label_prefix=None)
 
 		html = self._html("Package")
 		self.assertNotIn("jobtmpl-", html)
@@ -369,7 +374,9 @@ class Parameters(Project):
 		self._build({"Package": PAGE})
 
 		html = self._html("Package")
-		entry = html[html.index('id="gha-input-Package.package_name"'):html.index('id="gha-input-Package.python_version"')]
+		entry = html[
+			html.index('id="ghactions-input-Package.package_name"'):html.index('id="ghactions-input-Package.python_version"')
+		]
 		fields = [part.split("<")[0] for part in entry.split('<dt class="field-')[1:]]
 		self.assertEqual(
 			["odd\">Type", "even\">Required", "odd\">Default Value", "even\">Possible Values", "odd\">Description",
@@ -406,7 +413,7 @@ class Parameters(Project):
 		self._build({"Package": PAGE})
 
 		html = self._html("Package")
-		entry = html[html.index('id="gha-output-Package.version"'):]
+		entry = html[html.index('id="ghactions-output-Package.version"'):]
 		self.assertLess(entry.index(">Type<"), entry.index(">Description<"))
 		self.assertIn("<p>Version of the package.</p>", entry)
 		self.assertNotIn(">Required<", entry[:entry.index("</section>")])
@@ -416,7 +423,7 @@ class Parameters(Project):
 		self._build({"Package": PAGE})
 
 		html = self._html("Package")
-		entry = html[html.index('id="gha-secret-Package.PYPI_TOKEN"'):html.index('id="outputs"')]
+		entry = html[html.index('id="ghactions-secret-Package.PYPI_TOKEN"'):html.index('id="outputs"')]
 		self.assertIn("<p>string</p>", entry)
 		self.assertIn("<p>yes</p>", entry)
 		self.assertIn(f"<p>{NO_DEFAULT}</p>", entry)
@@ -428,8 +435,8 @@ class Parameters(Project):
 
 		self.assertEqual(
 			[
-				"src/Package.rst:11: WARNING: gha:input 'Package.package_name': field 'Type' is taken from the workflow "
-				"file; remove it. [gha.drift]"
+				"src/Package.rst:11: WARNING: ghactions:input 'Package.package_name': field 'Type' is taken from the workflow "
+				"file; remove it. [ghactions.drift]"
 			],
 			self._warningLines()
 		)
@@ -437,18 +444,19 @@ class Parameters(Project):
 
 	def test_Unknown(self) -> None:
 		self._workflow("Package")
-		self._build({"Package": PAGE + "\n.. gha:input:: unknown\n"})
+		self._build({"Package": PAGE + "\n.. ghactions:input:: unknown\n"})
 
 		self.assertEqual(
-			["src/Package.rst:34: WARNING: Workflow 'Package' has no input 'unknown' (Package.yml). [gha.drift]"],
+			["src/Package.rst:34: WARNING: Workflow 'Package' has no input 'unknown' (Package.yml). [ghactions.drift]"],
 			self._warningLines()
 		)
 
 	def test_OutsideWorkflow(self) -> None:
-		self._build({"Package": "Package\n#######\n\n.. gha:input:: package_name\n"})
+		self._build({"Package": "Package\n#######\n\n.. ghactions:input:: package_name\n"})
 
 		self.assertEqual(
-			["src/Package.rst:4: WARNING: gha:input 'package_name' is not preceded by a gha:workflow. [gha.workflow]"],
+			["src/Package.rst:4: WARNING: ghactions:input 'package_name' is not preceded by a ghactions:workflow. "
+				"[ghactions.workflow]"],
 			self._warningLines()
 		)
 
@@ -456,14 +464,16 @@ class Parameters(Project):
 		self._workflow("Package")
 		self._build({"Package": PAGE, "Again": PAGE.replace("Package\n#######", "Again\n#####")})
 
-		self.assertTrue(any("Duplicate description of gha:workflow 'Package'" in line for line in self._warningLines()))
+		self.assertTrue(
+			any("Duplicate description of ghactions:workflow 'Package'" in line for line in self._warningLines())
+		)
 
 
 class References(Project):
 	PAGE = PAGE + dedent("""\
 
-		See :gha:input:`package_name`, :gha:input:`~Package.python_version`, :gha:workflow:`Package`,
-		:gha:secret:`PYPI_TOKEN`, :gha:output:`version` and :ref:`JOBTMPL/Package/Input/dry_run`.
+		See :ghactions:input:`package_name`, :ghactions:input:`~Package.python_version`, :ghactions:workflow:`Package`,
+		:ghactions:secret:`PYPI_TOKEN`, :ghactions:output:`version` and :ref:`JOBTMPL/Package/Input/dry_run`.
 	""")
 
 	def test_InWorkflow(self) -> None:
@@ -472,33 +482,33 @@ class References(Project):
 
 		html = self._html("Package")
 		self.assertEqual([], self._warningLines())
-		self.assertIn('href="#gha-input-Package.package_name"', html)
+		self.assertIn('href="#ghactions-input-Package.package_name"', html)
 		self.assertIn(
-			'title="Package.python_version"><code class="xref gha gha-input docutils literal notranslate">'
+			'title="Package.python_version"><code class="xref ghactions ghactions-input docutils literal notranslate">'
 			'<span class="pre">python_version</span>',
 			html
 		)
-		self.assertIn('href="#gha-workflow-Package"', html)
-		self.assertIn('href="#gha-secret-Package.PYPI_TOKEN"', html)
-		self.assertIn('href="#gha-output-Package.version"', html)
+		self.assertIn('href="#ghactions-workflow-Package"', html)
+		self.assertIn('href="#ghactions-secret-Package.PYPI_TOKEN"', html)
+		self.assertIn('href="#ghactions-output-Package.version"', html)
 		self.assertIn('href="#jobtmpl-package-input-dry-run"><span class="std std-ref">dry_run</span>', html)
 
 	def test_OtherDocument(self) -> None:
 		self._workflow("Package")
-		index = "Index\n#####\n\n:gha:input:`Package.package_name` and :ref:`JOBTMPL/Package`\n"
+		index = "Index\n#####\n\n:ghactions:input:`Package.package_name` and :ref:`JOBTMPL/Package`\n"
 		self._build({"Package": PAGE, "index": index})
 
 		html = self._html("index")
 		self.assertEqual([], self._warningLines())
-		self.assertIn('href="Package.html#gha-input-Package.package_name"', html)
+		self.assertIn('href="Package.html#ghactions-input-Package.package_name"', html)
 		self.assertIn('href="Package.html#jobtmpl-package"><span class="std std-ref">Package</span>', html)
 
 	def test_Unresolved(self) -> None:
 		self._workflow("Package")
-		self._build({"Package": PAGE, "index": "Index\n#####\n\n:gha:input:`package_name`\n"})
+		self._build({"Package": PAGE, "index": "Index\n#####\n\n:ghactions:input:`package_name`\n"})
 
 		self.assertEqual(
-			["src/index.rst:4: WARNING: gha:input reference target not found: package_name [ref.input]"],
+			["src/index.rst:4: WARNING: ghactions:input reference target not found: package_name [ref.input]"],
 			self._warningLines()
 		)
 
@@ -507,7 +517,7 @@ class References(Project):
 		self._build({"Package": PAGE, "index": "Index\n#####\n\n:any:`Package.package_name`\n"})
 
 		self.assertEqual([], self._warningLines())
-		self.assertIn('href="Package.html#gha-input-Package.package_name"', self._html("index"))
+		self.assertIn('href="Package.html#ghactions-input-Package.package_name"', self._html("index"))
 
 
 class Builds(Project):
@@ -516,29 +526,29 @@ class Builds(Project):
 		self._workflow("Build")
 		documents = {
 			"Package": References.PAGE,
-			"Build":   PAGE.replace("Package", "Build") + "\n:gha:input:`Package.dry_run`\n",
+			"Build":   PAGE.replace("Package", "Build") + "\n:ghactions:input:`Package.dry_run`\n",
 			"A": "A\n#\n", "B": "B\n#\n", "C": "C\n#\n",
 		}
 		app = self._build(documents, parallel=2)
 
 		self.assertEqual([], self._warningLines())
-		objects = app.env.get_domain("gha").Objects
-		self.assertEqual(("Build", "gha-input-Build.dry_run"), objects[("input", "Build.dry_run")])
-		self.assertEqual(("Package", "gha-input-Package.dry_run"), objects[("input", "Package.dry_run")])
-		self.assertIn('href="Package.html#gha-input-Package.dry_run"', self._html("Build"))
+		objects = app.env.get_domain("ghactions").Objects
+		self.assertEqual(("Build", "ghactions-input-Build.dry_run"), objects[("input", "Build.dry_run")])
+		self.assertEqual(("Package", "ghactions-input-Package.dry_run"), objects[("input", "Package.dry_run")])
+		self.assertIn('href="Package.html#ghactions-input-Package.dry_run"', self._html("Build"))
 
 	def test_Incremental(self) -> None:
 		self._workflow("Package")
-		index = "Index\n#####\n\n:gha:input:`Package.dry_run`\n"
+		index = "Index\n#####\n\n:ghactions:input:`Package.dry_run`\n"
 		self._build({"Package": PAGE, "index": index})
 		self.assertEqual([], self._warningLines())
 
-		app = self._build({"Package": PAGE.replace(".. gha:input:: dry_run\n", ""), "index": index}, fresh=False)
+		app = self._build({"Package": PAGE.replace(".. ghactions:input:: dry_run\n", ""), "index": index}, fresh=False)
 
-		self.assertNotIn(("input", "Package.dry_run"), app.env.get_domain("gha").Objects)
-		self.assertIn(("input", "Package.package_name"), app.env.get_domain("gha").Objects)
+		self.assertNotIn(("input", "Package.dry_run"), app.env.get_domain("ghactions").Objects)
+		self.assertIn(("input", "Package.package_name"), app.env.get_domain("ghactions").Objects)
 		self.assertIn(
-			"src/index.rst:4: WARNING: gha:input reference target not found: Package.dry_run [ref.input]",
+			"src/index.rst:4: WARNING: ghactions:input reference target not found: Package.dry_run [ref.input]",
 			self._warningLines()
 		)
 

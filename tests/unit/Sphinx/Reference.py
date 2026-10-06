@@ -153,22 +153,22 @@ MINIMAL = dedent("""\
 	""")
 
 #: The start of a page documenting workflow 'Package'.
-HEADER = ".. gha:workflow:: Package\n\nPackage\n#######\n\n"
+HEADER = ".. ghactions:workflow:: Package\n\nPackage\n#######\n\n"
 
 #: The entries of every input of workflow 'Package' but 'dry_run'.
 ENTRIES = dedent("""\
-	.. gha:input:: package_name
+	.. ghactions:input:: package_name
 
-	.. gha:input:: python_version
+	.. ghactions:input:: python_version
 
-	.. gha:input:: pages_on
+	.. ghactions:input:: pages_on
 
-	.. gha:input:: system_list
+	.. ghactions:input:: system_list
 """)
 
 
 class ParameterTables(Project):
-	PAGE = f"{HEADER}.. gha:parameter-table::\n\n.. gha:autoinputs::\n"
+	PAGE = f"{HEADER}.. ghactions:parameter-table::\n\n.. ghactions:autoinputs::\n"
 
 	def _table(self, html: str, kind: str) -> str:
 		"""
@@ -178,7 +178,7 @@ class ParameterTables(Project):
 		:param kind: The kind of the table, as ``inputs``.
 		:returns:    The table's HTML.
 		"""
-		start = html.index(f'gha-parameter-table gha-{kind}')
+		start = html.index(f'ghactions-parameter-table ghactions-{kind}')
 		return html[start:html.index("</table>", start)]
 
 	def test_Inputs(self) -> None:
@@ -190,7 +190,7 @@ class ParameterTables(Project):
 		self.assertIn("<th class=\"head\">Parameter Name</th>", table)
 		rows = table.split("<tr")[2:]
 		self.assertEqual(5, len(rows))
-		self.assertIn('href="#gha-input-Package.package_name"', rows[0])
+		self.assertIn('href="#ghactions-input-Package.package_name"', rows[0])
 		self.assertIn("<p>yes</p>", rows[0])
 		self.assertIn("<p>— — — —</p>", rows[0])
 		self.assertIn("<p>no</p>", rows[1])
@@ -234,8 +234,8 @@ class ParameterTables(Project):
 		self._build({"Package": self.PAGE})
 
 		html = self._html("Package")
-		self.assertLess(html.index("gha-inputs"), html.index("gha-secrets"))
-		self.assertLess(html.index("gha-secrets"), html.index("gha-outputs"))
+		self.assertLess(html.index("ghactions-inputs"), html.index("ghactions-secrets"))
+		self.assertLess(html.index("ghactions-secrets"), html.index("ghactions-outputs"))
 
 	def test_Kinds(self) -> None:
 		self._workflow("Package", PACKAGE)
@@ -244,9 +244,9 @@ class ParameterTables(Project):
 
 		html = self._html("Package")
 		self.assertEqual([], self._warningLines())
-		self.assertEqual(1, html.count("gha-outputs"))
-		self.assertLess(html.index("gha-outputs"), html.index("gha-inputs"))
-		self.assertNotIn("gha-secrets", html)
+		self.assertEqual(1, html.count("ghactions-outputs"))
+		self.assertLess(html.index("ghactions-outputs"), html.index("ghactions-inputs"))
+		self.assertNotIn("ghactions-secrets", html)
 
 	def test_KindsWithoutParameters(self) -> None:
 		"""Only a kind named explicitly is shown when the workflow has none of it."""
@@ -254,8 +254,8 @@ class ParameterTables(Project):
 		self._build({"Package": self.PAGE})
 
 		html = self._html("Package")
-		self.assertIn("gha-inputs", html)
-		self.assertNotIn("gha-outputs", html)
+		self.assertIn("ghactions-inputs", html)
+		self.assertNotIn("ghactions-outputs", html)
 
 		self._build({"Package": self.PAGE.replace("parameter-table::\n", "parameter-table::\n   :kinds: outputs\n")})
 
@@ -267,23 +267,24 @@ class ParameterTables(Project):
 
 		self.assertEqual(
 			[
-				"src/Package.rst:6: ERROR: gha:parameter-table::kinds: 'results' is not one of inputs, secrets, outputs. "
+				"src/Package.rst:6: ERROR: ghactions:parameter-table::kinds: 'results' is not one of inputs, secrets, outputs. "
 				"[docutils]"
 			],
 			self._warningLines()
 		)
 
 	def test_NoWorkflow(self) -> None:
-		self._build({"Package": "Package\n#######\n\n.. gha:parameter-table::\n"})
+		self._build({"Package": "Package\n#######\n\n.. ghactions:parameter-table::\n"})
 
 		self.assertEqual(
-			["src/Package.rst:4: WARNING: gha:parameter-table is not preceded by a gha:workflow. [gha.workflow]"],
+			["src/Package.rst:4: WARNING: ghactions:parameter-table is not preceded by a ghactions:workflow. "
+				"[ghactions.workflow]"],
 			self._warningLines()
 		)
 
 
 class Interfaces(Project):
-	PAGE = f"{HEADER}.. gha:interface::\n\n.. gha:autoinputs::\n"
+	PAGE = f"{HEADER}.. ghactions:interface::\n\n.. ghactions:autoinputs::\n"
 
 	def _field(self, html: str, name: str) -> str:
 		"""
@@ -304,7 +305,7 @@ class Interfaces(Project):
 		html = self._html("Package")
 		self.assertEqual([], self._warningLines())
 		required = self._field(html, "Required Inputs")
-		self.assertIn('href="#gha-input-Package.package_name"', required)
+		self.assertIn('href="#ghactions-input-Package.package_name"', required)
 		self.assertNotIn("python_version", required)
 		secrets = self._field(html, "Secrets")
 		self.assertIn("<span class=\"pre\">PYPI_TOKEN</span></code> (required), ", secrets)
@@ -335,7 +336,7 @@ class Interfaces(Project):
 	def test_PermissionLink(self) -> None:
 		self._workflow("Package", PACKAGE)
 		self._workflow("Tag", TAG)
-		self._build({"Package": self.PAGE}, gha_ref="r1")
+		self._build({"Package": self.PAGE}, ghactions_ref="r1")
 
 		self.assertIn(
 			'href="https://github.com/owner/repo/blob/r1/.github/workflows/Tag.yml#L10">Tag.yml:10</a>',
@@ -343,7 +344,7 @@ class Interfaces(Project):
 		)
 
 	def test_Contract(self) -> None:
-		"""The templates and actions are left to gha:dependencies."""
+		"""The templates and actions are left to ghactions:dependencies."""
 		self._workflow("Package", PACKAGE)
 		self._workflow("Tag", TAG)
 		self._build({"Package": self.PAGE})
@@ -359,7 +360,8 @@ class Interfaces(Project):
 
 		self.assertIn(" - job <em>Build</em> (Package.yml:46)", self._field(self._html("Package"), "Permissions"))
 		self.assertEqual(
-			["src/Package.rst:6: WARNING: gha:interface: Workflow 'Tag.yml' doesn't exist in 'workflows'. [gha.workflow]"],
+			["src/Package.rst:6: WARNING: ghactions:interface: Workflow 'Tag.yml' doesn't exist in 'workflows'. "
+				"[ghactions.workflow]"],
 			self._warningLines()
 		)
 
@@ -444,18 +446,21 @@ class DependencyLists(Project):
 
 	def _items(self, content: str = "", **config: str) -> list[str]:
 		"""
-		Build a page with ``gha:dependencies`` for workflow 'Pipeline', and return the list as indented lines of text.
+		Build a page with ``ghactions:dependencies`` for workflow 'Pipeline', and return the list as indented lines of text.
 
 		:param content: The directive's content.
 		:param config:  Configuration values overriding the defaults.
 		:returns:       One line per list item, indented by two spaces per level.
 		"""
 		self._repository()
-		page = f".. gha:workflow:: Pipeline\n\nPipeline\n########\n\n.. gha:dependencies::\n\n{indent(content, '   ')}"
-		self._build({"Pipeline": page}, gha_workflow_directory="../.github/workflows", **config)
+		page = (
+			f".. ghactions:workflow:: Pipeline\n\nPipeline\n########\n\n"
+			f".. ghactions:dependencies::\n\n{indent(content, '   ')}"
+		)
+		self._build({"Pipeline": page}, ghactions_workflow_directory="../.github/workflows", **config)
 
 		html = self._html("Pipeline")
-		start = html.rindex("<ul", 0, html.index("gha-dependencies"))
+		start = html.rindex("<ul", 0, html.index("ghactions-dependencies"))
 		lines = []
 		level = 0
 		for tag, text in findall(r"<(/?\w+)[^>]*>|([^<]+)", html[start:]):
@@ -493,7 +498,7 @@ class DependencyLists(Project):
 		self.assertEqual([], self._warningLines())
 
 	def test_Links(self) -> None:
-		self._items(gha_ref="r1")
+		self._items(ghactions_ref="r1")
 
 		html = self._html("Pipeline")
 		self.assertIn('href="https://github.com/actions/checkout"', html)
@@ -502,7 +507,7 @@ class DependencyLists(Project):
 		self.assertIn('href="https://github.com/other/tools/blob/v2/.github/workflows/Notify.yml"', html)
 
 	def test_Links_Server(self) -> None:
-		self._items(gha_ref="r1", gha_server="https://github.example.com/")
+		self._items(ghactions_ref="r1", ghactions_server="https://github.example.com/")
 
 		html = self._html("Pipeline")
 		self.assertIn('href="https://github.example.com/actions/checkout"', html)
@@ -563,7 +568,7 @@ class DependencyLists(Project):
 
 	def test_None(self) -> None:
 		self._workflow("Package", MINIMAL)
-		self._build({"Package": f"{HEADER}.. gha:dependencies::\n\n.. gha:autoinputs::\n"})
+		self._build({"Package": f"{HEADER}.. ghactions:dependencies::\n\n.. ghactions:autoinputs::\n"})
 
 		self.assertEqual([], self._warningLines())
 		self.assertIn("<p><em>none</em></p>", self._html("Package"))
@@ -571,13 +576,13 @@ class DependencyLists(Project):
 	def test_MissingAction(self) -> None:
 		self._repository()
 		(self._path / ".github" / "actions" / "Docker" / "action.yml").unlink()
-		page = ".. gha:workflow:: Pipeline\n\nPipeline\n########\n\n.. gha:dependencies::\n"
-		self._build({"Pipeline": page}, gha_workflow_directory="../.github/workflows")
+		page = ".. ghactions:workflow:: Pipeline\n\nPipeline\n########\n\n.. ghactions:dependencies::\n"
+		self._build({"Pipeline": page}, ghactions_workflow_directory="../.github/workflows")
 
 		self.assertEqual(
 			[
-				"src/Pipeline.rst:6: WARNING: gha:dependencies: Action '.github/actions/Docker' has no 'action.yml' in "
-				"'.github/actions/Docker'. [gha.workflow]"
+				"src/Pipeline.rst:6: WARNING: ghactions:dependencies: Action '.github/actions/Docker' has no 'action.yml' in "
+				"'.github/actions/Docker'. [ghactions.workflow]"
 			],
 			self._warningLines()
 		)
@@ -596,12 +601,12 @@ class YAMLExcerpts(Project):
 
 	def _page(self, options: str = "") -> str:
 		"""
-		Create a page showing workflow 'Package' by ``gha:yaml``.
+		Create a page showing workflow 'Package' by ``ghactions:yaml``.
 
-		:param options: The options of ``gha:yaml``, one per line, indented.
+		:param options: The options of ``ghactions:yaml``, one per line, indented.
 		:returns:       The page.
 		"""
-		return f"{HEADER}.. gha:yaml::\n{options}\n.. gha:autoinputs::\n"
+		return f"{HEADER}.. ghactions:yaml::\n{options}\n.. ghactions:autoinputs::\n"
 
 	def test_Section(self) -> None:
 		self._workflow("Package", PACKAGE)
@@ -644,7 +649,7 @@ class YAMLExcerpts(Project):
 
 	def test_Link(self) -> None:
 		self._workflow("Package", PACKAGE)
-		self._build({"Package": self._page("   :job: Build\n")}, gha_ref="r1")
+		self._build({"Package": self._page("   :job: Build\n")}, ghactions_ref="r1")
 
 		self.assertIn(
 			'href="https://github.com/owner/repo/blob/r1/.github/workflows/Package.yml#L43-L55">Package.yml, lines 43-55</a>',
@@ -664,7 +669,7 @@ class YAMLExcerpts(Project):
 		self._build({"Package": self._page("   :job: Test\n")})
 
 		self.assertEqual(
-			["src/Package.rst:6: WARNING: gha:yaml: Workflow 'Package' has no job 'Test'. [gha.drift]"],
+			["src/Package.rst:6: WARNING: ghactions:yaml: Workflow 'Package' has no job 'Test'. [ghactions.drift]"],
 			self._warningLines()
 		)
 
@@ -673,7 +678,7 @@ class YAMLExcerpts(Project):
 		self._build({"Package": self._page("   :section: outputs\n")})
 
 		self.assertEqual(
-			["src/Package.rst:6: WARNING: gha:yaml: Workflow 'Package' has no outputs. [gha.drift]"],
+			["src/Package.rst:6: WARNING: ghactions:yaml: Workflow 'Package' has no outputs. [ghactions.drift]"],
 			self._warningLines()
 		)
 
@@ -681,42 +686,49 @@ class YAMLExcerpts(Project):
 		self._workflow("Package", PACKAGE)
 		self._build({"Package": self._page("   :job: Build\n   :section: jobs\n")})
 		self.assertEqual(
-			["src/Package.rst:6: ERROR: gha:yaml: Options ':section:' and ':job:' exclude each other. [docutils]"],
+			["src/Package.rst:6: ERROR: ghactions:yaml: Options ':section:' and ':job:' exclude each other. [docutils]"],
 			self._warningLines()
 		)
 
 		self._build({"Package": self._page("   :section: steps\n")})
 		self.assertEqual(
-			["src/Package.rst:6: ERROR: gha:yaml::section: 'steps' is not one of inputs, outputs, secrets, jobs. [docutils]"],
+			["src/Package.rst:6: ERROR: ghactions:yaml::section: 'steps' is not one of inputs, outputs, secrets, jobs. "
+				"[docutils]"],
 			self._warningLines()
 		)
 
 
 class AutoInputs(Project):
 	def test_Entries(self) -> None:
-		"""An input documented after gha:autoinputs gets no second entry."""
+		"""An input documented after ghactions:autoinputs gets no second entry."""
 		self._workflow("Package", PACKAGE)
-		page = f"{HEADER}.. gha:input:: package_name\n\n.. gha:autoinputs::\n\n{ENTRIES}"
-		page = page.replace(".. gha:input:: package_name\n\n.. gha:input:: python_version\n", "")
-		app = self._build({"Package": page, "index": "Index\n#####\n\n:gha:input:`Package.dry_run`\n"})
+		page = f"{HEADER}.. ghactions:input:: package_name\n\n.. ghactions:autoinputs::\n\n{ENTRIES}"
+		page = page.replace(".. ghactions:input:: package_name\n\n.. ghactions:input:: python_version\n", "")
+		app = self._build({"Package": page, "index": "Index\n#####\n\n:ghactions:input:`Package.dry_run`\n"})
 
 		self.assertEqual([], self._warningLines())
 		html = self._html("Package")
-		self.assertEqual(1, html.count('id="gha-input-Package.package_name"'))
-		self.assertEqual(1, html.count('id="gha-input-Package.pages_on"'))
-		self.assertLess(html.index('id="gha-input-Package.python_version"'), html.index('id="gha-input-Package.pages_on"'))
-		self.assertLess(html.index('id="gha-input-Package.dry_run"'), html.index('id="gha-input-Package.pages_on"'))
-		objects = app.env.get_domain("gha").Objects
-		self.assertEqual(("Package", "gha-input-Package.dry_run"), objects[("input", "Package.dry_run")])
-		self.assertIn('href="Package.html#gha-input-Package.dry_run"', self._html("index"))
+		self.assertEqual(1, html.count('id="ghactions-input-Package.package_name"'))
+		self.assertEqual(1, html.count('id="ghactions-input-Package.pages_on"'))
+		self.assertLess(
+			html.index('id="ghactions-input-Package.python_version"'), html.index('id="ghactions-input-Package.pages_on"')
+		)
+		self.assertLess(
+			html.index('id="ghactions-input-Package.dry_run"'), html.index('id="ghactions-input-Package.pages_on"')
+		)
+		objects = app.env.get_domain("ghactions").Objects
+		self.assertEqual(("Package", "ghactions-input-Package.dry_run"), objects[("input", "Package.dry_run")])
+		self.assertIn('href="Package.html#ghactions-input-Package.dry_run"', self._html("index"))
 
 	def test_Entry(self) -> None:
 		"""An entry has the facts and the description of the workflow file, the anchors and the index entry."""
 		self._workflow("Package", PACKAGE)
-		self._build({"Package": f"{HEADER}.. gha:autoinputs::\n"})
+		self._build({"Package": f"{HEADER}.. ghactions:autoinputs::\n"})
 
 		html = self._html("Package")
-		entry = html[html.index('id="gha-input-Package.python_version"'):html.index('id="gha-input-Package.pages_on"')]
+		entry = html[
+			html.index('id="ghactions-input-Package.python_version"'):html.index('id="ghactions-input-Package.pages_on"')
+		]
 		fields = [part.split("<")[0] for part in entry.split('<dt class="field-')[1:]]
 		self.assertEqual(["odd\">Type", "even\">Required", "odd\">Default Value", "even\">Description"], fields)
 		self.assertIn("<p>Python version.</p>", entry)
@@ -727,7 +739,7 @@ class AutoInputs(Project):
 	def test_Label(self) -> None:
 		self._workflow("Package", PACKAGE)
 		self._build({
-			"Package": f"{HEADER}.. gha:autoinputs::\n",
+			"Package": f"{HEADER}.. ghactions:autoinputs::\n",
 			"index": "Index\n#####\n\n:ref:`JOBTMPL/Package/Input/dry_run`\n"
 		})
 
@@ -737,22 +749,23 @@ class AutoInputs(Project):
 	def test_Parallel(self) -> None:
 		self._workflow("Package", PACKAGE)
 		documents = {
-			"Package": f"{HEADER}.. gha:autoinputs::\n",
-			"index": "Index\n#####\n\n:gha:input:`Package.dry_run`\n",
+			"Package": f"{HEADER}.. ghactions:autoinputs::\n",
+			"index": "Index\n#####\n\n:ghactions:input:`Package.dry_run`\n",
 			"A": "A\n#\n", "B": "B\n#\n", "C": "C\n#\n",
 		}
 		app = self._build(documents, parallel=2)
 
 		self.assertEqual([], self._warningLines())
-		objects = app.env.get_domain("gha").Objects
-		self.assertEqual(("Package", "gha-input-Package.dry_run"), objects[("input", "Package.dry_run")])
-		self.assertIn('href="Package.html#gha-input-Package.dry_run"', self._html("index"))
+		objects = app.env.get_domain("ghactions").Objects
+		self.assertEqual(("Package", "ghactions-input-Package.dry_run"), objects[("input", "Package.dry_run")])
+		self.assertIn('href="Package.html#ghactions-input-Package.dry_run"', self._html("index"))
 
 	def test_NoWorkflow(self) -> None:
-		self._build({"Package": "Package\n#######\n\n.. gha:autoinputs::\n"})
+		self._build({"Package": "Package\n#######\n\n.. ghactions:autoinputs::\n"})
 
 		self.assertEqual(
-			["src/Package.rst:4: WARNING: gha:autoinputs is not preceded by a gha:workflow. [gha.workflow]"],
+			["src/Package.rst:4: WARNING: ghactions:autoinputs is not preceded by a ghactions:workflow. "
+				"[ghactions.workflow]"],
 			self._warningLines()
 		)
 
@@ -764,25 +777,25 @@ class Drift(Project):
 
 		self.assertEqual(
 			[
-				"src/Package.rst:1: WARNING: Input 'dry_run' of workflow 'Package' has no entry: add a gha:input or a "
-				"gha:autoinputs. [gha.drift]"
+				"src/Package.rst:1: WARNING: Input 'dry_run' of workflow 'Package' has no entry: add a ghactions:input or a "
+				"ghactions:autoinputs. [ghactions.drift]"
 			],
 			self._warningLines()
 		)
 
 	def test_Workflows(self) -> None:
-		"""Each workflow of a document is checked, and reported at its own gha:workflow."""
+		"""Each workflow of a document is checked, and reported at its own ghactions:workflow."""
 		self._workflow("Package", PACKAGE)
 		self._workflow("Minimal", MINIMAL)
-		page = f".. gha:workflow:: Minimal\n\nMinimal\n#######\n\n.. gha:workflow:: Package\n\n{ENTRIES}"
+		page = f".. ghactions:workflow:: Minimal\n\nMinimal\n#######\n\n.. ghactions:workflow:: Package\n\n{ENTRIES}"
 		self._build({"Package": page})
 
 		self.assertEqual(
 			[
-				"src/Package.rst:1: WARNING: Input 'name' of workflow 'Minimal' has no entry: add a gha:input or a "
-				"gha:autoinputs. [gha.drift]",
-				"src/Package.rst:6: WARNING: Input 'dry_run' of workflow 'Package' has no entry: add a gha:input or a "
-				"gha:autoinputs. [gha.drift]"
+				"src/Package.rst:1: WARNING: Input 'name' of workflow 'Minimal' has no entry: add a ghactions:input or a "
+				"ghactions:autoinputs. [ghactions.drift]",
+				"src/Package.rst:6: WARNING: Input 'dry_run' of workflow 'Package' has no entry: add a ghactions:input or a "
+				"ghactions:autoinputs. [ghactions.drift]"
 			],
 			self._warningLines()
 		)
@@ -791,17 +804,17 @@ class Drift(Project):
 		"""An input documented only in another document has no entry in this one."""
 		self._workflow("Package", PACKAGE)
 		page = f"{HEADER}{ENTRIES}"
-		other = ".. gha:workflow:: Package\n\nOther\n#####\n\n.. gha:input:: dry_run\n"
-		self._build({"Package": page, "Other": other}, suppress_warnings=["gha.duplicate"])
+		other = ".. ghactions:workflow:: Package\n\nOther\n#####\n\n.. ghactions:input:: dry_run\n"
+		self._build({"Package": page, "Other": other}, suppress_warnings=["ghactions.duplicate"])
 
 		self.assertIn(
-			"src/Package.rst:1: WARNING: Input 'dry_run' of workflow 'Package' has no entry: add a gha:input or a "
-			"gha:autoinputs. [gha.drift]",
+			"src/Package.rst:1: WARNING: Input 'dry_run' of workflow 'Package' has no entry: add a ghactions:input or a "
+			"ghactions:autoinputs. [ghactions.drift]",
 			self._warningLines()
 		)
 
 	def test_Suppressed(self) -> None:
 		self._workflow("Package", PACKAGE)
-		self._build({"Package": f"{HEADER}{ENTRIES}"}, suppress_warnings=["gha.drift"])
+		self._build({"Package": f"{HEADER}{ENTRIES}"}, suppress_warnings=["ghactions.drift"])
 
 		self.assertEqual([], self._warningLines())

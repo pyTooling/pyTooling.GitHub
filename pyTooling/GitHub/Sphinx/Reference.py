@@ -29,42 +29,43 @@
 # ==================================================================================================================== #
 #
 """
-Directives of the ``gha`` domain summarizing the current workflow: its parameters, interface, dependencies and YAML.
+Directives of the ``ghactions`` domain summarizing the current workflow: its parameters, interface, dependencies and
+YAML.
 
-Each of them reads the workflow of the preceding ``gha:workflow``:
+Each of them reads the workflow of the preceding ``ghactions:workflow``:
 
 .. code-block:: ReST
 
-   .. gha:workflow:: Package
+   .. ghactions:workflow:: Package
 
-   .. gha:parameter-table::
+   .. ghactions:parameter-table::
       :kinds: inputs secrets
 
-   .. gha:interface::
+   .. ghactions:interface::
 
-   .. gha:dependencies::
+   .. ghactions:dependencies::
 
       * pip
 
-   .. gha:yaml::
+   .. ghactions:yaml::
       :job: Package
 
-   .. gha:autoinputs::
+   .. ghactions:autoinputs::
 
-* ``gha:parameter-table`` - the summary tables of the inputs, secrets and outputs;
-* ``gha:interface`` - the contract with a caller: the required inputs, the secrets, the outputs, the permissions to
-  grant;
-* ``gha:dependencies`` - the templates, actions and container images used, merged with hand-written ones;
-* ``gha:yaml`` - the workflow file or a part of it, as a code block linked to the file on GitHub;
-* ``gha:autoinputs`` - an entry for every input the document has no ``gha:input`` for.
+* ``ghactions:parameter-table`` - the summary tables of the inputs, secrets and outputs;
+* ``ghactions:interface`` - the contract with a caller: the required inputs, the secrets, the outputs, the permissions
+  to grant;
+* ``ghactions:dependencies`` - the templates, actions and container images used, merged with hand-written ones;
+* ``ghactions:yaml`` - the workflow file or a part of it, as a code block linked to the file on GitHub;
+* ``ghactions:autoinputs`` - an entry for every input the document has no ``ghactions:input`` for.
 
-When a document was read, an input of its workflow without an entry is a ``gha.drift`` warning
+When a document was read, an input of its workflow without an entry is a ``ghactions.drift`` warning
 (:func:`checkUndocumentedInputs`).
 
 .. seealso::
 
    :mod:`pyTooling.GitHub.Sphinx`
-      |rarr| The domain ``gha``, its workflows and parameter entries.
+      |rarr| The domain ``ghactions``, its workflows and parameter entries.
 """
 from __future__                      import annotations
 
@@ -89,15 +90,15 @@ if TYPE_CHECKING:  # pragma: no cover
 
 __all__ = ["KINDS", "SECTIONS", "MAX_DEFAULT_LENGTH"]
 
-#: The kinds of parameters ``gha:parameter-table`` summarizes, in the order it shows them by default: kind |rarr| the
-#: columns.
+#: The kinds of parameters ``ghactions:parameter-table`` summarizes, in the order it shows them by default: kind |rarr|
+#: the columns.
 KINDS = {
 	"inputs":  ("Parameter Name", "Required", "Type", "Default"),
 	"secrets": ("Token Name",     "Required", "Type", "Default"),
 	"outputs": ("Result Name",    "Description"),
 }
 
-#: The parts of a workflow file ``gha:yaml`` shows by option ``:section:``.
+#: The parts of a workflow file ``ghactions:yaml`` shows by option ``:section:``.
 SECTIONS = ("inputs", "outputs", "secrets", "jobs")
 
 #: The length a default is shortened to in a summary table; a multi-line default is shortened to its first line.
@@ -111,7 +112,7 @@ _ResultType = TypeVar("_ResultType")
 @export
 class WorkflowReferenceDirective(BaseDirective):
 	"""
-	Base-class of the directives summarizing the current workflow, as set by the preceding ``gha:workflow``.
+	Base-class of the directives summarizing the current workflow, as set by the preceding ``ghactions:workflow``.
 	"""
 
 	@staticmethod
@@ -125,7 +126,7 @@ class WorkflowReferenceDirective(BaseDirective):
 		:returns:          The pending reference.
 		"""
 		return addnodes.pending_xref(
-			"", nodes.literal(text, text), refdomain="gha", reftype=objectType, reftarget=target, refexplicit=True,
+			"", nodes.literal(text, text), refdomain="ghactions", reftype=objectType, reftarget=target, refexplicit=True,
 			refwarn=False
 		)
 
@@ -136,13 +137,13 @@ class WorkflowReferenceDirective(BaseDirective):
 		:param fileName: The workflow file's name, as ``Package.yml``.
 		:param first:    Optional, the first line to mark. Default: ``None``.
 		:param last:     Optional, the last line to mark. Default: ``None``.
-		:returns:        The URL, or ``None`` if ``gha_repository`` or ``gha_ref`` isn't configured.
+		:returns:        The URL, or ``None`` if ``ghactions_repository`` or ``ghactions_ref`` isn't configured.
 		"""
-		if self.config.gha_repository is None or self.config.gha_ref is None:
+		if self.config.ghactions_repository is None or self.config.ghactions_ref is None:
 			return None
 
-		server = self.config.gha_server.rstrip("/")
-		url = f"{server}/{self.config.gha_repository}/blob/{self.config.gha_ref}/.github/workflows/{fileName}"
+		server = self.config.ghactions_server.rstrip("/")
+		url = f"{server}/{self.config.ghactions_repository}/blob/{self.config.ghactions_ref}/.github/workflows/{fileName}"
 		if first is None:
 			return url
 		elif last is None or last == first:
@@ -152,19 +153,19 @@ class WorkflowReferenceDirective(BaseDirective):
 
 	def _CurrentWorkflow(self) -> Nullable[Workflow]:
 		"""
-		Return the model of the current workflow, and warn if there is no ``gha:workflow`` before the directive.
+		Return the model of the current workflow, and warn if there is no ``ghactions:workflow`` before the directive.
 
-		:returns: The workflow, or ``None`` if there is no ``gha:workflow`` before the directive, or its file couldn't be
-		          read - which the ``gha:workflow`` directive reported already.
+		:returns: The workflow, or ``None`` if there is no ``ghactions:workflow`` before the directive, or its file couldn't
+		          be read - which the ``ghactions:workflow`` directive reported already.
 		"""
-		if self.env.ref_context.get("gha:workflow", None) is None:
+		if self.env.ref_context.get("ghactions:workflow", None) is None:
 			_logger.warning(
-				f"{self.directiveName} is not preceded by a gha:workflow.",
+				f"{self.directiveName} is not preceded by a ghactions:workflow.",
 				location=self.get_location(), type=WARNING_TYPE, subtype="workflow"
 			)
 			return None
 
-		return self.env.get_domain("gha").GetCurrentWorkflow()
+		return self.env.get_domain("ghactions").GetCurrentWorkflow()
 
 	def _ResolveOrWarn(self, resolve: Callable[[], _ResultType], fallback: Callable[[], _ResultType]) -> _ResultType:
 		"""
@@ -189,11 +190,11 @@ class WorkflowReferenceDirective(BaseDirective):
 @export
 class ParameterTable(WorkflowReferenceDirective):
 	"""
-	The directive ``gha:parameter-table``: summary tables of the current workflow's inputs, secrets and outputs.
+	The directive ``ghactions:parameter-table``: summary tables of the current workflow's inputs, secrets and outputs.
 
 	.. code-block:: ReST
 
-	   .. gha:parameter-table::
+	   .. ghactions:parameter-table::
 	      :kinds: inputs secrets
 
 	A table per kind, in the order ``:kinds:`` names them, by default the order of :data:`KINDS`. A table lists the
@@ -205,7 +206,7 @@ class ParameterTable(WorkflowReferenceDirective):
 	which the workflow has none, is a table with a single row saying so.
 	"""
 
-	directiveName: str = "gha:parameter-table"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:parameter-table"  #: Name the directive is invoked by.
 
 	has_content =               False  #: A boolean; ``True`` if content is allowed.
 	required_arguments =        0      #: Number of required directive arguments.
@@ -230,7 +231,7 @@ class ParameterTable(WorkflowReferenceDirective):
 		if (workflow := self._CurrentWorkflow()) is None:
 			return []
 
-		workflowName = self.env.ref_context["gha:workflow"]
+		workflowName = self.env.ref_context["ghactions:workflow"]
 		tables = []
 		for kind in kinds:
 			parameters = getattr(workflow, kind.capitalize())
@@ -241,7 +242,7 @@ class ParameterTable(WorkflowReferenceDirective):
 			tableGroup = self._CreateSingleRowTableHeader(
 				columns=[(title, None) for title in columns],
 				identifier=f"{workflowName}-{kind}",
-				classes=["gha-parameter-table", f"gha-{kind}"]
+				classes=["ghactions-parameter-table", f"ghactions-{kind}"]
 			)
 			tableGroup += (tableBody := nodes.tbody())
 
@@ -314,11 +315,11 @@ class ParameterTable(WorkflowReferenceDirective):
 @export
 class Interface(WorkflowReferenceDirective):
 	"""
-	The directive ``gha:interface``: the contract of the current workflow with its caller, as a field list.
+	The directive ``ghactions:interface``: the contract of the current workflow with its caller, as a field list.
 
 	.. code-block:: ReST
 
-	   .. gha:interface::
+	   .. ghactions:interface::
 
 	* *Required Inputs*, *Secrets* and *Outputs* - the parameters, each linked to its entry; a secret a caller has to
 	  pass is marked *required*.
@@ -329,7 +330,7 @@ class Interface(WorkflowReferenceDirective):
 	The templates and actions the workflow uses are listed by :class:`Dependencies`.
 	"""
 
-	directiveName: str = "gha:interface"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:interface"  #: Name the directive is invoked by.
 
 	has_content =               False  #: A boolean; ``True`` if content is allowed.
 	required_arguments =        0      #: Number of required directive arguments.
@@ -349,9 +350,9 @@ class Interface(WorkflowReferenceDirective):
 		if (workflow := self._CurrentWorkflow()) is None:
 			return []
 
-		workflowName = self.env.ref_context["gha:workflow"]
+		workflowName = self.env.ref_context["ghactions:workflow"]
 
-		fieldList = nodes.field_list(classes=["gha-interface"])
+		fieldList = nodes.field_list(classes=["ghactions-interface"])
 		fieldList += self._Field("Required Inputs", [
 			[self._Reference("input", f"{workflowName}.{name}", name)]
 			for name, parameter in workflow.Inputs.items() if parameter.Required
@@ -367,7 +368,7 @@ class Interface(WorkflowReferenceDirective):
 			[self._Reference("output", f"{workflowName}.{name}", name)] for name in workflow.Outputs
 		])
 
-		resolver = self.env.get_domain("gha").Resolver
+		resolver = self.env.get_domain("ghactions").Resolver
 		permissions = self._ResolveOrWarn(lambda: workflow.CollectPermissions(resolver), workflow.CollectPermissions)
 
 		items = []
@@ -419,17 +420,17 @@ class Interface(WorkflowReferenceDirective):
 @export
 class Dependencies(WorkflowReferenceDirective):
 	"""
-	The directive ``gha:dependencies``: what the current workflow uses, as a nested bullet list.
+	The directive ``ghactions:dependencies``: what the current workflow uses, as a nested bullet list.
 
 	.. code-block:: ReST
 
-	   .. gha:dependencies::
+	   .. ghactions:dependencies::
 
 	      * UnitTesting.yml
 
 	        * pip
 
-	          * Python packages given by :gha:input:`UnitTesting.requirements`.
+	          * Python packages given by :ghactions:input:`UnitTesting.requirements`.
 
 	From the workflow file, and the files of the templates and actions it uses, as far as they are known locally:
 
@@ -446,7 +447,7 @@ class Dependencies(WorkflowReferenceDirective):
 	list.
 	"""
 
-	directiveName: str = "gha:dependencies"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:dependencies"  #: Name the directive is invoked by.
 
 	has_content =               True   #: The hand-written dependencies.
 	required_arguments =        0      #: Number of required directive arguments.
@@ -468,7 +469,7 @@ class Dependencies(WorkflowReferenceDirective):
 
 		self._keys = {}
 		dependencies = self._WorkflowItems(workflow, {id(workflow)})
-		dependencies["classes"].append("gha-dependencies")
+		dependencies["classes"].append("ghactions-dependencies")
 
 		others = []
 		for node in self.parse_content_to_nodes():
@@ -499,9 +500,9 @@ class Dependencies(WorkflowReferenceDirective):
 		"""
 		Create the item of a template or an action.
 
-		A template of the documented repository links to its ``gha:workflow``, if that is documented; one of another
-		repository and an action link to GitHub, as does a local action when ``gha_repository`` and ``gha_ref`` are
-		configured.
+		A template of the documented repository links to its ``ghactions:workflow``, if that is documented; one of another
+		repository and an action link to GitHub, as does a local action when ``ghactions_repository`` and ``ghactions_ref``
+		are configured.
 
 		:param uses: The reference, as written in the workflow file.
 		:returns:    The item, known by the reference as written, without its ref, and by a template's file name and
@@ -513,11 +514,11 @@ class Dependencies(WorkflowReferenceDirective):
 			keys.update((uses.FileName, uses.Stem))
 
 		literal = nodes.literal(text, text)
-		server = self.config.gha_server.rstrip("/")
-		if uses.IsWorkflow and self.env.get_domain("gha").Resolver.CanResolve(uses):
+		server = self.config.ghactions_server.rstrip("/")
+		if uses.IsWorkflow and self.env.get_domain("ghactions").Resolver.CanResolve(uses):
 			return self._Item(nodes.paragraph("", "", self._Reference("workflow", uses.Stem, text)), keys)
-		elif uses.IsLocal and self.config.gha_repository is not None and self.config.gha_ref is not None:
-			url = f"{server}/{self.config.gha_repository}/tree/{self.config.gha_ref}/{uses.Path}"
+		elif uses.IsLocal and self.config.ghactions_repository is not None and self.config.ghactions_ref is not None:
+			url = f"{server}/{self.config.ghactions_repository}/tree/{self.config.ghactions_ref}/{uses.Path}"
 		elif uses.Repository is None:
 			return self._Item(nodes.paragraph("", "", literal), keys)
 		else:
@@ -572,7 +573,7 @@ class Dependencies(WorkflowReferenceDirective):
 			if len(jobNames) > 1:
 				item[0] += nodes.Text(f" (called by {len(jobNames)} jobs: {', '.join(jobNames)})")
 
-			called = self._ResolveOrWarn(lambda: self.env.get_domain("gha").Resolver.Resolve(uses), lambda: None)
+			called = self._ResolveOrWarn(lambda: self.env.get_domain("ghactions").Resolver.Resolve(uses), lambda: None)
 			if called is not None and id(called) not in visited:
 				if len(nested := self._WorkflowItems(called, visited | {id(called)})) > 0:
 					item += nested
@@ -596,7 +597,7 @@ class Dependencies(WorkflowReferenceDirective):
 		items = []
 		for uses in {str(uses): uses for uses in references}.values():
 			item = self._UsesItem(uses)
-			action = self._ResolveOrWarn(lambda: self.env.get_domain("gha").Resolver.ResolveAction(uses), lambda: None)
+			action = self._ResolveOrWarn(lambda: self.env.get_domain("ghactions").Resolver.ResolveAction(uses), lambda: None)
 			if action is not None and id(action) not in visited:
 				nested = nodes.bullet_list("", *self._ActionItems(action.IterateActions(), visited | {id(action)}))
 				if action.Image is not None:
@@ -640,22 +641,22 @@ class Dependencies(WorkflowReferenceDirective):
 @export
 class YAMLExcerpt(WorkflowReferenceDirective):
 	"""
-	The directive ``gha:yaml``: the current workflow's file or a part of it, as a YAML code block.
+	The directive ``ghactions:yaml``: the current workflow's file or a part of it, as a YAML code block.
 
 	.. code-block:: ReST
 
-	   .. gha:yaml::
+	   .. ghactions:yaml::
 	      :section: inputs
 
 	Option ``:section:`` selects the ``inputs``, ``outputs`` or ``secrets`` of ``on.workflow_call``, or the ``jobs``;
 	option ``:job:`` selects one job. Without either, the whole file is shown.
 
 	The lines are numbered as in the file, and the part is shifted left by the indentation of its first line. The
-	caption names the file and the lines, and links to them on GitHub at ``gha_ref``, if ``gha_repository`` and
-	``gha_ref`` are configured.
+	caption names the file and the lines, and links to them on GitHub at ``ghactions_ref``, if ``ghactions_repository``
+	and ``ghactions_ref`` are configured.
 	"""
 
-	directiveName: str = "gha:yaml"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:yaml"  #: Name the directive is invoked by.
 
 	has_content =               False  #: A boolean; ``True`` if content is allowed.
 	required_arguments =        0      #: Number of required directive arguments.
@@ -801,19 +802,19 @@ class YAMLExcerpt(WorkflowReferenceDirective):
 @export
 class AutoInputs(WorkflowReferenceDirective):
 	"""
-	The directive ``gha:autoinputs``: an entry for every input of the current workflow the document has no
-	``gha:input`` for.
+	The directive ``ghactions:autoinputs``: an entry for every input of the current workflow the document has no
+	``ghactions:input`` for.
 
 	.. code-block:: ReST
 
-	   .. gha:autoinputs::
+	   .. ghactions:autoinputs::
 
-	An entry is created as a ``gha:input`` without content creates it: the fields *Type*, *Required*, *Default Value*
-	and the *Description* of the workflow file. Inputs documented by a ``gha:input`` later in the document are left
-	out, too - the entries are created by :class:`AutoInputsTransform` when the whole document was parsed.
+	An entry is created as a ``ghactions:input`` without content creates it: the fields *Type*, *Required*, *Default
+	Value* and the *Description* of the workflow file. Inputs documented by a ``ghactions:input`` later in the document
+	are left out, too - the entries are created by :class:`AutoInputsTransform` when the whole document was parsed.
 	"""
 
-	directiveName: str = "gha:autoinputs"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:autoinputs"  #: Name the directive is invoked by.
 
 	has_content =               False  #: A boolean; ``True`` if content is allowed.
 	required_arguments =        0      #: Number of required directive arguments.
@@ -830,7 +831,7 @@ class AutoInputs(WorkflowReferenceDirective):
 		if (workflow := self._CurrentWorkflow()) is None:
 			return []
 
-		details = {"workflow": self.env.ref_context["gha:workflow"], "path": workflow.Path}
+		details = {"workflow": self.env.ref_context["ghactions:workflow"], "path": workflow.Path}
 		pending = nodes.pending(AutoInputsTransform, details)
 		self.set_source_info(pending)
 		self.state.document.note_pending(pending)
@@ -841,10 +842,10 @@ class AutoInputs(WorkflowReferenceDirective):
 @export
 class AutoInputsTransform(SphinxTransform):
 	"""
-	Replaces the placeholder of a ``gha:autoinputs`` by an entry for every input of its workflow the document has no
-	``gha:input`` for.
+	Replaces the placeholder of a ``ghactions:autoinputs`` by an entry for every input of its workflow the document has no
+	``ghactions:input`` for.
 
-	It runs after the document was parsed - so every ``gha:input`` has registered its entry - and before the entries
+	It runs after the document was parsed - so every ``ghactions:input`` has registered its entry - and before the entries
 	are collected for the table of contents and the index.
 	"""
 
@@ -858,7 +859,7 @@ class AutoInputsTransform(SphinxTransform):
 		"""
 		pending: nodes.pending = self.startnode
 		workflowName = pending.details["workflow"]
-		domain = self.env.get_domain("gha")
+		domain = self.env.get_domain("ghactions")
 		workflow = domain.Resolver.Load(pending.details["path"])
 
 		entries = []
@@ -876,20 +877,21 @@ def checkUndocumentedInputs(sphinx: Sphinx, doctree: nodes.document) -> None:
 	"""
 	Call-back for Sphinx' ``doctree-read`` event, warning about inputs the document has no entry for.
 
-	Every input of a workflow the document names by ``gha:workflow`` needs an entry in the document, by a ``gha:input``
-	or a ``gha:autoinputs``; one without is a warning of type ``gha.drift`` at the ``gha:workflow``.
+	Every input of a workflow the document names by ``ghactions:workflow`` needs an entry in the document, by a
+	``ghactions:input`` or a ``ghactions:autoinputs``; one without is a warning of type ``ghactions.drift`` at the
+	``ghactions:workflow``.
 
 	:param sphinx:  The Sphinx application.
 	:param doctree: The document read.
 	"""
-	if (workflows := sphinx.env.current_document.get("gha:workflows", None)) is None:
+	if (workflows := sphinx.env.current_document.get("ghactions:workflows", None)) is None:
 		return
 
-	domain = sphinx.env.get_domain("gha")
+	domain = sphinx.env.get_domain("ghactions")
 	for workflowName, path, location in workflows:
 		for name in domain.Resolver.Load(path).Inputs:
 			if domain.Objects.get(("input", f"{workflowName}.{name}"), ("", ""))[0] != sphinx.env.docname:
 				_logger.warning(
-					f"Input '{name}' of workflow '{workflowName}' has no entry: add a gha:input or a gha:autoinputs.",
+					f"Input '{name}' of workflow '{workflowName}' has no entry: add a ghactions:input or a ghactions:autoinputs.",
 					location=location, type=WARNING_TYPE, subtype="drift"
 				)

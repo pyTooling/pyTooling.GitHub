@@ -29,7 +29,7 @@
 # ==================================================================================================================== #
 #
 """
-Unit tests for :mod:`pyTooling.GitHub.Sphinx.Graph`, the ``gha:pipeline-graph`` directive.
+Unit tests for :mod:`pyTooling.GitHub.Sphinx.Graph`, the ``ghactions:pipeline-graph`` directive.
 
 A graph is checked as DOT source, not as a picture: every testcase builds a small Sphinx project around three workflow
 files and reads the code handed to :mod:`sphinx.ext.graphviz`.
@@ -147,36 +147,36 @@ TEST = dedent("""\
 	      - run: echo
 	""")
 
-#: A configuration registering a stub of the 'gha' domain, which knows a page for 'Test.yml' only.
+#: A configuration registering a stub of the 'ghactions' domain, which knows a page for 'Test.yml' only.
 CONFIGURATION = dedent("""\
 	from sphinx.domains import Domain
 
 	from pyTooling.GitHub.Sphinx.Graph import PipelineGraph, resolveLinks
 
 	class GitHubActionsDomain(Domain):
-	    name = "gha"
+	    name = "ghactions"
 	    label = "GitHub Actions"
 	    directives = {"pipeline-graph": PipelineGraph}
 
 	    def ResolveWorkflow(self, name):
-	        return {"Test": ("templates", "gha-workflow-Test")}.get(name, None)
+	        return {"Test": ("templates", "ghactions-workflow-Test")}.get(name, None)
 
 	def setup(app):
 	    app.add_domain(GitHubActionsDomain)
-	    app.add_config_value("gha_repository", None, "env")
-	    app.add_config_value("gha_workflow_directory", None, "env")
-	    app.add_config_value("gha_ref", None, "env")
+	    app.add_config_value("ghactions_repository", None, "env")
+	    app.add_config_value("ghactions_workflow_directory", None, "env")
+	    app.add_config_value("ghactions_ref", None, "env")
 	    app.connect("doctree-resolved", resolveLinks)
 
 	extensions = ["sphinx.ext.graphviz"]
-	gha_repository = "Owner/Repo"
+	ghactions_repository = "Owner/Repo"
 	""")
 
-#: A configuration loading pyTooling's extension, which registers the real 'gha' domain and the directive.
+#: A configuration loading pyTooling's extension, which registers the real 'ghactions' domain and the directive.
 CONFIGURATION_EXTENSION = dedent("""\
 	extensions = ["pyTooling.GitHub.Sphinx"]
-	gha_repository = "Owner/Repo"
-	gha_workflow_directory = "../.github/workflows"
+	ghactions_repository = "Owner/Repo"
+	ghactions_workflow_directory = "../.github/workflows"
 	""")
 
 
@@ -214,7 +214,7 @@ def build(
 	indentedOptions = "".join(f"   {line}\n" for line in dedent(options).splitlines())
 	(source / "index.rst").write_text(
 		f"Pipeline\n########\n\n.. toctree::\n   :hidden:\n\n   templates\n\n"
-		f".. gha:pipeline-graph:: {path}\n{indentedOptions}",
+		f".. ghactions:pipeline-graph:: {path}\n{indentedOptions}",
 		encoding="utf-8"
 	)
 
@@ -453,7 +453,7 @@ class Clusters(Testcase):
 		self.assertEqual(['\tsubgraph "cluster_Tests" {'], [line for line in code0.splitlines() if "subgraph" in line])
 		self.assertIn(
 			'\t\t"Tests/Tests (3.13)" [label=<Tests (3.13)<br/><font point-size="8" color="#3d4652">Test.yml</font>>, '
-			'style="rounded,filled", tooltip="uses: ./.github/workflows/Test.yml" /*gha-link:Test*/];',
+			'style="rounded,filled", tooltip="uses: ./.github/workflows/Test.yml" /*ghactions-link:Test*/];',
 			code0
 		)
 
@@ -493,7 +493,7 @@ class Clusters(Testcase):
 
 @mark.skipif(not sphinxIsSupported, reason="Sphinx 9.1 needs Python 3.12 or newer.")
 class Links(Testcase):
-	"""In HTML, a job links to the page the 'gha' domain resolves its template to."""
+	"""In HTML, a job links to the page the 'ghactions' domain resolves its template to."""
 
 	def test_Node(self) -> None:
 		"""Test.yml has a page; Prepare.yml has none."""
@@ -502,16 +502,16 @@ class Links(Testcase):
 
 		test = next(line for line in code.splitlines() if line.startswith('\t"Test" ['))
 		prepare = next(line for line in code.splitlines() if line.startswith('\t"Prepare" ['))
-		self.assertIn(' URL="templates.html#gha-workflow-Test" target="_top"];', test)
+		self.assertIn(' URL="templates.html#ghactions-workflow-Test" target="_top"];', test)
 		self.assertNotIn("URL=", prepare)
-		self.assertNotIn("gha-link", code)
+		self.assertNotIn("ghactions-link", code)
 
 	def test_Cluster(self) -> None:
 		"""An expanded template links its cluster."""
 		with TemporaryDirectory() as directory:
 			(code, ), _ = build(directory, ":depth: 1")
 
-		self.assertIn('\t\tURL="templates.html#gha-workflow-Test" target="_top"\n', code)
+		self.assertIn('\t\tURL="templates.html#ghactions-workflow-Test" target="_top"\n', code)
 
 	def test_Disabled(self) -> None:
 		"""':link: no' links nothing."""
@@ -526,48 +526,48 @@ class Links(Testcase):
 			(code, ), warnings = build(directory, builder="text")
 
 		self.assertNotIn("URL=", code)
-		self.assertNotIn("gha-link", code)
+		self.assertNotIn("ghactions-link", code)
 		self.assertEqual([], [warning for warning in warnings if "pipeline-graph" in warning])
 
 	def test_Extension(self) -> None:
-		"""With pyTooling's extension, a job links to the page a 'gha:workflow' directive documents its template on."""
+		"""With pyTooling's extension, a job links to the page documenting its template by 'ghactions:workflow'."""
 		with TemporaryDirectory() as directory:
 			(code, ), warnings = build(
 				directory,
 				configuration=CONFIGURATION_EXTENSION,
-				templates=".. gha:workflow:: Test\n\nTemplates\n#########\n"
+				templates=".. ghactions:workflow:: Test\n\nTemplates\n#########\n"
 			)
 
 		test = next(line for line in code.splitlines() if line.startswith('\t"Test" ['))
 		prepare = next(line for line in code.splitlines() if line.startswith('\t"Prepare" ['))
 		self.assertIn(' URL="templates.html#', test)
 		self.assertNotIn("URL=", prepare)
-		self.assertNotIn("gha-link", code)
-		self.assertEqual([], [warning for warning in warnings if "gha" in warning])
+		self.assertNotIn("ghactions-link", code)
+		self.assertEqual([], [warning for warning in warnings if "ghactions" in warning])
 
 
 @mark.skipif(not sphinxIsSupported, reason="Sphinx 9.1 needs Python 3.12 or newer.")
 class RefCheck(Testcase):
-	"""A job calling a template of the documented repository at another ref than 'gha_ref' is reported."""
+	"""A job calling a template of the documented repository at another ref than 'ghactions_ref' is reported."""
 
 	def test_Drift(self) -> None:
 		"""Test.yml is called at 'dev' while the documentation describes 'r1'; a foreign template isn't checked."""
 		with TemporaryDirectory() as directory:
-			_, warnings = build(directory, configuration=CONFIGURATION + 'gha_ref = "r1"\n')
+			_, warnings = build(directory, configuration=CONFIGURATION + 'ghactions_ref = "r1"\n')
 
-		drifts = [warning for warning in warnings if "[gha.ref]" in warning]
+		drifts = [warning for warning in warnings if "[ghactions.ref]" in warning]
 		self.assertEqual(1, len(drifts))
 		self.assertTrue(drifts[0].endswith(
-			"index.rst:9: WARNING: gha:pipeline-graph: Job 'Test' calls 'Test.yml' at ref 'dev', but the documentation "
-			"describes ref 'r1' (Pipeline.yml:22). [gha.ref]"
+			"index.rst:9: WARNING: ghactions:pipeline-graph: Job 'Test' calls 'Test.yml' at ref 'dev', but the documentation "
+			"describes ref 'r1' (Pipeline.yml:22). [ghactions.ref]"
 		), drifts[0])
 
 	def test_Unconfigured(self) -> None:
-		"""Without 'gha_ref', refs aren't checked."""
+		"""Without 'ghactions_ref', refs aren't checked."""
 		with TemporaryDirectory() as directory:
 			_, warnings = build(directory)
 
-		self.assertEqual([], [warning for warning in warnings if "gha" in warning])
+		self.assertEqual([], [warning for warning in warnings if "ghactions" in warning])
 
 
 @mark.skipif(not sphinxIsSupported, reason="Sphinx 9.1 needs Python 3.12 or newer.")
@@ -580,7 +580,7 @@ class Errors(Testcase):
 			codes, warnings = build(directory, path="../.github/workflows/Missing.yml")
 
 		self.assertEqual([], codes)
-		self.assertTrue(any("ERROR: gha:pipeline-graph: Couldn't draw '../.github/workflows/Missing.yml'" in warning
+		self.assertTrue(any("ERROR: ghactions:pipeline-graph: Couldn't draw '../.github/workflows/Missing.yml'" in warning
 			for warning in warnings), warnings)
 
 	def test_Direction(self) -> None:
@@ -589,7 +589,7 @@ class Errors(Testcase):
 			codes, warnings = build(directory, ":direction: RL")
 
 		self.assertEqual([], codes)
-		self.assertTrue(any("gha:pipeline-graph::direction: 'RL' not an accepted value" in warning
+		self.assertTrue(any("ghactions:pipeline-graph::direction: 'RL' not an accepted value" in warning
 			for warning in warnings), warnings)
 
 	def test_Boolean(self) -> None:
@@ -598,7 +598,7 @@ class Errors(Testcase):
 			codes, warnings = build(directory, ":reduce: maybe")
 
 		self.assertEqual([], codes)
-		self.assertTrue(any("gha:pipeline-graph::reduce: 'maybe' not supported" in warning for warning in warnings))
+		self.assertTrue(any("ghactions:pipeline-graph::reduce: 'maybe' not supported" in warning for warning in warnings))
 
 
 @mark.skipif(not sphinxIsSupported, reason="Sphinx 9.1 needs Python 3.12 or newer.")

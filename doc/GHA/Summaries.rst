@@ -17,7 +17,7 @@ Parameter Tables
    .. grid-item::
       :columns: 6
 
-      ``gha:parameter-table`` renders the summary tables of the current workflow's parameters - one per kind, the
+      ``ghactions:parameter-table`` renders the summary tables of the current workflow's parameters - one per kind, the
       parameters in file order, each name linked to its entry:
 
       * **inputs** - *Parameter Name*, *Required*, *Type* and *Default*;
@@ -37,15 +37,15 @@ Parameter Tables
 
          .. rubric:: Inputs
 
-         .. gha:parameter-table::
+         .. ghactions:parameter-table::
             :kinds: inputs
 
          .. rubric:: Secrets
 
-         .. gha:parameter-table::
+         .. ghactions:parameter-table::
             :kinds: secrets
 
-.. rst:directive:: .. gha:parameter-table::
+.. rst:directive:: .. ghactions:parameter-table::
 
    .. rst:directive:option:: kinds: <kind> ...
 
@@ -65,16 +65,16 @@ Interface
    .. grid-item::
       :columns: 6
 
-      ``gha:interface`` renders the contract of the current workflow with its caller, as a field list:
+      ``ghactions:interface`` renders the contract of the current workflow with its caller, as a field list:
 
       * **Required Inputs**, **Secrets** - a secret the caller has to pass is marked *required* - and **Outputs**,
         each linked to its entry;
       * **Permissions** - the permissions a caller has to grant the ``GITHUB_TOKEN``. A called workflow can keep or
         reduce them, never raise them, so these are the permissions the workflow's jobs and the jobs of the workflows
         they call declare - per scope the highest access, with the job and the line asking for it, linked to GitHub
-        when :confval:`gha_ref` is configured.
+        when :confval:`ghactions_ref` is configured.
 
-      What the workflow uses is listed by ``gha:dependencies``.
+      What the workflow uses is listed by ``ghactions:dependencies``.
 
    .. grid-item::
       :columns: 6
@@ -83,9 +83,9 @@ Interface
 
          .. topic:: Interface
 
-            .. gha:interface::
+            .. ghactions:interface::
 
-.. rst:directive:: .. gha:interface::
+.. rst:directive:: .. ghactions:interface::
 
    Summarizes the contract of the current workflow with its caller.
 
@@ -100,8 +100,8 @@ Dependencies
    .. grid-item::
       :columns: 6
 
-      ``gha:dependencies`` renders what the current workflow uses, as a nested bullet list. From the workflow file,
-      and from the files of the templates and actions it uses, as far as they are in the documented repository:
+      ``ghactions:dependencies`` renders what the current workflow uses, as a nested bullet list. From the workflow
+      file, and from the files of the templates and actions it uses, as far as they are in the documented repository:
 
       * the **templates** the jobs call - each once, with the jobs calling it, when several do - each with its own
         dependencies. A template of the documented repository links to its page, one of another repository to
@@ -121,7 +121,7 @@ Dependencies
 
          .. topic:: Dependencies
 
-            .. gha:dependencies::
+            .. ghactions:dependencies::
 
                * pyTooling/upload-artifact
 
@@ -131,7 +131,7 @@ Dependencies
 
                  * :term:`wheel`
 
-.. rst:directive:: .. gha:dependencies::
+.. rst:directive:: .. ghactions:dependencies::
 
    Lists the templates, actions and container images the current workflow uses, merged with the hand-written items of
    its content. A derived item is named by:
@@ -148,7 +148,7 @@ Dependencies
    ========================= ==========================================================================================
 
    A file of the documented repository that doesn't exist - a template or an :file:`action.yml` - is a warning of type
-   ``gha.workflow``, and its item has no nested list.
+   ``ghactions.workflow``, and its item has no nested list.
 
 
 .. _GHA/YAML:
@@ -161,10 +161,10 @@ YAML Excerpts
    .. grid-item::
       :columns: 6
 
-      ``gha:yaml`` renders the current workflow's file, or a part of it, as a YAML code block. The lines are numbered
-      as in the file, and the part is shifted left by the indentation of its first line.
+      ``ghactions:yaml`` renders the current workflow's file, or a part of it, as a YAML code block. The lines are
+      numbered as in the file, and the part is shifted left by the indentation of its first line.
 
-      The caption names the file and the lines. When :confval:`gha_repository` and :confval:`gha_ref` are
+      The caption names the file and the lines. When :confval:`ghactions_repository` and :confval:`ghactions_ref` are
       configured, it links to these lines on GitHub:
       ``https://github.com/<repository>/blob/<ref>/.github/workflows/<file>#L<first>-L<last>``.
 
@@ -173,13 +173,13 @@ YAML Excerpts
 
       .. code-block:: ReST
 
-         .. gha:yaml::
+         .. ghactions:yaml::
             :section: inputs
 
-         .. gha:yaml::
+         .. ghactions:yaml::
             :job: Package
 
-.. rst:directive:: .. gha:yaml::
+.. rst:directive:: .. ghactions:yaml::
 
    .. rst:directive:option:: section: inputs | outputs | secrets | jobs
 

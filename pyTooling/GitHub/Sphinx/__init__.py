@@ -29,7 +29,7 @@
 # ==================================================================================================================== #
 #
 """
-A Sphinx domain ``gha`` documenting GitHub Actions workflows from their YAML files.
+A Sphinx domain ``ghactions`` documenting GitHub Actions workflows from their YAML files.
 
 The facts of a reusable workflow - an input's type, whether it is required, its default - are read from the workflow
 file by :mod:`pyTooling.GitHub.WorkflowFile`, so a page states them without copying them. What the file can't say
@@ -37,12 +37,12 @@ stays hand-written, as the content of a directive:
 
 .. code-block:: rst
 
-   .. gha:workflow:: Parameters
+   .. ghactions:workflow:: Parameters
 
    Parameters
    ##########
 
-   .. gha:input:: package_name
+   .. ghactions:input:: package_name
 
       :Possible Values: Any valid Python package name.
       :Example:         ``myPackage``
@@ -51,25 +51,25 @@ stays hand-written, as the content of a directive:
 
 * Directives
 
-  * ``gha:workflow``
-  * ``gha:input``
-  * ``gha:output``
-  * ``gha:secret``
+  * ``ghactions:workflow``
+  * ``ghactions:input``
+  * ``ghactions:output``
+  * ``ghactions:secret``
 
 * Roles
 
-  * ``:gha:workflow:``
-  * ``:gha:input:``
-  * ``:gha:output:``
-  * ``:gha:secret:``
+  * ``:ghactions:workflow:``
+  * ``:ghactions:input:``
+  * ``:ghactions:output:``
+  * ``:ghactions:secret:``
 
 * Configuration values, as listed in :attr:`GitHubActionsDomain.configValues`
 
-  * ``gha_server``
-  * ``gha_repository``
-  * ``gha_workflow_directory``
-  * ``gha_ref``
-  * ``gha_label_prefix``
+  * ``ghactions_server``
+  * ``ghactions_repository``
+  * ``ghactions_workflow_directory``
+  * ``ghactions_ref``
+  * ``ghactions_label_prefix``
 
 The workflow files are read with ``ruamel.yaml`` when a directive runs, not when this module is imported.
 
@@ -78,7 +78,7 @@ The workflow files are read with ``ruamel.yaml`` when a directive runs, not when
    :mod:`pyTooling.GitHub.WorkflowFile`
       |rarr| The model of a workflow file the domain reads.
    :mod:`pyTooling.GitHub.Sphinx.Graph`
-      |rarr| The ``gha:pipeline-graph`` directive, drawing a workflow's jobs and their ``needs``.
+      |rarr| The ``ghactions:pipeline-graph`` directive, drawing a workflow's jobs and their ``needs``.
    :mod:`pyTooling.GitHub.Sphinx.Reference`
       |rarr| The directives summarizing a workflow: its parameters, its interface, its YAML.
 """
@@ -114,8 +114,8 @@ __all__ = ["NO_DEFAULT", "WARNING_TYPE", "LEADING_FIELDS"]
 NO_DEFAULT = "— — — —"
 
 #: The type of the warnings this domain emits; the drift warnings have the subtype ``drift``, so
-#: ``suppress_warnings = ["gha.drift"]`` silences them.
-WARNING_TYPE = "gha"
+#: ``suppress_warnings = ["ghactions.drift"]`` silences them.
+WARNING_TYPE = "ghactions"
 
 #: The fields a *Description* taken from the workflow file follows.
 LEADING_FIELDS = ("Type", "Required", "Default Value", "Possible Values")
@@ -148,21 +148,21 @@ def formatValue(value: ValueT) -> str:
 @export
 class WorkflowDirective(BaseDirective):
 	"""
-	The directive ``gha:workflow``: a workflow's target, its index entry, and the current workflow of the document.
+	The directive ``ghactions:workflow``: a workflow's target, its index entry, and the current workflow of the document.
 
 	.. code-block:: rst
 
-	   .. gha:workflow:: Parameters
+	   .. ghactions:workflow:: Parameters
 	      :file: ../../.github/workflows/Parameters.yml
 
 	The argument is the workflow's name, its file's stem. Without ``:file:``, the file is ``<name>.yml`` in
-	``gha_workflow_directory``. Every ``gha:input``, ``gha:output`` and ``gha:secret`` following it in the document
-	belongs to this workflow.
+	``ghactions_workflow_directory``. Every ``ghactions:input``, ``ghactions:output`` and ``ghactions:secret`` following
+	it in the document belongs to this workflow.
 
 	The directive writes no visible output. Placed above a page's title, its target is the title, as a label is.
 	"""
 
-	directiveName: str = "gha:workflow"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:workflow"  #: Name the directive is invoked by.
 
 	has_content =        False                                   #: The directive has no content.
 	required_arguments = 1                                       #: The workflow's name.
@@ -175,7 +175,7 @@ class WorkflowDirective(BaseDirective):
 		:returns: An index node and the workflow's target.
 		"""
 		name = self.arguments[0].strip()
-		domain: GitHubActionsDomain = self.env.get_domain("gha")
+		domain: GitHubActionsDomain = self.env.get_domain("ghactions")
 
 		if "file" in self.options:
 			path = Path(self.env.relfn2path(self.options["file"], self.env.docname)[1])
@@ -188,7 +188,7 @@ class WorkflowDirective(BaseDirective):
 
 		if path is None:
 			_logger.warning(
-				f"{self.directiveName} '{name}' has no file: give option ':file:' or set 'gha_workflow_directory'.",
+				f"{self.directiveName} '{name}' has no file: give option ':file:' or set 'ghactions_workflow_directory'.",
 				location=self.get_location(), type=WARNING_TYPE, subtype="workflow"
 			)
 		elif not path.exists():
@@ -200,11 +200,11 @@ class WorkflowDirective(BaseDirective):
 			self.env.note_dependency(str(path))
 			self._Load(domain, name, path)
 
-		self.env.ref_context["gha:workflow"] = name
+		self.env.ref_context["ghactions:workflow"] = name
 
-		nodeID = make_id(self.env, self.state.document, "gha-workflow", name)
+		nodeID = make_id(self.env, self.state.document, "ghactions-workflow", name)
 		target = nodes.target("", "", ids=[nodeID])
-		if (prefix := self.config.gha_label_prefix) is not None:
+		if (prefix := self.config.ghactions_label_prefix) is not None:
 			label = f"{prefix}/{name}"
 			target["ids"].append(nodes.make_id(label))
 			target["names"].append(fully_normalize_name(label))
@@ -220,7 +220,7 @@ class WorkflowDirective(BaseDirective):
 		Read the workflow file, make it the current one, and warn about inputs that are required and have a default.
 
 		A file that isn't a well-formed workflow is reported as a warning at the place in the file, and the document
-		has no current workflow model then. A workflow read is added to the document's list ``gha:workflows`` of
+		has no current workflow model then. A workflow read is added to the document's list ``ghactions:workflows`` of
 		(name, path, location of the directive), which is checked when the document was read.
 
 		:param domain: The domain.
@@ -248,8 +248,8 @@ class WorkflowDirective(BaseDirective):
 				location=self.get_location(), type=WARNING_TYPE, subtype="workflow"
 			)
 
-		self.env.current_document["gha:workflow-file"] = path
-		self.env.current_document.setdefault("gha:workflows", []).append((name, path, self.get_location()))
+		self.env.current_document["ghactions:workflow-file"] = path
+		self.env.current_document.setdefault("ghactions:workflows", []).append((name, path, self.get_location()))
 
 		for parameter in workflow.Inputs.values():
 			if parameter.Required and parameter.Default is not None:
@@ -271,8 +271,8 @@ class ParameterDirective(BaseDirective):
 
 	A hand-written field repeating a fact of the file is a warning, and the file's value is shown.
 
-	Besides its anchor ``gha-<type>-<Workflow>.<name>``, the section carries the anchor of its label and - unless the
-	document uses it already - the anchor docutils derives from a title, as a hand-written section has.
+	Besides its anchor ``ghactions-<type>-<Workflow>.<name>``, the section carries the anchor of its label and - unless
+	the document uses it already - the anchor docutils derives from a title, as a hand-written section has.
 	"""
 
 	OBJECT_TYPE: ClassVar[str]              #: The domain's object type, as ``input``.
@@ -287,17 +287,17 @@ class ParameterDirective(BaseDirective):
 		"""
 		Create the parameter's entry and register it.
 
-		:returns: An index node and the entry's section, or nothing outside a ``gha:workflow``.
+		:returns: An index node and the entry's section, or nothing outside a ``ghactions:workflow``.
 		"""
 		name = self.arguments[0].strip()
-		if (workflowName := self.env.ref_context.get("gha:workflow", None)) is None:
+		if (workflowName := self.env.ref_context.get("ghactions:workflow", None)) is None:
 			_logger.warning(
-				f"{self.directiveName} '{name}' is not preceded by a gha:workflow.",
+				f"{self.directiveName} '{name}' is not preceded by a ghactions:workflow.",
 				location=self.get_location(), type=WARNING_TYPE, subtype="workflow"
 			)
 			return []
 
-		domain: GitHubActionsDomain = self.env.get_domain("gha")
+		domain: GitHubActionsDomain = self.env.get_domain("ghactions")
 		parameter = None
 		if (workflow := domain.GetCurrentWorkflow()) is not None:
 			if (parameter := getattr(workflow, self.COLLECTION).get(name, None)) is None:
@@ -358,13 +358,13 @@ class ParameterDirective(BaseDirective):
 		:returns:            An index node and the entry's section.
 		"""
 		fullName = f"{workflowName}.{name}"
-		nodeID = make_id(env, document, f"gha-{cls.OBJECT_TYPE}", fullName)
+		nodeID = make_id(env, document, f"ghactions-{cls.OBJECT_TYPE}", fullName)
 		section = nodes.section("", nodes.title(name, name), ids=[nodeID])
 		if (titleID := nodes.make_id(name)) not in document.ids:
 			section["ids"].append(titleID)
 
 		# The label's anchor comes last: docutils links a name to a node's last anchor, so a link keeps its target.
-		if (prefix := env.config.gha_label_prefix) is not None:
+		if (prefix := env.config.ghactions_label_prefix) is not None:
 			label = f"{prefix}/{workflowName}/{cls.LABEL_KIND}/{name}"
 			section["ids"].append(nodes.make_id(label))
 			section["names"].append(fully_normalize_name(label))
@@ -386,7 +386,7 @@ class ParameterDirective(BaseDirective):
 			section += nodes.field_list("", *fields)
 		section.extend(content)
 
-		domain: GitHubActionsDomain = env.get_domain("gha")
+		domain: GitHubActionsDomain = env.get_domain("ghactions")
 		domain.NoteObject(cls.OBJECT_TYPE, fullName, nodeID, section)
 		return [
 			addnodes.index(entries=[("single", f"{name} ({cls.OBJECT_TYPE} of {workflowName})", nodeID, "", None)]),
@@ -447,12 +447,12 @@ class ParameterDirective(BaseDirective):
 @export
 class InputDirective(ParameterDirective):
 	"""
-	The directive ``gha:input``: an input of the current workflow.
+	The directive ``ghactions:input``: an input of the current workflow.
 
 	The fields *Type*, *Required* and *Default Value* are taken from the workflow file.
 	"""
 
-	directiveName: str = "gha:input"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:input"  #: Name the directive is invoked by.
 
 	OBJECT_TYPE = "input"                                #: The domain's object type.
 	LABEL_KIND =  "Input"                                #: The kind in a label.
@@ -477,13 +477,13 @@ class InputDirective(ParameterDirective):
 @export
 class SecretDirective(ParameterDirective):
 	"""
-	The directive ``gha:secret``: a secret of the current workflow.
+	The directive ``ghactions:secret``: a secret of the current workflow.
 
 	The fields *Type* - a secret is a string -, *Required* and *Default Value* - a secret has none - are taken from the
 	workflow file.
 	"""
 
-	directiveName: str = "gha:secret"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:secret"  #: Name the directive is invoked by.
 
 	OBJECT_TYPE = "secret"                               #: The domain's object type.
 	LABEL_KIND =  "Secret"                               #: The kind in a label.
@@ -508,13 +508,13 @@ class SecretDirective(ParameterDirective):
 @export
 class OutputDirective(ParameterDirective):
 	"""
-	The directive ``gha:output``: an output of the current workflow.
+	The directive ``ghactions:output``: an output of the current workflow.
 
 	A workflow file states no type and no default for an output, so every field is hand-written; only the
 	*Description* falls back to the file's ``description``.
 	"""
 
-	directiveName: str = "gha:output"  #: Name the directive is invoked by.
+	directiveName: str = "ghactions:output"  #: Name the directive is invoked by.
 
 	OBJECT_TYPE = "output"   #: The domain's object type.
 	LABEL_KIND =  "Output"   #: The kind in a label.
@@ -525,9 +525,9 @@ class OutputDirective(ParameterDirective):
 @export
 class GitHubActionsXRefRole(XRefRole):
 	"""
-	The roles ``:gha:workflow:``, ``:gha:input:``, ``:gha:output:`` and ``:gha:secret:``.
+	The roles ``:ghactions:workflow:``, ``:ghactions:input:``, ``:ghactions:output:`` and ``:ghactions:secret:``.
 
-	A parameter is named as ``<Workflow>.<name>``; inside a ``gha:workflow``, the name alone refers to the current
+	A parameter is named as ``<Workflow>.<name>``; inside a ``ghactions:workflow``, the name alone refers to the current
 	workflow's parameter. A leading ``~`` shows only the part behind the last dot.
 	"""
 
@@ -549,7 +549,7 @@ class GitHubActionsXRefRole(XRefRole):
 		:param target:             The target.
 		:returns:                  The title and the target.
 		"""
-		refnode["gha:workflow"] = env.ref_context.get("gha:workflow", None)
+		refnode["ghactions:workflow"] = env.ref_context.get("ghactions:workflow", None)
 		if not has_explicit_title and target.startswith("~"):
 			target = target[1:]
 			title = target.rpartition(".")[2]
@@ -560,14 +560,15 @@ class GitHubActionsXRefRole(XRefRole):
 @export
 class GitHubActionsDomain(Domain):
 	"""
-	The Sphinx domain ``gha``, documenting GitHub Actions workflows.
+	The Sphinx domain ``ghactions``, documenting GitHub Actions workflows.
 
 	Its objects are keyed by type and name - ``("workflow", "Parameters")``, ``("input", "Parameters.package_name")``
 	- and located by document and anchor. Directives of other modules reach the domain by
-	``self.env.get_domain("gha")``, and use :meth:`GetCurrentWorkflow`, :attr:`Resolver` and :meth:`ResolveWorkflow`.
+	``self.env.get_domain("ghactions")``, and use :meth:`GetCurrentWorkflow`, :attr:`Resolver` and
+	:meth:`ResolveWorkflow`.
 	"""
 
-	name =         "gha"             #: Name of the domain, the prefix of its directives and roles.
+	name =         "ghactions"             #: Name of the domain, the prefix of its directives and roles.
 	label =        "GitHub Actions"  #: Name of the domain, as displayed.
 	data_version = 1                 #: Version of the data layout; a change discards pickled environments.
 
@@ -597,17 +598,17 @@ class GitHubActionsDomain(Domain):
 	}  #: The domain's data: ``objects`` maps (type, name) to (document, anchor).
 
 	#: The configuration values the domain adds to :file:`conf.py`, as ``name: (default, rebuild, types)``. Each is
-	#: registered with the domain's name as prefix, e.g. ``gha_repository``.
+	#: registered with the domain's name as prefix, e.g. ``ghactions_repository``.
 	#:
 	#: ``server``
 	#:    The URL of the GitHub server links point to, ``https://github.com`` by default, or a GitHub Enterprise
 	#:    Server's, as ``https://github.example.com``.
 	#: ``repository``
-	#:    The documented repository, as ``owner/repo``. A ``uses`` naming it is read from ``gha_workflow_directory``,
-	#:    whatever its ref.
+	#:    The documented repository, as ``owner/repo``. A ``uses`` naming it is read from
+	#:    ``ghactions_workflow_directory``, whatever its ref.
 	#: ``workflow_directory``
 	#:    The directory holding the workflow files, relative to the Sphinx source directory, as
-	#:    ``../.github/workflows``. A ``gha:workflow`` without ``:file:`` reads ``<name>.yml`` from it.
+	#:    ``../.github/workflows``. A ``ghactions:workflow`` without ``:file:`` reads ``<name>.yml`` from it.
 	#: ``ref``
 	#:    The ref - a branch or tag - of the documented repository the documentation describes, as ``r8``, or ``None``.
 	#:    A directive may warn about a ``uses`` of the documented repository at another ref.
@@ -648,9 +649,10 @@ class GitHubActionsDomain(Domain):
 		"""
 		Read-only property to return the directory holding the workflow files.
 
-		:returns: ``gha_workflow_directory`` resolved against the Sphinx source directory, or ``None`` if it isn't set.
+		:returns: ``ghactions_workflow_directory`` resolved against the Sphinx source directory, or ``None`` if it
+		          isn't set.
 		"""
-		if (directory := self.env.config.gha_workflow_directory) is None:
+		if (directory := self.env.config.ghactions_workflow_directory) is None:
 			return None
 
 		return (Path(self.env.srcdir) / directory).resolve()
@@ -661,7 +663,7 @@ class GitHubActionsDomain(Domain):
 		Read-only property to access the resolver reading the workflow files (:attr:`_resolver`), created when first
 		needed.
 
-		It maps ``gha_repository`` to :attr:`WorkflowDirectory`, and reads every file once per build and process - a
+		It maps ``ghactions_repository`` to :attr:`WorkflowDirectory`, and reads every file once per build and process - a
 		parallel build reads a file once in every process that needs it.
 
 		:returns:                       The resolver.
@@ -671,7 +673,7 @@ class GitHubActionsDomain(Domain):
 			from pyTooling.GitHub.WorkflowFile import WorkflowResolver
 
 			repositories = {}
-			repository = self.env.config.gha_repository
+			repository = self.env.config.ghactions_repository
 			if repository is not None and (directory := self.WorkflowDirectory) is not None:
 				repositories[repository] = directory
 
@@ -681,12 +683,12 @@ class GitHubActionsDomain(Domain):
 
 	def GetCurrentWorkflow(self) -> Nullable[Workflow]:
 		"""
-		Return the model of the current document's workflow, as set by the last ``gha:workflow``.
+		Return the model of the current document's workflow, as set by the last ``ghactions:workflow``.
 
-		:returns: The workflow, or ``None`` if the document has no ``gha:workflow``, or its file couldn't be read -
-		          which the ``gha:workflow`` directive reported already.
+		:returns: The workflow, or ``None`` if the document has no ``ghactions:workflow``, or its file couldn't be read -
+		          which the ``ghactions:workflow`` directive reported already.
 		"""
-		if (path := self.env.current_document.get("gha:workflow-file", None)) is None:
+		if (path := self.env.current_document.get("ghactions:workflow-file", None)) is None:
 			return None
 
 		return self.Resolver.Load(path)
@@ -696,7 +698,7 @@ class GitHubActionsDomain(Domain):
 		Return where a workflow is documented.
 
 		:param name:        The workflow's name, its file's stem.
-		:returns:           The document and the anchor of its ``gha:workflow``, or ``None`` if it isn't documented.
+		:returns:           The document and the anchor of its ``ghactions:workflow``, or ``None`` if it isn't documented.
 		:raises ValueError: If parameter 'name' is ``None``.
 		:raises TypeError:  If parameter 'name' is not of type :class:`str`.
 		"""
@@ -745,7 +747,7 @@ class GitHubActionsDomain(Domain):
 		objects = self.data["objects"]
 		if (known := objects.get((objectType, name), None)) is not None:
 			_logger.warning(
-				f"Duplicate description of gha:{objectType} '{name}', other instance in '{known[0]}'.",
+				f"Duplicate description of ghactions:{objectType} '{name}', other instance in '{known[0]}'.",
 				location=location, type=WARNING_TYPE, subtype="duplicate"
 			)
 
@@ -798,7 +800,7 @@ class GitHubActionsDomain(Domain):
 		:param contnode:    The node rendering the reference's title.
 		:returns:           The reference, or ``None`` if the target isn't documented.
 		"""
-		if typ != "workflow" and "." not in target and (workflowName := node.get("gha:workflow", None)) is not None:
+		if typ != "workflow" and "." not in target and (workflowName := node.get("ghactions:workflow", None)) is not None:
 			target = f"{workflowName}.{target}"
 
 		if (location := self.data["objects"].get((typ, target), None)) is None:
@@ -829,7 +831,7 @@ class GitHubActionsDomain(Domain):
 		results = []
 		for objectType in self.object_types:
 			if (reference := self.resolve_xref(env, fromdocname, builder, objectType, target, node, contnode)) is not None:
-				results.append((f"gha:{objectType}", reference))
+				results.append((f"ghactions:{objectType}", reference))
 
 		return results
 
@@ -846,7 +848,7 @@ class GitHubActionsDomain(Domain):
 @export
 def setup(sphinx: Sphinx) -> dict[str, Any]:
 	"""
-	Register the domain ``gha``, its directives and its configuration values with Sphinx.
+	Register the domain ``ghactions``, its directives and its configuration values with Sphinx.
 
 	The directives derive from :class:`~pyTooling.Sphinx.BaseDirective` and draw graphs with
 	:mod:`sphinx.ext.graphviz`, so the extension :mod:`pyTooling.Sphinx` is set up first.
@@ -862,12 +864,12 @@ def setup(sphinx: Sphinx) -> dict[str, Any]:
 	sphinx.setup_extension("pyTooling.Sphinx")
 
 	sphinx.add_domain(GitHubActionsDomain)
-	sphinx.add_directive_to_domain("gha", "pipeline-graph", PipelineGraph)
-	sphinx.add_directive_to_domain("gha", "parameter-table", ParameterTable)
-	sphinx.add_directive_to_domain("gha", "interface", Interface)
-	sphinx.add_directive_to_domain("gha", "dependencies", Dependencies)
-	sphinx.add_directive_to_domain("gha", "yaml", YAMLExcerpt)
-	sphinx.add_directive_to_domain("gha", "autoinputs", AutoInputs)
+	sphinx.add_directive_to_domain("ghactions", "pipeline-graph", PipelineGraph)
+	sphinx.add_directive_to_domain("ghactions", "parameter-table", ParameterTable)
+	sphinx.add_directive_to_domain("ghactions", "interface", Interface)
+	sphinx.add_directive_to_domain("ghactions", "dependencies", Dependencies)
+	sphinx.add_directive_to_domain("ghactions", "yaml", YAMLExcerpt)
+	sphinx.add_directive_to_domain("ghactions", "autoinputs", AutoInputs)
 
 	for configName, (default, rebuild, types) in GitHubActionsDomain.configValues.items():
 		sphinx.add_config_value(f"{GitHubActionsDomain.name}_{configName}", default, rebuild, types)
