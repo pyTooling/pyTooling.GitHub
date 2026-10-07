@@ -33,7 +33,6 @@ PyPI (see :ref:`INSTALL`).
 
 .. dependency-table:: package
    :caption: Mandatory dependencies of the pyTooling.GitHub package.
-   :depth: 1
 
 
 .. _DEP/diagram:
@@ -106,7 +105,6 @@ install the mandatory dependencies too.
 
 .. dependency-table:: unittest
    :caption: Dependencies for unit testing and code coverage.
-   :depth: 1
 
 
 .. _DEP/apptesting:
@@ -142,7 +140,6 @@ install the mandatory dependencies too.
 
 .. dependency-table:: apptest
    :caption: Dependencies for application testing.
-   :depth: 1
 
 
 .. _DEP/documentation:
@@ -178,4 +175,3 @@ the mandatory dependencies too.
 
 .. dependency-table:: documentation
    :caption: Dependencies for building the documentation.
-   :depth: 1
