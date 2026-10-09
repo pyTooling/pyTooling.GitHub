@@ -33,23 +33,23 @@ A data model of a GitHub Actions workflow file.
 
 A workflow file is read once into objects:
 
-.. code-block:: text
+.. tree::
 
-   Workflow                 a workflow file, e.g. '.github/workflows/CompletePipeline.yml'
-   +-- Input                an input of 'on.workflow_call'
-   +-- Output               an output of 'on.workflow_call'
-   +-- Secret               a secret of 'on.workflow_call'
-   +-- Permission           a permission the workflow declares
-   +-- Job                  a job, in file order
-       +-- UsesReference    the reusable workflow the job calls
-       +-- Permission       a permission the job declares
-       +-- Matrix           the job's 'strategy.matrix'
-       +-- Step             a step of the job
-           +-- UsesReference    the action the step runs
+   - :class:`Workflow`            | a workflow file, e.g. :file:`.github/workflows/CompletePipeline.yml`
+     - :class:`Input`             | an input of ``on.workflow_call``
+     - :class:`Output`            | an output of ``on.workflow_call``
+     - :class:`Secret`            | a secret of ``on.workflow_call``
+     - :class:`Permission`        | a permission the workflow declares
+     - :class:`Job`               | a job, in file order
+       - :class:`UsesReference`   | the reusable workflow the job calls
+       - :class:`Permission`      | a permission the job declares
+       - :class:`Matrix`          | the job's ``strategy.matrix``
+       - :class:`Step`            | a step of the job
+         - :class:`UsesReference` | the action the step runs
 
-   Action                   an action's file, e.g. '.github/actions/ComputeRequirements/action.yml'
-   +-- Step                 a step of a composite action
-       +-- UsesReference    the action the step runs
+   - :class:`Action`              | an action's file, e.g. :file:`.github/actions/ComputeRequirements/action.yml`
+     - :class:`Step`              | a step of a composite action
+       - :class:`UsesReference`   | the action the step runs
 
 Every element knows its parent, the workflow it belongs to, the file it was read from - a workflow's or an action's -
 and the line it starts at, so a consumer can name the place a finding comes from, as ``CompletePipeline.yml:552``.
