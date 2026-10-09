@@ -34,18 +34,18 @@ A data model of a GitHub Actions workflow run.
 The GitHub REST API answers with nested JSON objects whose fields are strings - ``"status": "completed"``,
 ``"conclusion": "timed_out"``, timestamps as ISO 8601 text. This model reads those payloads once into objects:
 
-.. code-block:: text
+.. tree::
 
-   PipelineGroup            every run started for one commit
-   +-- Pipeline             a workflow run
-       +-- Workflow         a called (reusable) workflow, grouping the jobs it contains
-       |   +-- Workflow     a workflow called by that workflow
-       |   +-- Matrix       a matrix, grouping the job instances it produced
-       |   |   +-- MatrixJob
-       |   +-- Job
-       +-- Matrix
-       +-- Job              a job that ran on a runner
-           +-- Step         a step of that job
+   - :class:`PipelineGroup`                | every run started for one commit
+     - :class:`Pipeline`                   | a workflow run
+       - :class:`~pyTooling.CI.Workflow`   | a called (reusable) workflow, grouping the jobs it contains
+         - :class:`~pyTooling.CI.Workflow` | a workflow called by that workflow
+         - :class:`~pyTooling.CI.Matrix`   | a matrix, grouping the job instances it produced
+           - :class:`MatrixJob`
+         - :class:`Job`
+       - :class:`~pyTooling.CI.Matrix`
+       - :class:`Job`                      | a job that ran on a runner
+         - :class:`Step`                   | a step of that job
 
 The classes derive from the service-independent model :mod:`pyTooling.CI`, which a called workflow, a
 matrix and their base-class are taken from unchanged. Every element knows its parent and the pipeline it belongs to,

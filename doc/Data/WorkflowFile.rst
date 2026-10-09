@@ -26,19 +26,19 @@ The file is read with ``ruamel.yaml``, a requirement of this package.
 The Tree
 ********
 
-.. code-block:: text
+.. tree::
 
-   Workflow                 a workflow file
-   +-- Input                an input of 'on.workflow_call'
-   +-- Output               an output of 'on.workflow_call'
-   +-- Secret               a secret of 'on.workflow_call'
-   +-- Permission           a permission the workflow declares
-   +-- Job                  a job, in file order
-       +-- UsesReference    the reusable workflow the job calls
-       +-- Permission       a permission the job declares
-       +-- Matrix           the job's 'strategy.matrix'
-       +-- Step             a step of the job
-           +-- UsesReference    the action the step runs
+   - :class:`~pyTooling.GitHub.WorkflowFile.Workflow`            | a workflow file
+     - :class:`~pyTooling.GitHub.WorkflowFile.Input`             | an input of ``on.workflow_call``
+     - :class:`~pyTooling.GitHub.WorkflowFile.Output`            | an output of ``on.workflow_call``
+     - :class:`~pyTooling.GitHub.WorkflowFile.Secret`            | a secret of ``on.workflow_call``
+     - :class:`~pyTooling.GitHub.WorkflowFile.Permission`        | a permission the workflow declares
+     - :class:`~pyTooling.GitHub.WorkflowFile.Job`               | a job, in file order
+       - :class:`~pyTooling.GitHub.WorkflowFile.UsesReference`   | the reusable workflow the job calls
+       - :class:`~pyTooling.GitHub.WorkflowFile.Permission`      | a permission the job declares
+       - :class:`~pyTooling.GitHub.WorkflowFile.Matrix`          | the job's ``strategy.matrix``
+       - :class:`~pyTooling.GitHub.WorkflowFile.Step`            | a step of the job
+         - :class:`~pyTooling.GitHub.WorkflowFile.UsesReference` | the action the step runs
 
 * A workflow is named by its file's stem - ``CompletePipeline`` - because a caller names it that way in ``uses``.
   The ``name`` key is :attr:`~pyTooling.GitHub.WorkflowFile.Workflow.DisplayName`.

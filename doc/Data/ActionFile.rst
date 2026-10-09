@@ -29,11 +29,11 @@ with ``uses``:
 The Tree
 ********
 
-.. code-block:: text
+.. tree::
 
-   Action                   an action's file, 'action.yml'
-   +-- Step                 a step of a composite action
-       +-- UsesReference    the action the step runs
+   - :class:`~pyTooling.GitHub.WorkflowFile.Action`            | an action's file, :file:`action.yml`
+     - :class:`~pyTooling.GitHub.WorkflowFile.Step`            | a step of a composite action
+       - :class:`~pyTooling.GitHub.WorkflowFile.UsesReference` | the action the step runs
 
 * An action is named by its directory - ``ComputeRequirements`` for
   :file:`.github/actions/ComputeRequirements/action.yml` -, because a step names it that way in ``uses``. The ``name``
