@@ -21,18 +21,18 @@ Pipeline Run
 The Tree
 ********
 
-.. code-block:: text
+.. tree::
 
-   PipelineGroup            every run started for one commit
-   +-- Pipeline             a workflow run
-       +-- Workflow         a called (reusable) workflow
-       |   +-- Workflow     a workflow called by that workflow
-       |   +-- Matrix       a matrix
-       |   |   +-- MatrixJob    one instance it produced
-       |   +-- Job
-       +-- Matrix
-       +-- Job              a job that ran on a runner
-           +-- Step         a step of that job
+   - :class:`~pyTooling.GitHub.PipelineGroup`     | every run started for one commit
+     - :class:`~pyTooling.GitHub.Pipeline`        | a workflow run
+       - :class:`~pyTooling.CI.Workflow`          | a called (reusable) workflow
+         - :class:`~pyTooling.CI.Workflow`        | a workflow called by that workflow
+         - :class:`~pyTooling.CI.Matrix`          | a matrix
+           - :class:`~pyTooling.GitHub.MatrixJob` | one instance it produced
+         - :class:`~pyTooling.GitHub.Job`
+       - :class:`~pyTooling.CI.Matrix`
+       - :class:`~pyTooling.GitHub.Job`           | a job that ran on a runner
+         - :class:`~pyTooling.GitHub.Step`        | a step of that job
 
 The tree is :mod:`pyTooling.CI`'s (see `pyTooling's pipeline model
 <https://pyTooling.github.io/pyTooling/CI/Pipeline.html>`__): a called workflow, a matrix and their base-class are that
