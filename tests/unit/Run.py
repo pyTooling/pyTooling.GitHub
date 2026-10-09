@@ -1231,7 +1231,11 @@ class GenericModel(Testcase):
 
 
 class MatrixOfCalledWorkflows(Testcase):
-	"""A job with ``strategy.matrix`` and ``uses:`` calls a workflow per combination, e.g. GHDL's ``Ubuntu-fast``."""
+	"""
+	A job with ``strategy.matrix`` and ``uses:`` calls a workflow per combination.
+
+	GHDL's pipeline has such a job: ``Ubuntu-fast``.
+	"""
 
 	def _Pipeline(self) -> Pipeline:
 		"""
