@@ -1,0 +1,199 @@
+{
+ "graphql": [
+  {
+   "data": {
+    "repository": {
+     "nameWithOwner": "pyTooling/pyTooling",
+     "url": "https://github.com/pyTooling/pyTooling",
+     "releases": {
+      "pageInfo": {
+       "hasNextPage": true,
+       "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wOC0yMFQyMTo0OTowOVrOFkulYg=="
+      },
+      "nodes": [
+       {
+        "id": "RE_kwDOGVFYdM4YgMOm",
+        "databaseId": 411091878,
+        "tagName": "v10.0.0-rc2",
+        "name": null,
+        "description": "> [!NOTE]\n> The second release candidate of v10.0.0. The first, [v10.0.0-rc1](https://github.com/pyTooling/pyTooling/releases/tag/v10.0.0-rc1) ([#321](https://github.com/pyTooling/pyTooling/pull/321)), was tagged, but PyPI rejected its upload. These notes cover the whole release.\n>\n> This release accumulated **222 merged pull-requests**, so the notes below are grouped by section and, within each section, by namespace rather than enumerating every class. The linked pull-requests carry the per-item detail, and `doc/News.rst` carries the reader-facing version of the same list.\n>\n> * ✨ New packages `pyTooling.ControlFlow`, `pyTooling.CallGraph`, `pyTooling.CI`, `pyTooling.REST`, `pyTooling.Documentation` and `pyTooling.Graph.GraphViz`; traces render as Gantt charts and export OTLP/JSON; SPDX license expressions, version expressions and epochs; a test report format with four names per item.",
+        "publishedAt": "2026-10-13T00:04:02Z",
+        "url": "https://github.com/pyTooling/pyTooling/releases/tag/v10.0.0-rc2",
+        "isDraft": false,
+        "isPrerelease": true,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "b0eabfcbc4311ee2f3a7dd066d832265858e0fc7",
+         "url": "https://github.com/pyTooling/pyTooling/commit/b0eabfcbc4311ee2f3a7dd066d832265858e0fc7"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": null
+         },
+         "nodes": []
+        }
+       },
+       {
+        "id": "RE_kwDOGVFYdM4WS6Vi",
+        "databaseId": 374056290,
+        "tagName": "v9.0.0",
+        "name": null,
+        "description": "# New Features\n\n* `pyTooling.Testing` is a new module: enhanced classes for writing unit tests with Python's `unittest` framework,\n  which pytest runs as well.\n  * `ApplicationTestcase` starts the installed program the way a user does, so a test covers the\n    `console_scripts` entry point, the argument parsing and the exit code - none of which importing the code can",
+        "publishedAt": "2026-08-20T22:05:17Z",
+        "url": "https://github.com/pyTooling/pyTooling/releases/tag/v9.0.0",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": true,
+        "tagCommit": {
+         "oid": "d1d186cdb73f55bfa7846095ff4fe02f74570587",
+         "url": "https://github.com/pyTooling/pyTooling/commit/d1d186cdb73f55bfa7846095ff4fe02f74570587"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": null
+         },
+         "nodes": []
+        }
+       }
+      ]
+     },
+     "refs": {
+      "pageInfo": {
+       "hasNextPage": true,
+       "endCursor": "Mw"
+      },
+      "nodes": [
+       {
+        "name": "v10.0.0-rc2",
+        "target": {
+         "__typename": "Commit",
+         "oid": "b0eabfcbc4311ee2f3a7dd066d832265858e0fc7",
+         "url": "https://github.com/pyTooling/pyTooling/commit/b0eabfcbc4311ee2f3a7dd066d832265858e0fc7",
+         "committedDate": "2026-10-12T23:30:52Z"
+        }
+       },
+       {
+        "name": "v9.0.0",
+        "target": {
+         "__typename": "Commit",
+         "oid": "d1d186cdb73f55bfa7846095ff4fe02f74570587",
+         "url": "https://github.com/pyTooling/pyTooling/commit/d1d186cdb73f55bfa7846095ff4fe02f74570587",
+         "committedDate": "2026-08-20T21:49:09Z"
+        }
+       },
+       {
+        "name": "v8.19.0",
+        "target": {
+         "__typename": "Commit",
+         "oid": "06d3800bde9f58a8b59e15367e0dd0fef2849294",
+         "url": "https://github.com/pyTooling/pyTooling/commit/06d3800bde9f58a8b59e15367e0dd0fef2849294",
+         "committedDate": "2026-07-31T07:20:12Z"
+        }
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "data": {
+    "repository": {
+     "nameWithOwner": "pyTooling/pyTooling",
+     "url": "https://github.com/pyTooling/pyTooling",
+     "releases": {
+      "pageInfo": {
+       "hasNextPage": false,
+       "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wNy0zMFQyMToxOTo1NlrOFZ7rBw=="
+      },
+      "nodes": [
+       {
+        "id": "RE_kwDOGVFYdM4VoZ9o",
+        "databaseId": 362913640,
+        "tagName": "v8.19.0",
+        "name": null,
+        "description": "# Changes\r\n\r\n* `pyTooling.Versioning`:\r\n  * `CalendarVersion.Year`, `YearMonthVersion.Month`, `YearWeekVersion.Week`, `YearReleaseVersion.Release`, `YearMonthDayVersion.Month` and `YearMonthDayVersion.Day` are marked `@readonly`. They had no setter, while `Version.Major`, `.Minor`, `.Micro` and `.Prefix` in the same file already used `@readonly`.\r\n* `pyTooling.Attributes`:\r\n  * `Attribute.Scope` is marked `@readonly`.\r",
+        "publishedAt": "2026-07-31T07:34:54Z",
+        "url": "https://github.com/pyTooling/pyTooling/releases/tag/v8.19.0",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "06d3800bde9f58a8b59e15367e0dd0fef2849294",
+         "url": "https://github.com/pyTooling/pyTooling/commit/06d3800bde9f58a8b59e15367e0dd0fef2849294"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": null
+         },
+         "nodes": []
+        }
+       },
+       {
+        "id": "RE_kwDOGVFYdM4VnusH",
+        "databaseId": 362736391,
+        "tagName": "v8.18.0",
+        "name": null,
+        "description": "# New Features\n\n* `pyTooling.Configuration`:\n  * Added `KeyNotFoundException`, raised when a key or index doesn't exist. Its note lists the node's actual keys or its valid index range.\n  * Added `UnsupportedValueTypeException`, raised when the parser returns a value type the package doesn't support.\n  * Added `InterpolationException`, raised for a malformed `${...}` reference.",
+        "publishedAt": "2026-07-30T21:37:32Z",
+        "url": "https://github.com/pyTooling/pyTooling/releases/tag/v8.18.0",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "4e59c014e672241db2c3cece34da6e877204ae64",
+         "url": "https://github.com/pyTooling/pyTooling/commit/4e59c014e672241db2c3cece34da6e877204ae64"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": null
+         },
+         "nodes": []
+        }
+       }
+      ]
+     },
+     "refs": {
+      "pageInfo": {
+       "hasNextPage": false,
+       "endCursor": "Ng"
+      },
+      "nodes": [
+       {
+        "name": "v8.18.0",
+        "target": {
+         "__typename": "Commit",
+         "oid": "4e59c014e672241db2c3cece34da6e877204ae64",
+         "url": "https://github.com/pyTooling/pyTooling/commit/4e59c014e672241db2c3cece34da6e877204ae64",
+         "committedDate": "2026-07-30T21:19:56Z"
+        }
+       },
+       {
+        "name": "v8.17.0",
+        "target": {
+         "__typename": "Commit",
+         "oid": "ce5381afb813db811b1cea82248e5dfebb53c7d1",
+         "url": "https://github.com/pyTooling/pyTooling/commit/ce5381afb813db811b1cea82248e5dfebb53c7d1",
+         "committedDate": "2026-07-20T21:09:17Z"
+        }
+       },
+       {
+        "name": "v8.16.1",
+        "target": {
+         "__typename": "Commit",
+         "oid": "22b5a1421e400de0d37e0d0b695abbb2a43bbcaf",
+         "url": "https://github.com/pyTooling/pyTooling/commit/22b5a1421e400de0d37e0d0b695abbb2a43bbcaf",
+         "committedDate": "2026-07-08T06:26:09Z"
+        }
+       }
+      ]
+     }
+    }
+   }
+  }
+ ],
+ "rest": {}
+}
