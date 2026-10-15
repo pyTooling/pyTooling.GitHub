@@ -2475,8 +2475,7 @@ class Permission(Base[Union[Workflow, Job]]):
 		"""
 		Read-only property to access the scope (:attr:`_scope`).
 
-		:returns: The scope, as :attr:`PermissionScope.Contents`, or :attr:`PermissionScope.All` for ``read-all`` and
-		          ``write-all``.
+		:returns: The scope the permission grants access to.
 		"""
 		return self._scope
 
