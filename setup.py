@@ -36,31 +36,37 @@ from setuptools          import setup
 
 from pathlib             import Path
 from pyTooling.Packaging import DescribePythonPackageHostedOnGitHub
+from pyTooling.Warning   import WarningCollector
 
 gitHubNamespace =        "pyTooling"
 packageName =            "pyTooling.GitHub"
 packageDirectory =       packageName.replace(".", "/")
 packageInformationFile = Path(f"{packageDirectory}/__init__.py")
 
-setup(
-	**DescribePythonPackageHostedOnGitHub(
-		packageName=packageName,
-		description="Working with GitHub pipelines - workflow files, action files, convert pipeline runs to (OTLP) traces.",
-		gitHubNamespace=gitHubNamespace,
-		unittestRequirementsFile=Path("tests/requirements.txt"),
-		sourceFileWithVersion=packageInformationFile,
-		developmentStatus="alpha",
-		pythonVersions=("3.11", "3.12", "3.13", "3.14"),
-		additionalRequirements={
-			"diagram": ["matplotlib >= 3.10"],
-			"sphinx":  ["pyTooling.Sphinx @ git+https://github.com/pyTooling/pyTooling.Sphinx.git@dev"],
-		},
-		consoleScripts={
-			"pytooling-github": "pyTooling.GitHub.CLI:main"
-		},
-		dataFiles={
-			packageName: ["py.typed"]
-		},
-		debug=True
+with WarningCollector() as warnings:
+	setup(
+		**DescribePythonPackageHostedOnGitHub(
+			packageName=packageName,
+			description="Working with GitHub pipelines - workflow files, action files, convert pipeline runs to (OTLP) "
+			            "traces.",
+			gitHubNamespace=gitHubNamespace,
+			unittestRequirementsFile=Path("tests/requirements.txt"),
+			sourceFileWithVersion=packageInformationFile,
+			developmentStatus="alpha",
+			pythonVersions=("3.11", "3.12", "3.13", "3.14"),
+			additionalRequirements={
+				"diagram": ["matplotlib >= 3.10"],
+				"sphinx":  ["pyTooling.Sphinx ~= 0.1.0rc1"],
+			},
+			consoleScripts={
+				"pytooling-github": "pyTooling.GitHub.CLI:main"
+			},
+			dataFiles={
+				packageName: ["py.typed"]
+			},
+			debug=True
+		)
 	)
-)
+
+for warning in warnings:
+	print(f"[setup.py] WARNING: {warning}")
