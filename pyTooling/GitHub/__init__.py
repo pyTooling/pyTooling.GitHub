@@ -79,14 +79,90 @@ from pyTooling.Common          import getFullyQualifiedName, parseISO8601Timesta
 from pyTooling.Decorators      import export, readonly
 from pyTooling.GenericPath.URL import URL
 from pyTooling.MetaClasses     import ExtendedType
+from pyTooling.REST            import RESTClient
 
 
-__all__ = ["CONCLUSION_TO_OUTCOME"]
+__all__ = ["CONCLUSION_TO_OUTCOME", "GITHUB_API_URL"]
 
 
 @export
 class GitHubError(CIError):
 	"""Base-exception of all exceptions raised by :mod:`pyTooling.GitHub`."""
+
+
+GITHUB_API_URL = URL.Parse("https://api.github.com")
+"""Base URL of the GitHub REST API."""
+
+_GITHUB_HEADERS = {
+	"Accept":               "application/vnd.github+json",
+	"X-GitHub-Api-Version": "2022-11-28"
+}
+"""Headers every request to the GitHub REST API carries."""
+
+
+@export
+class RepositoryClient(RESTClient):
+	"""
+	A client of the GitHub REST API for one repository.
+
+	A reader of a repository's data derives from it, e.g. :class:`~pyTooling.GitHub.Tracing.WorkflowRunReader`. The
+	requests themselves - the retries, the pagination and the token's boundary - are
+	:class:`~pyTooling.REST.RESTClient`'s.
+	"""
+
+	_repository: str  #: Repository as ``owner/name``.
+
+	def __init__(
+		self,
+		repository: str,
+		token:      Nullable[str] = None,
+		*,
+		apiURL:     Union[str, URL] = GITHUB_API_URL,
+		timeout:    float = 30.0,
+		retries:    int = 3,
+		retryDelay: float = 2.0
+	) -> None:
+		"""
+		Initializes a client for one repository.
+
+		:param repository:  The repository as ``owner/name``.
+		:param token:       Optional, token authorizing the requests. Default: anonymous requests.
+		:param apiURL:      Optional, base URL of the GitHub REST API, e.g. of a GitHub Enterprise Server.
+		                    Default: :data:`GITHUB_API_URL`.
+		:param timeout:     Optional, timeout of a single request in seconds. Default: ``30.0``.
+		:param retries:     Optional, how often a transiently failing request is tried again. ``0`` tries once.
+		                    Default: ``3``.
+		:param retryDelay:  Optional, pause in seconds before a request is tried again the first time. The pause doubles
+		                    with every further attempt. Default: ``2.0``.
+		:raises ValueError: If parameter 'repository' is ``None``.
+		:raises TypeError:  If parameter 'repository' is not of type :class:`str`.
+		:raises ValueError: If parameter 'repository' isn't of the form ``owner/name``.
+		:raises TypeError:  If a parameter of :class:`~pyTooling.REST.RESTClient` has the wrong type.
+		:raises ValueError: If a parameter of :class:`~pyTooling.REST.RESTClient` has an invalid value.
+		"""
+		super().__init__(apiURL, token, headers=_GITHUB_HEADERS, timeout=timeout, retries=retries, retryDelay=retryDelay)
+
+		if repository is None:
+			raise ValueError("Parameter 'repository' is None.")
+		elif not isinstance(repository, str):
+			ex = TypeError("Parameter 'repository' is not of type 'str'.")
+			ex.add_note(f"Got type '{getFullyQualifiedName(repository)}'.")
+			raise ex
+		elif len(parts := repository.split("/")) != 2 or "" in parts:
+			ex = ValueError("Parameter 'repository' isn't of the form 'owner/name'.")
+			ex.add_note(f"Got value '{repository}'.")
+			raise ex
+
+		self._repository = repository
+
+	@readonly
+	def Repository(self) -> str:
+		"""
+		Read-only property to access the repository (:attr:`_repository`).
+
+		:returns: The repository as ``owner/name``.
+		"""
+		return self._repository
 
 
 @export
