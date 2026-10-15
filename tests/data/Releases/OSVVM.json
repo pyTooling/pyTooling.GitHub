@@ -1,0 +1,313 @@
+{
+ "graphql": [
+  {
+   "data": {
+    "repository": {
+     "nameWithOwner": "OSVVM/OsvvmLibraries",
+     "url": "https://github.com/OSVVM/OsvvmLibraries",
+     "releases": {
+      "pageInfo": {
+       "hasNextPage": false,
+       "endCursor": "Y3Vyc29yOnYyOpK0MjAyNC0wNy0yNVQwMjozNDo1MVrOCgczTg=="
+      },
+      "nodes": [
+       {
+        "id": "RE_kwDOEL_b8c4YBpnr",
+        "databaseId": 403085803,
+        "tagName": "2026.09",
+        "name": "2026.09",
+        "description": "# OSVVM 2026.09\r\n\r\nAll Git repositories and submodules have been packaged in a single zip file. This file contains the following\r\nOSVVM components.\r\n\r\n## Release Files\r",
+        "publishedAt": "2026-10-04T15:42:56Z",
+        "url": "https://github.com/OSVVM/OsvvmLibraries/releases/tag/2026.09",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": true,
+        "tagCommit": {
+         "oid": "ab47a2637008a0709bbf593aa1ab0060dcc39aac",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/ab47a2637008a0709bbf593aa1ab0060dcc39aac"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpHOJF2CAQ=="
+         },
+         "nodes": [
+          {
+           "name": "OsvvmLibraries-2026.09.zip",
+           "contentType": "application/zip",
+           "size": 45482193,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.zip"
+          },
+          {
+           "name": "OsvvmLibraries-2026.09.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 44228671,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.tar.gz"
+          },
+          {
+           "name": "OsvvmLibraries-2026.09.tar.zst",
+           "contentType": "application/zstd",
+           "size": 42521868,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.tar.zst"
+          }
+         ]
+        }
+       },
+       {
+        "id": "RE_kwDOEL_b8c4XASLT",
+        "databaseId": 385950419,
+        "tagName": "2026.08",
+        "name": "",
+        "description": "# OSVVM 2026.08\r\n\r\nOSVVM release 2026.08 adds the following\r\n<ul>\r\n\t<li>Updated Requirements Settings</li>\r\n\t<li>Multi-line Alert, Log, LogHeader, PrintLine, PrintHeader, ...</li>\r",
+        "publishedAt": "2026-09-10T04:48:22Z",
+        "url": "https://github.com/OSVVM/OsvvmLibraries/releases/tag/2026.08",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "ecbe94d3396503c4c09bae994315a9b3458ea654",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/ecbe94d3396503c4c09bae994315a9b3458ea654"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpHOIQU3SQ=="
+         },
+         "nodes": [
+          {
+           "name": "OsvvmLibraries-2026.08.zip",
+           "contentType": "application/zip",
+           "size": 45481169,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.zip"
+          },
+          {
+           "name": "OsvvmLibraries-2026.08.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 44230044,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.tar.gz"
+          },
+          {
+           "name": "OsvvmLibraries-2026.08.tar.zst",
+           "contentType": "application/zstd",
+           "size": 42527183,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.tar.zst"
+          }
+         ]
+        }
+       },
+       {
+        "id": "RE_kwDOEL_b8c4O1cza",
+        "databaseId": 248892634,
+        "tagName": "2025.06a",
+        "name": "",
+        "description": "This release contains all important artifacts created by OSVVM's CI pipeline.\r\n\r\n# OSVVM 2025.06a\r\n\r\nAll Git repositories and submodules have been packaged in a single zip file. This file contains the following\r\nOSVVM components.\r",
+        "publishedAt": "2025-09-21T23:07:16Z",
+        "url": "https://github.com/OSVVM/OsvvmLibraries/releases/tag/2025.06a",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "2f80e1642270799e0a7d0e57daddec58c7e554cc",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/2f80e1642270799e0a7d0e57daddec58c7e554cc"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpHOEaEATw=="
+         },
+         "nodes": [
+          {
+           "name": "OsvvmLibraries-2025.06a.zip",
+           "contentType": "application/zip",
+           "size": 22451747,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.zip"
+          },
+          {
+           "name": "OsvvmLibraries-2025.06a.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 21305163,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.tar.gz"
+          },
+          {
+           "name": "OsvvmLibraries-2025.06a.tar.zst",
+           "contentType": "application/zstd",
+           "size": 20196313,
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.tar.zst"
+          }
+         ]
+        }
+       },
+       {
+        "id": "RE_kwDOEL_b8c4KBzNO",
+        "databaseId": 168244046,
+        "tagName": "2024.07",
+        "name": "2024.07 Release",
+        "description": "The 2024.07 release adds:\r\n<ul>\r\n       <li>Breaking changes in Test Status and CreateClock\r\n       <ul>\r\n\t   <li>To maintain backward compabitility, set the script variable OsvvmVersionCompatibility to a value 2024.05 or less in OsvvmSettingsLocal.tcl.</li>\r\n\t   <li>OSVVM provides OsvvmSettingsLocal_example.tcl that can be used to create your OsvvmSettingsLocal.tcl</li>\r",
+        "publishedAt": "2024-08-01T13:19:19Z",
+        "url": "https://github.com/OSVVM/OsvvmLibraries/releases/tag/2024.07",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "95468c855be8e6fab4a52860de6ffd1f9f4a1f28",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/95468c855be8e6fab4a52860de6ffd1f9f4a1f28"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": null
+         },
+         "nodes": []
+        }
+       }
+      ]
+     },
+     "refs": {
+      "pageInfo": {
+       "hasNextPage": false,
+       "endCursor": "NTU"
+      },
+      "nodes": [
+       {
+        "name": "2026.09",
+        "target": {
+         "__typename": "Commit",
+         "oid": "ab47a2637008a0709bbf593aa1ab0060dcc39aac",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/ab47a2637008a0709bbf593aa1ab0060dcc39aac",
+         "committedDate": "2026-10-03T15:51:41Z"
+        }
+       },
+       {
+        "name": "2026.08",
+        "target": {
+         "__typename": "Commit",
+         "oid": "ecbe94d3396503c4c09bae994315a9b3458ea654",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/ecbe94d3396503c4c09bae994315a9b3458ea654",
+         "committedDate": "2026-09-09T21:46:11Z"
+        }
+       },
+       {
+        "name": "2025.06a",
+        "target": {
+         "__typename": "Commit",
+         "oid": "2f80e1642270799e0a7d0e57daddec58c7e554cc",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/2f80e1642270799e0a7d0e57daddec58c7e554cc",
+         "committedDate": "2025-09-21T19:15:12Z"
+        }
+       },
+       {
+        "name": "2025.06",
+        "target": {
+         "__typename": "Commit",
+         "oid": "bb5c527da15d4ca3cb3874eb6cf479a7582428bd",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/bb5c527da15d4ca3cb3874eb6cf479a7582428bd",
+         "committedDate": "2025-07-18T18:08:06Z"
+        }
+       },
+       {
+        "name": "2024.07",
+        "target": {
+         "__typename": "Commit",
+         "oid": "95468c855be8e6fab4a52860de6ffd1f9f4a1f28",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/95468c855be8e6fab4a52860de6ffd1f9f4a1f28",
+         "committedDate": "2024-07-25T02:34:51Z"
+        }
+       },
+       {
+        "name": "GhdlDebug_22_1114",
+        "target": {
+         "__typename": "Commit",
+         "oid": "fae33442a191ceb1ba6ba5bbb1dd23fbee130a99",
+         "url": "https://github.com/OSVVM/OsvvmLibraries/commit/fae33442a191ceb1ba6ba5bbb1dd23fbee130a99",
+         "committedDate": "2022-11-14T15:47:07Z"
+        }
+       },
+       {
+        "name": "2022.05b_",
+        "target": {
+         "__typename": "Tag",
+         "oid": "fea91eeefc7d81d56ee768941842d3a40e63dda4",
+         "target": {
+          "__typename": "Commit",
+          "oid": "d3616593c4ba859fe1fa676876426b8192fcb6ea",
+          "url": "https://github.com/OSVVM/OsvvmLibraries/commit/d3616593c4ba859fe1fa676876426b8192fcb6ea",
+          "committedDate": "2022-06-09T16:05:13Z"
+         }
+        }
+       },
+       {
+        "name": "2020.12+doc",
+        "target": {
+         "__typename": "Tag",
+         "oid": "9e60c1c824bf79f4f7a3c8f0989ae46cbba9b300",
+         "target": {
+          "__typename": "Commit",
+          "oid": "b855e12af49d9c75d90bf7b39c1b5295bed9e4b4",
+          "url": "https://github.com/OSVVM/OsvvmLibraries/commit/b855e12af49d9c75d90bf7b39c1b5295bed9e4b4",
+          "committedDate": "2021-01-01T22:27:16Z"
+         }
+        }
+       }
+      ]
+     }
+    }
+   }
+  }
+ ],
+ "rest": {
+  "repos/OSVVM/OsvvmLibraries/releases/403085803": {
+   "id": 403085803,
+   "tag_name": "2026.09",
+   "assets": [
+    {
+     "name": "OsvvmLibraries-2026.09.tar.gz",
+     "label": "OsvvmLibraries - 2026.09 - all-in-one (TAR/GZ)"
+    },
+    {
+     "name": "OsvvmLibraries-2026.09.tar.zst",
+     "label": "OsvvmLibraries - 2026.09 - all-in-one (TAR/ZST)"
+    },
+    {
+     "name": "OsvvmLibraries-2026.09.zip",
+     "label": "OsvvmLibraries - 2026.09 - all-in-one (ZIP)"
+    }
+   ]
+  },
+  "repos/OSVVM/OsvvmLibraries/releases/385950419": {
+   "id": 385950419,
+   "tag_name": "2026.08",
+   "assets": [
+    {
+     "name": "OsvvmLibraries-2026.08.tar.gz",
+     "label": "OsvvmLibraries - 2026.08 - all-in-one (TAR/GZ)"
+    },
+    {
+     "name": "OsvvmLibraries-2026.08.tar.zst",
+     "label": "OsvvmLibraries - 2026.08 - all-in-one (TAR/ZST)"
+    },
+    {
+     "name": "OsvvmLibraries-2026.08.zip",
+     "label": "OsvvmLibraries - 2026.08 - all-in-one (ZIP)"
+    }
+   ]
+  },
+  "repos/OSVVM/OsvvmLibraries/releases/248892634": {
+   "id": 248892634,
+   "tag_name": "2025.06a",
+   "assets": [
+    {
+     "name": "OsvvmLibraries-2025.06a.tar.gz",
+     "label": "OsvvmLibraries - 2025.06a - all-in-one (TAR/GZ)"
+    },
+    {
+     "name": "OsvvmLibraries-2025.06a.tar.zst",
+     "label": "OsvvmLibraries - 2025.06a - all-in-one (TAR/ZST)"
+    },
+    {
+     "name": "OsvvmLibraries-2025.06a.zip",
+     "label": "OsvvmLibraries - 2025.06a - all-in-one (ZIP)"
+    }
+   ]
+  }
+ }
+}

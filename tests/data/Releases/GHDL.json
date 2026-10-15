@@ -1,0 +1,303 @@
+{
+ "graphql": [
+  {
+   "data": {
+    "repository": {
+     "nameWithOwner": "ghdl/ghdl",
+     "url": "https://github.com/ghdl/ghdl",
+     "releases": {
+      "pageInfo": {
+       "hasNextPage": false,
+       "endCursor": "Y3Vyc29yOnYyOpK0MjAxNS0xMC0yM1QwNTo1MTo0NFrOACDIZg=="
+      },
+      "nodes": [
+       {
+        "id": "RE_kwDOAsScFs4XIYty",
+        "databaseId": 388074354,
+        "tagName": "nightly",
+        "name": "Nightly Release",
+        "description": "This *nightly* release contains all latest and important artifacts created by GHDL's CI pipeline.\n\n# GHDL 7.0.0-dev\n\n![GitHub Downloads (all assets, specific tag)](https://img.shields.io/github/downloads/ghdl/ghdl/nightly/total)\n",
+        "publishedAt": "2026-09-14T00:03:11Z",
+        "url": "https://github.com/ghdl/ghdl/releases/tag/nightly",
+        "isDraft": false,
+        "isPrerelease": true,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "dd4f9740079b2fe79baf92b43d4a10a16254205a",
+         "url": "https://github.com/ghdl/ghdl/commit/dd4f9740079b2fe79baf92b43d4a10a16254205a"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpHOIYHqeA=="
+         },
+         "nodes": [
+          {
+           "name": "ghdl-llvm-7.0.0-dev-macos14-aarch64.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 43465761,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/nightly/ghdl-llvm-7.0.0-dev-macos14-aarch64.tar.gz"
+          },
+          {
+           "name": "ghdl-llvm-jit-7.0.0-dev-macos14-aarch64.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 37980012,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/nightly/ghdl-llvm-jit-7.0.0-dev-macos14-aarch64.tar.gz"
+          },
+          {
+           "name": "ghdl-llvm-7.0.0-dev-macos15-aarch64.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 43458973,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/nightly/ghdl-llvm-7.0.0-dev-macos15-aarch64.tar.gz"
+          }
+         ]
+        }
+       },
+       {
+        "id": "RE_kwDOAsScFs4RimPS",
+        "databaseId": 294282194,
+        "tagName": "v6.0.0",
+        "name": "",
+        "description": "# GHDL 6.0.0\r\n\r\n![GitHub Downloads (all assets, specific tag)](https://img.shields.io/github/downloads/ghdl/ghdl/v6.0.0/total)\r\n\r\n\r\nGHDL offers the simulator and synthesis tool for VHDL. GHDL can be built for various backends:\r",
+        "publishedAt": "2026-03-07T18:38:42Z",
+        "url": "https://github.com/ghdl/ghdl/releases/tag/v6.0.0",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": true,
+        "tagCommit": {
+         "oid": "e589c698c351369ac5bcfe7abe1f1152ac5d4727",
+         "url": "https://github.com/ghdl/ghdl/commit/e589c698c351369ac5bcfe7abe1f1152ac5d4727"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpHOGsGUkA=="
+         },
+         "nodes": [
+          {
+           "name": "ghdl-llvm-6.0.0-macos14-aarch64.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 42493570,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-llvm-6.0.0-macos14-aarch64.tar.gz"
+          },
+          {
+           "name": "ghdl-llvm-jit-6.0.0-macos14-aarch64.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 37213405,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-llvm-jit-6.0.0-macos14-aarch64.tar.gz"
+          },
+          {
+           "name": "ghdl-llvm-6.0.0-macos15-aarch64.tar.gz",
+           "contentType": "application/x-gtar",
+           "size": 42445801,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-llvm-6.0.0-macos15-aarch64.tar.gz"
+          }
+         ]
+        }
+       },
+       {
+        "id": "RE_kwDOAsScFs4Dnb4q",
+        "databaseId": 60669482,
+        "tagName": "v2.0.0",
+        "name": "",
+        "description": "![GitHub Downloads (all assets, specific tag)](https://img.shields.io/github/downloads/ghdl/ghdl/v2.0.0/total)",
+        "publishedAt": "2022-03-01T02:53:38Z",
+        "url": "https://github.com/ghdl/ghdl/releases/tag/v2.0.0",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "8185ed878df5054a9624af97ae4c73bbd3e906ef",
+         "url": "https://github.com/ghdl/ghdl/commit/8185ed878df5054a9624af97ae4c73bbd3e906ef"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": null
+         },
+         "nodes": []
+        }
+       },
+       {
+        "id": "MDc6UmVsZWFzZTI0MDg5MDEx",
+        "databaseId": 24089011,
+        "tagName": "v0.37",
+        "name": "",
+        "description": "**Downloads (all):**  \r\n![Downloads of GHDL v0.37](https://img.shields.io/github/downloads/ghdl/ghdl/v0.37/total.svg)",
+        "publishedAt": "2020-02-28T20:58:31Z",
+        "url": "https://github.com/ghdl/ghdl/releases/tag/v0.37",
+        "isDraft": false,
+        "isPrerelease": false,
+        "isLatest": false,
+        "tagCommit": {
+         "oid": "27093a5b476335b1e6b98cc7d20e34516afde196",
+         "url": "https://github.com/ghdl/ghdl/commit/27093a5b476335b1e6b98cc7d20e34516afde196"
+        },
+        "releaseAssets": {
+         "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpHOARhJ4g=="
+         },
+         "nodes": [
+          {
+           "name": "ghdl.1",
+           "contentType": "application/octet-stream",
+           "size": 168649,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl.1"
+          },
+          {
+           "name": "ghdl-0.37-buster-mcode-gpl.tgz",
+           "contentType": "application/x-gtar",
+           "size": 2815242,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-buster-mcode-gpl.tgz"
+          },
+          {
+           "name": "ghdl-0.37-buster-mcode-gpl.src.tgz",
+           "contentType": "application/x-gtar",
+           "size": 4033474,
+           "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-buster-mcode-gpl.src.tgz"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     "refs": {
+      "pageInfo": {
+       "hasNextPage": false,
+       "endCursor": "NDY"
+      },
+      "nodes": [
+       {
+        "name": "nightly",
+        "target": {
+         "__typename": "Commit",
+         "oid": "dd4f9740079b2fe79baf92b43d4a10a16254205a",
+         "url": "https://github.com/ghdl/ghdl/commit/dd4f9740079b2fe79baf92b43d4a10a16254205a",
+         "committedDate": "2026-09-13T12:37:17Z"
+        }
+       },
+       {
+        "name": "v6.0.0",
+        "target": {
+         "__typename": "Tag",
+         "oid": "ecfa637741fe259d284dc0b20936acc15bba44df",
+         "target": {
+          "__typename": "Commit",
+          "oid": "e589c698c351369ac5bcfe7abe1f1152ac5d4727",
+          "url": "https://github.com/ghdl/ghdl/commit/e589c698c351369ac5bcfe7abe1f1152ac5d4727",
+          "committedDate": "2026-03-07T17:47:40Z"
+         }
+        }
+       },
+       {
+        "name": "v6.0.0-rc.1",
+        "target": {
+         "__typename": "Tag",
+         "oid": "62ffdd5f2448f51f81175ee64c0820506aea09c5",
+         "target": {
+          "__typename": "Commit",
+          "oid": "28794290518a5b0d09b8ac98415588fcaa32c7a3",
+          "url": "https://github.com/ghdl/ghdl/commit/28794290518a5b0d09b8ac98415588fcaa32c7a3",
+          "committedDate": "2026-03-07T16:40:02Z"
+         }
+        }
+       },
+       {
+        "name": "v2.0.0",
+        "target": {
+         "__typename": "Tag",
+         "oid": "b2e7825324dc1f784edcb704e17bcf089b0cfefa",
+         "target": {
+          "__typename": "Commit",
+          "oid": "8185ed878df5054a9624af97ae4c73bbd3e906ef",
+          "url": "https://github.com/ghdl/ghdl/commit/8185ed878df5054a9624af97ae4c73bbd3e906ef",
+          "committedDate": "2022-02-28T18:46:53Z"
+         }
+        }
+       },
+       {
+        "name": "v0.37",
+        "target": {
+         "__typename": "Tag",
+         "oid": "3c2867e8f63edc749821224643cd1ac5e652eb1d",
+         "target": {
+          "__typename": "Commit",
+          "oid": "27093a5b476335b1e6b98cc7d20e34516afde196",
+          "url": "https://github.com/ghdl/ghdl/commit/27093a5b476335b1e6b98cc7d20e34516afde196",
+          "committedDate": "2020-02-28T21:25:18Z"
+         }
+        }
+       },
+       {
+        "name": "v0.34",
+        "target": {
+         "__typename": "Commit",
+         "oid": "06a78d2275dc837c7724c5dc5ede2e14ef67080b",
+         "url": "https://github.com/ghdl/ghdl/commit/06a78d2275dc837c7724c5dc5ede2e14ef67080b",
+         "committedDate": "2017-08-15T06:54:53Z"
+        }
+       }
+      ]
+     }
+    }
+   }
+  }
+ ],
+ "rest": {
+  "repos/ghdl/ghdl/releases/388074354": {
+   "id": 388074354,
+   "tag_name": "nightly",
+   "assets": [
+    {
+     "name": "ghdl-llvm-7.0.0-dev-macos14-aarch64.tar.gz",
+     "label": "GHDL - v7.0.0-dev - macOS 14 (aarch64) - llvm backend"
+    },
+    {
+     "name": "ghdl-llvm-7.0.0-dev-macos15-aarch64.tar.gz",
+     "label": "GHDL - v7.0.0-dev - macOS 15 (aarch64) - llvm backend"
+    },
+    {
+     "name": "ghdl-llvm-jit-7.0.0-dev-macos14-aarch64.tar.gz",
+     "label": "GHDL - v7.0.0-dev - macOS 14 (aarch64) - llvm-jit backend"
+    }
+   ]
+  },
+  "repos/ghdl/ghdl/releases/294282194": {
+   "id": 294282194,
+   "tag_name": "v6.0.0",
+   "assets": [
+    {
+     "name": "ghdl-llvm-6.0.0-macos14-aarch64.tar.gz",
+     "label": "GHDL - v6.0.0 - macOS 14 (aarch64) - llvm backend"
+    },
+    {
+     "name": "ghdl-llvm-6.0.0-macos15-aarch64.tar.gz",
+     "label": "GHDL - v6.0.0 - macOS 15 (aarch64) - llvm backend"
+    },
+    {
+     "name": "ghdl-llvm-jit-6.0.0-macos14-aarch64.tar.gz",
+     "label": "GHDL - v6.0.0 - macOS 14 (aarch64) - llvm-jit backend"
+    }
+   ]
+  },
+  "repos/ghdl/ghdl/releases/24089011": {
+   "id": 24089011,
+   "tag_name": "v0.37",
+   "assets": [
+    {
+     "name": "ghdl-0.37-buster-mcode-gpl.src.tgz",
+     "label": ""
+    },
+    {
+     "name": "ghdl-0.37-buster-mcode-gpl.tgz",
+     "label": ""
+    },
+    {
+     "name": "ghdl.1",
+     "label": ""
+    }
+   ]
+  }
+ }
+}
