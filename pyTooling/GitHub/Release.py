@@ -222,7 +222,9 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 		"""
 		Read-only property to access the asset's media type (:attr:`_contentType`).
 
-		:returns: The media type, as the uploader declared it, e.g. ``application/zip``.
+		The uploader declares it, e.g. ``application/zip`` for a ZIP file.
+
+		:returns: The media type.
 		"""
 		return self._contentType
 

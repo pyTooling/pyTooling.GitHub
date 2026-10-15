@@ -188,12 +188,14 @@ class ReleaseReader(RepositoryClient):
 		Read the releases and tags of the repository.
 
 		Every page of releases, tags and assets is read, the asset labels are added from the REST API, and the result is
-		parsed by :meth:`Repository.Parse <pyTooling.GitHub.Repository.Repository.Parse>`.
+		parsed by :meth:`Repository.Parse <pyTooling.GitHub.Repository.Repository.Parse>`. A request fails e.g. on an
+		exhausted rate limit or an unreachable API, and GitHub's GraphQL API reports e.g. an unknown repository as an
+		error.
 
 		:returns:            The repository, with its releases and tags attached, and the time reading began.
-		:raises GitHubError: If a request fails, e.g. because of the rate limit or an unreachable API. |br|
+		:raises GitHubError: If a request fails. |br|
 		                     The notes report the cause.
-		:raises GitHubError: If GitHub's GraphQL API responds with errors, e.g. for an unknown repository. |br|
+		:raises GitHubError: If GitHub's GraphQL API responds with errors. |br|
 		                     The notes report each error.
 		:raises GitHubError: If a response lacks a field or a page.
 		:raises GitHubError: If the REST API reports the assets of a release differently.

@@ -24,6 +24,7 @@ The pyTooling.GitHub Documentation
 reads the runs of a pipeline from GitHub's REST API, and converts them into traces - e.g. OpenTelemetry's OTLP/JSON
 or a Gantt chart of the jobs and steps. A Sphinx domain ``ghactions`` documents workflows and their inputs, outputs and
 secrets taken straight from the workflow files.
+It also reads a repository's releases and tags through GitHub's GraphQL API.
 
 It builds on :gh:`pyTooling <pyTooling/pyTooling>`'s generic CI pipeline model and tracing, and on
 :gh:`pyTooling.Sphinx <pyTooling/pyTooling.Sphinx>` for its documentation extensions.
@@ -57,6 +58,9 @@ Data models
   line numbers, and converted into a pipeline graph.
 :ref:`Action files <DATA/Action>`
   |rarr| An action's file: how it runs, and the steps of a composite action with the actions they run in turn.
+:ref:`Releases and tags <DATA/Release>`
+  |rarr| A repository's releases - notes, publish time, commit, assets - and its tags, read through GitHub's GraphQL
+  API and stored as a snapshot.
 
 Sphinx domain ``ghactions``
 ===========================
@@ -168,6 +172,7 @@ License
    Data/PipelineRun
    Data/WorkflowFile
    Data/ActionFile
+   Data/Release
 
 .. toctree::
    :caption: ghactions Domain

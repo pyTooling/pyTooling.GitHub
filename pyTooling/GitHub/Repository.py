@@ -191,9 +191,9 @@ class Tag(metaclass=ExtendedType, slots=True):
 		"""
 		Read-only property to access the commit the tag points to (:attr:`_commitSHA`).
 
-		An annotated tag is resolved to the commit it points to.
+		An annotated tag is resolved to the commit it points to. A tag may point to another kind of object, e.g. a tree.
 
-		:returns: The commit's hash, or ``None`` if the tag points to another kind of object, e.g. a tree.
+		:returns: The commit's hash, or ``None`` if the tag points to no commit.
 		"""
 		return self._commitSHA
 
