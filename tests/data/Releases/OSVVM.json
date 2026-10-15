@@ -36,19 +36,22 @@
            "name": "OsvvmLibraries-2026.09.zip",
            "contentType": "application/zip",
            "size": 45482193,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.zip"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.zip",
+           "digest": "sha256:236214bf06b8f755a19203b49f1f4df4660c36460a4d771449379c5a3a7459a1"
           },
           {
            "name": "OsvvmLibraries-2026.09.tar.gz",
            "contentType": "application/x-gtar",
            "size": 44228671,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.tar.gz"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.tar.gz",
+           "digest": "sha256:c13b074cd3d4912ecaa1430d3b0f347981f4a1c43c3d6fd65fd9f2c594e2a07a"
           },
           {
            "name": "OsvvmLibraries-2026.09.tar.zst",
            "contentType": "application/zstd",
            "size": 42521868,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.tar.zst"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.09/OsvvmLibraries-2026.09.tar.zst",
+           "digest": "sha256:7ab4d89e50e81c7d5a56ec9ad4ca89141c5f8360a3e70701a1bb750af4dbe83b"
           }
          ]
         }
@@ -78,19 +81,22 @@
            "name": "OsvvmLibraries-2026.08.zip",
            "contentType": "application/zip",
            "size": 45481169,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.zip"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.zip",
+           "digest": "sha256:fcf825d0caab3371bdedcb6a83ae9d51963675a14d7df58d7eb41767c0da0160"
           },
           {
            "name": "OsvvmLibraries-2026.08.tar.gz",
            "contentType": "application/x-gtar",
            "size": 44230044,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.tar.gz"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.tar.gz",
+           "digest": "sha256:86a4f9035128bfeadad4383f99ea0dd8b4b752cb16573c587468203a024d0d6c"
           },
           {
            "name": "OsvvmLibraries-2026.08.tar.zst",
            "contentType": "application/zstd",
            "size": 42527183,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.tar.zst"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2026.08/OsvvmLibraries-2026.08.tar.zst",
+           "digest": "sha256:2c1d454374a8a8adb8db80417311434c5361fa709305b253cd91a906b7de5aa6"
           }
          ]
         }
@@ -120,19 +126,22 @@
            "name": "OsvvmLibraries-2025.06a.zip",
            "contentType": "application/zip",
            "size": 22451747,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.zip"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.zip",
+           "digest": "sha256:90baf540c2e1d3c0f29ce42d50d0ddb0f0d804beb008f56d50ad75c92db8ce4e"
           },
           {
            "name": "OsvvmLibraries-2025.06a.tar.gz",
            "contentType": "application/x-gtar",
            "size": 21305163,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.tar.gz"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.tar.gz",
+           "digest": "sha256:4d61daec7a433110c14c801891106700208cffa942a4ecf5f3f879d65b0fdc5b"
           },
           {
            "name": "OsvvmLibraries-2025.06a.tar.zst",
            "contentType": "application/zstd",
            "size": 20196313,
-           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.tar.zst"
+           "downloadUrl": "https://github.com/OSVVM/OsvvmLibraries/releases/download/2025.06a/OsvvmLibraries-2025.06a.tar.zst",
+           "digest": "sha256:0224401dd816720b5c3d6f61eb56d6b42c40792815f0e9c531f80cb7b7605751"
           }
          ]
         }

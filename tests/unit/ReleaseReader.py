@@ -190,6 +190,10 @@ class Reading(Testcase):
 		self.assertEqual(
 			"OsvvmLibraries - 2026.09 - all-in-one (ZIP)", repository["2026.09"].Assets["OsvvmLibraries-2026.09.zip"].Label
 		)
+		self.assertEqual(
+			"sha256:236214bf06b8f755a19203b49f1f4df4660c36460a4d771449379c5a3a7459a1",
+			repository["2026.09"].Assets["OsvvmLibraries-2026.09.zip"].Digest
+		)
 		self.assertEqual(4, sum(1 for tag in repository.Tags.values() if not tag.HasRelease))
 
 	def test_Pagination(self) -> None:
@@ -241,6 +245,22 @@ class Reading(Testcase):
 		self.assertEqual(3, len(repository["nightly"].Assets))
 		self.assertEqual({"id": release["id"], "cursor": "Mg"}, server.variables[1])
 		self.assertEqual(RELEASE_ASSETS_QUERY, json_loads(server.requests[1].data)["query"])
+
+	def test_Drafts(self) -> None:
+		"""A draft is skipped before its labels are requested."""
+		fixture = _fixture("OSVVM")
+		pages =   deepcopy(fixture["graphql"])
+		pages[0]["data"]["repository"]["releases"]["nodes"][0]["isDraft"] = True
+
+		server =     Server(pages, fixture["rest"])
+		repository = self._Read(server, "OSVVM/OsvvmLibraries")
+
+		self.assertNotIn("2026.09", repository)
+		self.assertFalse(repository.Tags["2026.09"].HasRelease)
+		self.assertNotIn(
+			"https://api.github.com/repos/OSVVM/OsvvmLibraries/releases/403085803",
+			[request.full_url for request in server.requests]
+		)
 
 	def test_LabelsMissing(self) -> None:
 		"""An asset the REST API doesn't report is an error, not an asset without label."""

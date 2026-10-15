@@ -45,6 +45,8 @@ example, tags far more versions than it publishes releases of.
 
 * **A release's commit is the commit its tag points to.** GitHub's ``target_commitish`` is usually a branch's name,
   e.g. ``main``, and no commit. An annotated tag is resolved through its tag object.
+* **Drafts are skipped.** A draft is unpublished and may change, so it is no part of a repository's releases - even
+  for a token with write access, which GitHub reports drafts to.
 * **A release's time is when it was published**
   (:attr:`~pyTooling.GitHub.Release.Release.PublishedAt`). The time GitHub calls *created* is the commit's.
 * Every time keeps its time zone - GitHub reports UTC -, so a consumer converts it to the time zone it shows; a
@@ -54,7 +56,8 @@ example, tags far more versions than it publishes releases of.
 * :attr:`~pyTooling.GitHub.Release.Release.IsLatest` is GitHub's *latest release*, which a maintainer may also set by
   hand; :attr:`~pyTooling.GitHub.Repository.Repository.LatestRelease` returns it.
 * An asset's :attr:`~pyTooling.GitHub.Release.ReleaseAsset.Label` is the text GitHub's release page shows instead of
-  the file name, if the uploader set one.
+  the file name, if the uploader set one. Its :attr:`~pyTooling.GitHub.Release.ReleaseAsset.Digest` is the checksum
+  GitHub computed on upload, e.g. ``sha256:8c7dd2e9...``; an asset uploaded before GitHub computed checksums has none.
 * GitHub's *Source code* archives are no assets: GitHub creates them on request.
   :meth:`~pyTooling.GitHub.Release.Release.SourceArchiveURL` returns the URL the release page links.
 
@@ -70,8 +73,7 @@ Reading a Repository
 ********************
 
 GitHub's GraphQL API serves no anonymous requests, so :class:`~pyTooling.GitHub.ReleaseReader.ReleaseReader` needs a
-token - inside a workflow, ``GITHUB_TOKEN`` with the ``contents: read`` permission suffices. A token with write
-access to the repository also sees its draft releases.
+token - inside a workflow, ``GITHUB_TOKEN`` with the ``contents: read`` permission suffices.
 
 * One query (:data:`~pyTooling.GitHub.ReleaseReader.RELEASES_QUERY`) reads a page of 50 releases with their assets and
   a page of 100 tags with their commits. Both are read page by page, until each is complete.
@@ -92,7 +94,7 @@ Snapshots
 releases and reads them again without another request. The snapshot holds a format version
 (:class:`~pyTooling.GitHub.Repository.SnapshotVersion`), the time the data was read
 (:attr:`~pyTooling.GitHub.Repository.Repository.FetchedAt`), and the repository in the shape of GitHub's GraphQL API -
-all pages merged and each asset's label added:
+all pages merged, drafts skipped and each asset's label added:
 
 .. code-block:: json
 
@@ -113,7 +115,8 @@ all pages merged and each asset's label added:
                "name": "ghdl-llvm-6.0.0-macos14-aarch64.tar.gz",
                "label": "GHDL - v6.0.0 - macOS 14 (aarch64) - llvm backend",
                "contentType": "application/x-gtar", "size": 42493570,
-               "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-llvm-6.0.0-..."
+               "downloadUrl": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-llvm-6.0.0-...",
+               "digest": "sha256:..."
              }
            ]}
          }

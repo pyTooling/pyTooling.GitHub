@@ -71,7 +71,7 @@ _URL = URL
 class SnapshotVersion(StringEnum):
 	"""Versions of the snapshot format written by :meth:`Repository.ToSnapshot`."""
 
-	Version1 = "1"       #: GitHub's GraphQL ``Repository`` object, all pages merged, asset labels added.
+	Version1 = "1"       #: GitHub's GraphQL ``Repository`` object: pages merged, no drafts, labels added.
 	Latest =   Version1  #: The version :meth:`Repository.ToSnapshot` writes.
 
 
@@ -450,9 +450,7 @@ class Repository(metaclass=ExtendedType, slots=True):
 		if release._parent is not None:
 			raise ValueError(f"Release '{release._tagName}' belongs to repository '{release._parent}' already.")
 		elif release._tagName in self._releases:
-			ex = ValueError(f"Repository '{self}' has a release of tag '{release._tagName}' already.")
-			ex.add_note("GitHub reports drafts to a token with write access, and two drafts may name the same tag.")
-			raise ex
+			raise ValueError(f"Repository '{self}' has a release of tag '{release._tagName}' already.")
 
 		release._parent = self
 		self._releases[release._tagName] = release
@@ -592,7 +590,8 @@ class Repository(metaclass=ExtendedType, slots=True):
 		Read the releases and tags of a repository from a ``Repository`` object of GitHub's GraphQL API.
 
 		The object holds the fields ``nameWithOwner``, ``url``, ``releases`` and ``refs`` (the tags) as
-		:class:`~pyTooling.GitHub.ReleaseReader.ReleaseReader` queries them, each connection with all its nodes.
+		:class:`~pyTooling.GitHub.ReleaseReader.ReleaseReader` queries them, each connection with all its nodes. Draft
+		releases are skipped: a draft is unpublished and may change, so it is no part of a repository's releases.
 
 		:param repository:   The ``Repository`` object.
 		:param fetchedAt:    Optional, time the data was read from GitHub, with a time zone. Default: ``None``.
@@ -620,6 +619,7 @@ class Repository(metaclass=ExtendedType, slots=True):
 		releases = [
 			Release.Parse(release, f"repository.releases.nodes[{position}]")
 			for position, release in enumerate(_readNodes(repository, "releases", "repository"))
+			if not isinstance(release, dict) or release.get("isDraft", None) is not True
 		]
 		tags =     [
 			Tag.Parse(ref, f"repository.refs.nodes[{position}]")

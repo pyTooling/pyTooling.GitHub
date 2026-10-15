@@ -110,7 +110,7 @@ RELEASES_QUERY = dedent("""\
 	  }
 	}
 
-	fragment Asset on ReleaseAsset { name contentType size downloadUrl }
+	fragment Asset on ReleaseAsset { name contentType size downloadUrl digest }
 
 	fragment Target on GitObject { __typename oid ... on Commit { url committedDate } }
 """)
@@ -127,7 +127,7 @@ RELEASE_ASSETS_QUERY = dedent("""\
 	    ... on Release {
 	      releaseAssets(first: 100, after: $cursor) {
 	        pageInfo { hasNextPage endCursor }
-	        nodes { name contentType size downloadUrl }
+	        nodes { name contentType size downloadUrl digest }
 	      }
 	    }
 	  }
@@ -143,7 +143,7 @@ class ReleaseReader(RepositoryClient):
 
 	One query reads a page of releases with their assets and a page of tags with their commits, so a repository with
 	fewer than 50 releases and 100 tags is read by one request. GitHub's GraphQL API reports no asset labels, so each
-	release with assets costs one request to the REST API for its labels.
+	release with assets costs one request to the REST API for its labels. Draft releases are skipped.
 
 	GitHub's GraphQL API serves no anonymous requests, so a token is required - inside a workflow, ``GITHUB_TOKEN``
 	with the ``contents: read`` permission suffices. The GraphQL endpoint is ``graphql`` below :attr:`APIURL`, as on
@@ -187,10 +187,10 @@ class ReleaseReader(RepositoryClient):
 		"""
 		Read the releases and tags of the repository.
 
-		Every page of releases, tags and assets is read, the asset labels are added from the REST API, and the result is
-		parsed by :meth:`Repository.Parse <pyTooling.GitHub.Repository.Repository.Parse>`. A request fails e.g. on an
-		exhausted rate limit or an unreachable API, and GitHub's GraphQL API reports e.g. an unknown repository as an
-		error.
+		Every page of releases, tags and assets is read, draft releases are skipped, the asset labels are added from the
+		REST API, and the result is parsed by :meth:`Repository.Parse <pyTooling.GitHub.Repository.Repository.Parse>`.
+		A request fails e.g. on an exhausted rate limit or an unreachable API, and GitHub's GraphQL API reports e.g. an
+		unknown repository as an error.
 
 		:returns:            The repository, with its releases and tags attached, and the time reading began.
 		:raises GitHubError: If a request fails. |br|
@@ -234,6 +234,7 @@ class ReleaseReader(RepositoryClient):
 				variables[flag] =   pageInfo.get("hasNextPage", False) is True
 				variables[cursor] = pageInfo.get("endCursor", None)
 
+		releases = [release for release in releases if release.get("isDraft", None) is not True]
 		for release in releases:
 			tagName = release.get("tagName", None)
 			if not isinstance(connection := release.get("releaseAssets", None), dict) \

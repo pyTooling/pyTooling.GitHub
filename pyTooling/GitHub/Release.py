@@ -100,6 +100,7 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 	_parent:      Nullable[Release]  #: Release the file is attached to.
 	_name:        str                #: File name of the asset.
 	_label:       Nullable[str]      #: Text shown instead of the file name.
+	_digest:      Nullable[str]      #: Checksum of the asset as ``algorithm:value``.
 	_contentType: str                #: Media type of the asset.
 	_size:        int                #: Size of the asset in bytes.
 	_downloadURL: URL                #: URL to download the asset from.
@@ -111,6 +112,7 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 		contentType: str,
 		size:        int,
 		label:       Nullable[str] = None,
+		digest:      Nullable[str] = None,
 		*,
 		parent:      Nullable[Release] = None
 	) -> None:
@@ -122,6 +124,7 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 		:param contentType: Media type of the asset.
 		:param size:        Size of the asset in bytes.
 		:param label:       Optional, text shown instead of the file name. Default: ``None``.
+		:param digest:      Optional, checksum of the asset as ``algorithm:value``. Default: ``None``.
 		:param parent:      Optional, reference to the release the asset is attached to. Default: ``None``.
 		:raises ValueError: If parameter 'name' or 'contentType' is ``None``.
 		:raises TypeError:  If parameter 'name' or 'contentType' is not of type :class:`str`.
@@ -133,6 +136,8 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 		:raises ValueError: If parameter 'size' is negative.
 		:raises TypeError:  If parameter 'label' is not of type :class:`str`.
 		:raises ValueError: If parameter 'label' is empty.
+		:raises TypeError:  If parameter 'digest' is not of type :class:`str`.
+		:raises ValueError: If parameter 'digest' isn't of the form ``algorithm:value``.
 		:raises TypeError:  If parameter 'parent' is not of type :class:`Release`.
 		:raises ValueError: If parameter 'parent' has an asset of the same name.
 		"""
@@ -171,9 +176,19 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 		elif label == "":
 			raise ValueError("Parameter 'label' is empty.")
 
+		if digest is not None and not isinstance(digest, str):
+			ex = TypeError("Parameter 'digest' is not of type 'str'.")
+			ex.add_note(f"Got type '{getFullyQualifiedName(digest)}'.")
+			raise ex
+		elif digest is not None and "" in digest.partition(":"):
+			ex = ValueError("Parameter 'digest' isn't of the form 'algorithm:value'.")
+			ex.add_note(f"Got value '{digest}'.")
+			raise ex
+
 		self._parent =      None
 		self._name =        name
 		self._label =       label
+		self._digest =      digest
 		self._contentType = contentType
 		self._size =        size
 		self._downloadURL = downloadURL
@@ -216,6 +231,18 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 		:returns: The label, or ``None`` if the asset has none.
 		"""
 		return self._label
+
+	@readonly
+	def Digest(self) -> Nullable[str]:
+		"""
+		Read-only property to access the asset's checksum (:attr:`_digest`).
+
+		GitHub computes it on upload as ``algorithm:value``, e.g. ``sha256:8c7dd2e9...`` - for an asset uploaded before
+		GitHub computed checksums, there is none.
+
+		:returns: The checksum as ``algorithm:value``, or ``None`` if GitHub has none.
+		"""
+		return self._digest
 
 	@readonly
 	def ContentType(self) -> str:
@@ -284,7 +311,8 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 			URL.Parse(asset["downloadUrl"]),
 			asset["contentType"],
 			asset["size"],
-			None if label == "" else label
+			None if label == "" else label,
+			asset.get("digest", None)
 		)
 
 	def ToJSON(self) -> JSONObject:
@@ -298,7 +326,8 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 			"label":       self._label,
 			"contentType": self._contentType,
 			"size":        self._size,
-			"downloadUrl": str(self._downloadURL)
+			"downloadUrl": str(self._downloadURL),
+			"digest":      self._digest
 		}
 
 
@@ -306,6 +335,8 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 class Release(metaclass=ExtendedType, slots=True):
 	"""
 	A release, published at a tag.
+
+	A draft is no release: it is unpublished and may change, so the model has none.
 
 	The release's commit is the one its **tag** points to - not GitHub's ``target_commitish``, which is usually a
 	branch's name. The time is when the release was **published**, not when it was created, which is the commit's time.
@@ -317,7 +348,6 @@ class Release(metaclass=ExtendedType, slots=True):
 	_name:         Nullable[str]            #: Title of the release.
 	_description:  str                      #: Release notes as Markdown.
 	_publishedAt:  Nullable[datetime]       #: Time the release was published.
-	_isDraft:      bool                     #: True, if the release is a draft.
 	_isPrerelease: bool                     #: True, if the release is a pre-release.
 	_isLatest:     bool                     #: True, if the release is the repository's latest release.
 	_commitSHA:    Nullable[str]            #: Commit the tag points to.
@@ -331,7 +361,6 @@ class Release(metaclass=ExtendedType, slots=True):
 		name:         Nullable[str]                    = None,
 		description:  str                              = "",
 		publishedAt:  Nullable[datetime]               = None,
-		isDraft:      bool                             = False,
 		isPrerelease: bool                             = False,
 		isLatest:     bool                             = False,
 		commitSHA:    Nullable[str]                    = None,
@@ -348,7 +377,6 @@ class Release(metaclass=ExtendedType, slots=True):
 		:param name:         Optional, title of the release. Default: ``None``.
 		:param description:  Optional, release notes as Markdown. Default: ``""``.
 		:param publishedAt:  Optional, time the release was published, with a time zone. Default: ``None``.
-		:param isDraft:      Optional, ``True``, if the release is a draft. Default: ``False``.
 		:param isPrerelease: Optional, ``True``, if the release is a pre-release. Default: ``False``.
 		:param isLatest:     Optional, ``True``, if the release is the repository's latest release. Default: ``False``.
 		:param commitSHA:    Optional, commit the tag points to. Default: ``None``.
@@ -366,8 +394,8 @@ class Release(metaclass=ExtendedType, slots=True):
 		:raises TypeError:   If parameter 'description' is not of type :class:`str`.
 		:raises TypeError:   If parameter 'publishedAt' is not of type :class:`~datetime.datetime`.
 		:raises ValueError:  If parameter 'publishedAt' has no time zone.
-		:raises ValueError:  If parameter 'isDraft', 'isPrerelease' or 'isLatest' is ``None``.
-		:raises TypeError:   If parameter 'isDraft', 'isPrerelease' or 'isLatest' is not of type :class:`bool`.
+		:raises ValueError:  If parameter 'isPrerelease' or 'isLatest' is ``None``.
+		:raises TypeError:   If parameter 'isPrerelease' or 'isLatest' is not of type :class:`bool`.
 		:raises TypeError:   If an element of parameter 'assets' is not of type :class:`ReleaseAsset`.
 		:raises ValueError:  If two elements of parameter 'assets' have the same name.
 		:raises TypeError:   If parameter 'parent' is not of type :class:`Repository`.
@@ -415,7 +443,7 @@ class Release(metaclass=ExtendedType, slots=True):
 			ex.add_note(f"Got value '{publishedAt}'.")
 			raise ex
 
-		for parameterName, flag in (("isDraft", isDraft), ("isPrerelease", isPrerelease), ("isLatest", isLatest)):
+		for parameterName, flag in (("isPrerelease", isPrerelease), ("isLatest", isLatest)):
 			if flag is None:
 				raise ValueError(f"Parameter '{parameterName}' is None.")
 			elif not isinstance(flag, bool):
@@ -429,7 +457,6 @@ class Release(metaclass=ExtendedType, slots=True):
 		self._name =         name
 		self._description =  description
 		self._publishedAt =  publishedAt
-		self._isDraft =      isDraft
 		self._isPrerelease = isPrerelease
 		self._isLatest =     isLatest
 		self._commitSHA =    commitSHA
@@ -525,20 +552,9 @@ class Release(metaclass=ExtendedType, slots=True):
 		"""
 		Read-only property to access the time the release was published (:attr:`_publishedAt`).
 
-		:returns: The time with its time zone - UTC, as GitHub reports it -, or ``None`` for a draft.
+		:returns: The time with its time zone - UTC, as GitHub reports it -, or ``None`` if unknown.
 		"""
 		return self._publishedAt
-
-	@readonly
-	def IsDraft(self) -> bool:
-		"""
-		Read-only property to access whether the release is a draft (:attr:`_isDraft`).
-
-		GitHub reports drafts only to a token with write access to the repository.
-
-		:returns: ``True``, if the release is a draft.
-		"""
-		return self._isDraft
 
 	@readonly
 	def IsPrerelease(self) -> bool:
@@ -568,7 +584,7 @@ class Release(metaclass=ExtendedType, slots=True):
 
 		An annotated tag is resolved to the commit it points to.
 
-		:returns: The commit's hash, or ``None`` if the tag doesn't exist yet, as for a draft.
+		:returns: The commit's hash, or ``None`` if the tag doesn't exist.
 		"""
 		return self._commitSHA
 
@@ -627,7 +643,8 @@ class Release(metaclass=ExtendedType, slots=True):
 		"""
 		Read a release and its assets from a ``Release`` object of GitHub's GraphQL API.
 
-		An empty title is no title, and no release notes are empty release notes.
+		An empty title is no title, and no release notes are empty release notes. A draft is rejected, as it is no
+		release - :meth:`Repository.Parse <pyTooling.GitHub.Repository.Repository.Parse>` skips drafts.
 
 		:param release:      The ``Release`` object.
 		:param path:         Optional, position of the release, for an exception's message. Default: ``'release'``.
@@ -635,6 +652,7 @@ class Release(metaclass=ExtendedType, slots=True):
 		:raises TypeError:   If parameter 'release' is not of type :class:`dict`.
 		:raises GitHubError: If field ``tagName``, ``url``, ``isDraft``, ``isPrerelease``, ``isLatest`` or
 		                     ``releaseAssets`` is missing.
+		:raises GitHubError: If the release is a draft.
 		:raises GitHubError: If field ``tagCommit`` has no ``oid``.
 		:raises GitHubError: If field ``releaseAssets`` holds no complete list of nodes.
 		:raises GitHubError: If field ``publishedAt`` isn't an ISO 8601 timestamp.
@@ -647,6 +665,9 @@ class Release(metaclass=ExtendedType, slots=True):
 		for field in ("tagName", "url", "isDraft", "isPrerelease", "isLatest"):
 			if release.get(field, None) is None:
 				raise GitHubError(f"Field '{path}.{field}' is missing.")
+
+		if release["isDraft"] is True:
+			raise GitHubError(f"Release '{release['tagName']}' is a draft.")
 
 		if (tagCommit := release.get("tagCommit", None)) is None:
 			commitSHA = None
@@ -669,7 +690,6 @@ class Release(metaclass=ExtendedType, slots=True):
 			None if name == "" else name,
 			"" if description is None else description,
 			_parseISO8601Timestamp(release.get("publishedAt", None), f"{path}.publishedAt"),
-			release["isDraft"],
 			release["isPrerelease"],
 			release["isLatest"],
 			commitSHA,
@@ -694,7 +714,7 @@ class Release(metaclass=ExtendedType, slots=True):
 			"description":   self._description,
 			"publishedAt":   None if self._publishedAt is None else self._publishedAt.isoformat(),
 			"url":           str(self._url),
-			"isDraft":       self._isDraft,
+			"isDraft":       False,
 			"isPrerelease":  self._isPrerelease,
 			"isLatest":      self._isLatest,
 			"tagCommit":     tagCommit,

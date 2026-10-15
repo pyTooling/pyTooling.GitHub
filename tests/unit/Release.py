@@ -80,7 +80,6 @@ class Parsing(Testcase):
 		self.assertEqual("Nightly Release", nightly.Name)
 		self.assertTrue(nightly.IsPrerelease)
 		self.assertFalse(nightly.IsLatest)
-		self.assertFalse(nightly.IsDraft)
 		self.assertTrue(nightly.Description.startswith("This *nightly* release"))
 		self.assertEqual(datetime(2026, 9, 14, 0, 3, 11, tzinfo=timezone.utc), nightly.PublishedAt)
 		self.assertIs(repository, nightly.Parent)
@@ -102,6 +101,10 @@ class Parsing(Testcase):
 			str(asset.DownloadURL)
 		)
 		self.assertIsNone(asset.Label, "GitHub's GraphQL API reports no labels.")
+		self.assertEqual("sha256:9cb3ccc09ca95f37c88bb757b3da7415ce5efede51e136e0262c74f3f99c2245", asset.Digest)
+		self.assertTrue(
+			all(asset.Digest is None for asset in repository["v0.37"].Assets.values()), "Older assets have no digest."
+		)
 		self.assertEqual(0, len(repository["v2.0.0"].Assets))
 
 	def test_Tags(self) -> None:
@@ -199,6 +202,29 @@ class Parsing(Testcase):
 
 		self.assertEqual("Repository 'ghdl/ghdl' has a release of tag 'nightly' already.", str(context.exception))
 
+	def test_Drafts(self) -> None:
+		"""Drafts are skipped, also two drafts of one tag; parsing a draft on its own is an error."""
+		document = _repository("GHDL")
+		draft =    deepcopy(document["releases"]["nodes"][1])
+		draft["isDraft"] = True
+		draft["tagName"] = "v7.0.0"
+		document["releases"]["nodes"].extend((draft, deepcopy(draft)))
+
+		repository = Repository.Parse(document)
+
+		self.assertEqual(["nightly", "v6.0.0", "v2.0.0", "v0.37"], [release.TagName for release in repository])
+		self.assertNotIn("v7.0.0", repository)
+		self.assertFalse(repository.ToJSON()["releases"]["nodes"][0]["isDraft"])
+
+		with self.assertRaises(GitHubError) as context:
+			_ = Release.Parse(draft)
+		self.assertEqual("Release 'v7.0.0' is a draft.", str(context.exception))
+
+		del draft["isDraft"]
+		with self.assertRaises(GitHubError) as context:
+			_ = Release.Parse(draft)
+		self.assertEqual("Field 'release.isDraft' is missing.", str(context.exception))
+
 	def test_TagTargets(self) -> None:
 		"""A tag of a tree has no commit, a tag object is followed, and nesting beyond what was read is an error."""
 		commit = {"__typename": "Commit", "oid": "abc", "url": "https://github.com/o/r/commit/abc", "committedDate": None}
@@ -249,8 +275,8 @@ class Construction(Testcase):
 			(("v1", _URL, None, None),             ValueError, "Parameter 'description' is None."),
 			(("v1", _URL, None, "", "2026-10-15"), TypeError,  "Parameter 'publishedAt' is not of type 'datetime'."),
 			(("v1", _URL, None, "", datetime(2026, 10, 15)), ValueError, "Parameter 'publishedAt' has no time zone."),
-			(("v1", _URL, None, "", None, None),   ValueError, "Parameter 'isDraft' is None."),
-			(("v1", _URL, None, "", None, False, 1), TypeError, "Parameter 'isPrerelease' is not of type 'bool'."),
+			(("v1", _URL, None, "", None, None),   ValueError, "Parameter 'isPrerelease' is None."),
+			(("v1", _URL, None, "", None, False, 1), TypeError, "Parameter 'isLatest' is not of type 'bool'."),
 		):
 			with self.subTest(message=message):
 				with self.assertRaises(exception) as context:
@@ -281,6 +307,9 @@ class Construction(Testcase):
 			(("a.zip", download, "application/zip", True), TypeError, "Parameter 'size' is not of type 'int'."),
 			(("a.zip", download, "application/zip", -1), ValueError, "Parameter 'size' is negative."),
 			(("a.zip", download, "application/zip", 1, ""), ValueError, "Parameter 'label' is empty."),
+			(("a.zip", download, "application/zip", 1, None, 256), TypeError, "Parameter 'digest' is not of type 'str'."),
+			(("a.zip", download, "application/zip", 1, None, "abc"), ValueError,
+			 "Parameter 'digest' isn't of the form 'algorithm:value'."),
 		):
 			with self.subTest(message=message):
 				with self.assertRaises(exception) as context:
@@ -379,6 +408,10 @@ class Snapshot(Testcase):
 		self.assertNotIn("pageInfo", repository.ToJSON()["releases"])
 		self.assertEqual({"oid", "url"}, set(release["tagCommit"]))
 		self.assertIsNone(release["releaseAssets"]["nodes"][0]["label"])
+		self.assertEqual(
+			"sha256:236214bf06b8f755a19203b49f1f4df4660c36460a4d771449379c5a3a7459a1",
+			release["releaseAssets"]["nodes"][0]["digest"]
+		)
 		self.assertEqual("2026-10-04T15:42:56+00:00", release["publishedAt"])
 
 	def test_Version(self) -> None:
