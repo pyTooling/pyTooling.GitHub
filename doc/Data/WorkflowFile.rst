@@ -214,7 +214,7 @@ A run read from the GitHub REST API (:ref:`DATA/PipelineRun`) has no ``needs``: 
 
 .. code-block:: python
 
-   run =      Pipeline.FromJSON(runJSON, jobsJSON)
+   run =      Pipeline.Parse(runJSON, jobsJSON)
    workflow = resolver.Load(Path(run.Path))
 
    for name in workflow.ApplyNeeds(run, resolver):

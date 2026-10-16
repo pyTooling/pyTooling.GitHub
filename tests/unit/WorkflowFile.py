@@ -1564,7 +1564,7 @@ class ApplyNeeds(Fixture):
 		"""
 		run = {"id": 4711, "name": "Pipeline", "status": "completed", "conclusion": "success", "head_sha": "0123abcd"}
 
-		return GitHubPipeline.FromJSON(run, [_job(name, conclusion) for name, conclusion in names])
+		return GitHubPipeline.Parse(run, [_job(name, conclusion) for name, conclusion in names])
 
 	def test_Calls(self) -> None:
 		"""The jobs of the run and of its called workflows get the dependencies of the workflow files."""
