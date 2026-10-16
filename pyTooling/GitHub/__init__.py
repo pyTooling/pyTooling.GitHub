@@ -110,12 +110,12 @@ class RepositoryClient(RESTClient):
 	:class:`~pyTooling.REST.RESTClient`'s.
 	"""
 
-	_namespace:  str  #: Namespace of the repository, the user or organization owning it.
+	_owner:      str  #: Owner of the repository, a user or an organization.
 	_repository: str  #: Name of the repository.
 
 	def __init__(
 		self,
-		namespace:  str,
+		owner:      str,
 		repository: str,
 		token:      Nullable[str] = None,
 		*,
@@ -127,7 +127,7 @@ class RepositoryClient(RESTClient):
 		"""
 		Initializes a client for one repository.
 
-		:param namespace:   The namespace of the repository, the user or organization owning it.
+		:param owner:       The owner of the repository, a user or an organization.
 		:param repository:  The name of the repository.
 		:param token:       Optional, token authorizing the requests. Default: anonymous requests.
 		:param apiURL:      Optional, base URL of the GitHub REST API, e.g. of a GitHub Enterprise Server.
@@ -137,15 +137,15 @@ class RepositoryClient(RESTClient):
 		                    Default: ``3``.
 		:param retryDelay:  Optional, pause in seconds before a request is tried again the first time. The pause doubles
 		                    with every further attempt. Default: ``2.0``.
-		:raises ValueError: If parameter 'namespace' or 'repository' is ``None``.
-		:raises TypeError:  If parameter 'namespace' or 'repository' is not of type :class:`str`.
-		:raises ValueError: If parameter 'namespace' or 'repository' is empty or contains a ``/``.
+		:raises ValueError: If parameter 'owner' or 'repository' is ``None``.
+		:raises TypeError:  If parameter 'owner' or 'repository' is not of type :class:`str`.
+		:raises ValueError: If parameter 'owner' or 'repository' is empty or contains a ``/``.
 		:raises TypeError:  If a parameter of :class:`~pyTooling.REST.RESTClient` has the wrong type.
 		:raises ValueError: If a parameter of :class:`~pyTooling.REST.RESTClient` has an invalid value.
 		"""
 		super().__init__(apiURL, token, headers=_GITHUB_HEADERS, timeout=timeout, retries=retries, retryDelay=retryDelay)
 
-		for parameterName, text in (("namespace", namespace), ("repository", repository)):
+		for parameterName, text in (("owner", owner), ("repository", repository)):
 			if text is None:
 				raise ValueError(f"Parameter '{parameterName}' is None.")
 			elif not isinstance(text, str):
@@ -157,24 +157,24 @@ class RepositoryClient(RESTClient):
 				ex.add_note(f"Got value '{text}'.")
 				raise ex
 
-		self._namespace =  namespace
+		self._owner =      owner
 		self._repository = repository
 
 	@readonly
-	def Namespace(self) -> str:
+	def Owner(self) -> str:
 		"""
-		Read-only property to access the repository's namespace (:attr:`_namespace`).
+		Read-only property to access the repository's owner (:attr:`_owner`).
 
 		:returns: The name of the user or organization owning the repository.
 		"""
-		return self._namespace
+		return self._owner
 
 	@readonly
 	def Repository(self) -> str:
 		"""
 		Read-only property to access the repository's name (:attr:`_repository`).
 
-		:returns: The name of the repository, without its namespace.
+		:returns: The name of the repository, without its owner.
 		"""
 		return self._repository
 

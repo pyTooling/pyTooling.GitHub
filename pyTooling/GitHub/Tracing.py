@@ -462,7 +462,7 @@ class WorkflowRunReader(RepositoryClient):
 				ex.add_note(f"Got value '{attempt}'.")
 				raise ex
 
-		runPath = f"repos/{self._namespace}/{self._repository}/actions/runs/{runID}"
+		runPath = f"repos/{self._owner}/{self._repository}/actions/runs/{runID}"
 		if attempt is None:
 			run, _ =  self.GetJSONObject(runPath)
 			jobsPath = f"{runPath}/jobs?filter=latest&per_page=100"

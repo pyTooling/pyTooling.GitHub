@@ -152,7 +152,7 @@ class ReleaseReader(RepositoryClient):
 
 	def __init__(
 		self,
-		namespace:  str,
+		owner:      str,
 		repository: str,
 		token:      str,
 		*,
@@ -164,7 +164,7 @@ class ReleaseReader(RepositoryClient):
 		"""
 		Initializes a reader for the releases and tags of a repository.
 
-		:param namespace:   The namespace of the repository, the user or organization owning it.
+		:param owner:       The owner of the repository, a user or an organization.
 		:param repository:  The name of the repository.
 		:param token:       Token authorizing the requests.
 		:param apiURL:      Optional, base URL of the GitHub API. Default: :data:`~pyTooling.GitHub.GITHUB_API_URL`.
@@ -179,7 +179,7 @@ class ReleaseReader(RepositoryClient):
 		:raises ValueError: If a parameter of :class:`~pyTooling.GitHub.RepositoryClient` has an invalid value.
 		"""
 		super().__init__(
-			namespace, repository, token, apiURL=apiURL, timeout=timeout, retries=retries, retryDelay=retryDelay
+			owner, repository, token, apiURL=apiURL, timeout=timeout, retries=retries, retryDelay=retryDelay
 		)
 
 		if token is None:
@@ -207,7 +207,7 @@ class ReleaseReader(RepositoryClient):
 		"""
 		fetchedAt = datetime.now(timezone.utc)
 		variables: dict[str, Any] = {
-			"owner":          self._namespace,
+			"owner":          self._owner,
 			"name":           self._repository,
 			"withReleases":   True,
 			"releasesCursor": None,
@@ -219,7 +219,7 @@ class ReleaseReader(RepositoryClient):
 		repository: JSONObject
 		while variables["withReleases"] or variables["withTags"]:
 			if not isinstance(repository := self._Query(RELEASES_QUERY, variables).get("repository", None), dict):
-				raise GitHubError(f"GraphQL response has no repository '{self._namespace}/{self._repository}'.")
+				raise GitHubError(f"GraphQL response has no repository '{self._owner}/{self._repository}'.")
 
 			for field, nodes, flag, cursor in (
 				("releases", releases, "withReleases", "releasesCursor"),
@@ -267,7 +267,7 @@ class ReleaseReader(RepositoryClient):
 				raise GitHubError(f"Field 'databaseId' of release '{tagName}' is missing.")
 
 			try:
-				restRelease, _ = self.GetJSONObject(f"repos/{self._namespace}/{self._repository}/releases/{databaseID}")
+				restRelease, _ = self.GetJSONObject(f"repos/{self._owner}/{self._repository}/releases/{databaseID}")
 			except RESTError as cause:
 				ex = GitHubError(f"Request for asset labels of release '{tagName}' failed: {cause}")
 				for note in getattr(cause, "__notes__", []):
@@ -316,7 +316,7 @@ class ReleaseReader(RepositoryClient):
 		try:
 			response, _ = self._Request(HTTPMethod.POST, "graphql", {"query": query, "variables": variables})
 		except RESTError as cause:
-			ex = GitHubError(f"GraphQL request for repository '{self._namespace}/{self._repository}' failed: {cause}")
+			ex = GitHubError(f"GraphQL request for repository '{self._owner}/{self._repository}' failed: {cause}")
 			for note in getattr(cause, "__notes__", []):
 				ex.add_note(note)
 			raise ex from cause
@@ -324,7 +324,7 @@ class ReleaseReader(RepositoryClient):
 		if response is None:
 			raise GitHubError("GraphQL response is empty.")
 		elif (errors := response.get("errors", None)) is not None:
-			ex = GitHubError(f"GraphQL request for repository '{self._namespace}/{self._repository}' failed.")
+			ex = GitHubError(f"GraphQL request for repository '{self._owner}/{self._repository}' failed.")
 			types = set()
 			for error in errors if isinstance(errors, list) else [errors]:
 				if not isinstance(error, dict):

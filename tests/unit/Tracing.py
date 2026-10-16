@@ -625,10 +625,10 @@ class Reader(Testcase):
 
 	def test_Repository(self) -> None:
 		for arguments, exception, message in (
-			((None, "repo"),       ValueError, "Parameter 'namespace' is None."),
+			((None, "repo"),       ValueError, "Parameter 'owner' is None."),
 			(("owner", None),      ValueError, "Parameter 'repository' is None."),
-			((1, "repo"),          TypeError,  "Parameter 'namespace' is not of type 'str'."),
-			(("", "repo"),         ValueError, "Parameter 'namespace' is empty or contains a '/'."),
+			((1, "repo"),          TypeError,  "Parameter 'owner' is not of type 'str'."),
+			(("", "repo"),         ValueError, "Parameter 'owner' is empty or contains a '/'."),
 			(("owner", "repo/x"),  ValueError, "Parameter 'repository' is empty or contains a '/'."),
 		):
 			with self.subTest(message=message):
@@ -638,7 +638,7 @@ class Reader(Testcase):
 				self.assertEqual(message, str(context.exception))
 
 		reader = WorkflowRunReader("owner", "repo")
-		self.assertEqual(("owner", "repo"), (reader.Namespace, reader.Repository))
+		self.assertEqual(("owner", "repo"), (reader.Owner, reader.Repository))
 		reader = WorkflowRunReader("owner", "repo", apiURL="https://ghe.example.com/api/v3/")
 		self.assertEqual("https://ghe.example.com/api/v3", str(reader.APIURL))
 

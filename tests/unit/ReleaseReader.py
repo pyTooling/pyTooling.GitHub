@@ -145,17 +145,17 @@ class Server:
 
 
 class Reading(Testcase):
-	def _Read(self, server: Server, namespace: str, repository: str) -> Any:
+	def _Read(self, server: Server, owner: str, repository: str) -> Any:
 		"""
 		Read a repository from a fake GitHub API.
 
 		:param server:     The fake API.
-		:param namespace:  The repository's namespace.
+		:param owner:      The repository's owner.
 		:param repository: The repository's name.
 		:returns:          The repository's releases and tags.
 		"""
 		with server.Patch():
-			return ReleaseReader(namespace, repository, "secret").Read()
+			return ReleaseReader(owner, repository, "secret").Read()
 
 	def test_GHDL(self) -> None:
 		"""One query reads the releases and tags; a release with assets costs one REST request for its labels."""

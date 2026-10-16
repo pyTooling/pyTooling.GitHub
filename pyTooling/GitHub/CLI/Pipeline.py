@@ -231,8 +231,8 @@ class PipelineHandlers(metaclass=ExtendedType, mixin=True):
 			self.WriteErrorNote(f"Set '--github-repository=owner/name', or ${self.ENVIRONMENT_REPOSITORY}.")
 			self.Exit(2)
 
-		namespace, _, name = repository.partition("/")
-		if namespace == "" or name == "" or "/" in name:
+		owner, _, name = repository.partition("/")
+		if owner == "" or name == "" or "/" in name:
 			self.WriteError(f"Repository '{repository}' isn't of the form 'owner/name'.")
 			self.WriteErrorNote("E.g. '--github-repository=pyTooling/pyTooling'.")
 			self.Exit(2)
@@ -248,7 +248,7 @@ class PipelineHandlers(metaclass=ExtendedType, mixin=True):
 			self.Exit(2)
 
 		self.WriteVerbose(f"Reading run {runID} of '{repository}' ...")
-		reader = WorkflowRunReader(namespace, name, getenv(self.ENVIRONMENT_TOKEN))
+		reader = WorkflowRunReader(owner, name, getenv(self.ENVIRONMENT_TOKEN))
 
 		return reader.ReadRun(int(runID))
 
