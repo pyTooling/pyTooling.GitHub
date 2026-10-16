@@ -9,7 +9,7 @@ Pipeline Run
 
    from pyTooling.GitHub import Pipeline
 
-   pipeline = Pipeline.FromJSON(run, jobs)      # the REST API's two payloads
+   pipeline = Pipeline.Parse(run, jobs)      # the REST API's two payloads
 
    print(f"{pipeline.Name} #{pipeline.RunNumber}: {pipeline.Conclusion.name} in {pipeline.Duration} s")
    for job in pipeline.IterateJobs():
@@ -85,7 +85,7 @@ answers it without a search:
 
 * **A called workflow and a matrix are not elements GitHub reports.** It encodes both in a job's name -
   ``Caller / Job`` for a called workflow, ``Job (ubuntu-26.04, 3.14)`` for a matrix instance -
-  and :meth:`~pyTooling.GitHub.Pipeline.FromJSON` reads the name back into the tree.
+  and :meth:`~pyTooling.GitHub.Pipeline.Parse` reads the name back into the tree.
 * **A matrix may call a reusable workflow**, once per combination. Its jobs are named ``Tests (3.14) / Unit``, and
   the prefix becomes a :class:`~pyTooling.CI.MatrixWorkflow` ``Tests (3.14)`` below a
   :class:`~pyTooling.CI.Matrix` ``Tests``, beside the other combinations.
@@ -166,7 +166,7 @@ no field saying it is a tag, so :meth:`~pyTooling.GitHub.PipelineGroup.ByGitRefe
 
 .. code-block:: python
 
-   group = PipelineGroup.FromJSON(runs)          # GET .../actions/runs?head_sha=...
+   group = PipelineGroup.Parse(runs)          # GET .../actions/runs?head_sha=...
 
    for reference, pipelines in group.ByGitReference().items():
      print(f"{reference}: {len(pipelines)} pipeline(s)")

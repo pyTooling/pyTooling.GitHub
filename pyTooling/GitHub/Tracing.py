@@ -356,7 +356,7 @@ class WorkflowRunTrace(CIPipelineTrace, GitHubTimespanMixin):
 	"""A GitHub Actions workflow run as a trace."""
 
 	@classmethod
-	def FromJSON(cls, run: JSONObject, jobs: Nullable[Iterable[JSONObject]] = None) -> Self:
+	def Parse(cls, run: JSONObject, jobs: Nullable[Iterable[JSONObject]] = None) -> Self:
 		"""
 		Build the trace of a workflow run from the payloads the GitHub REST API answers with.
 
@@ -370,7 +370,7 @@ class WorkflowRunTrace(CIPipelineTrace, GitHubTimespanMixin):
 		:raises TypeError:   If parameter 'run' is not of type :class:`dict`.
 		:raises GitHubError: If a mandatory field is missing, or a field holds a value GitHub doesn't document.
 		"""
-		return cls.FromPipeline(Pipeline.FromJSON(run, jobs))
+		return cls.FromPipeline(Pipeline.Parse(run, jobs))
 
 	@classmethod
 	def FromPipeline(cls, pipeline: Pipeline) -> Self:
@@ -501,7 +501,7 @@ class WorkflowRunReader(RESTClient):
 
 		:param runID:         The workflow run's identifier.
 		:param attempt:       Optional, the run attempt to read. Default: the latest attempt.
-		:returns:             The workflow run as a trace (see :meth:`WorkflowRunTrace.FromJSON`).
+		:returns:             The workflow run as a trace (see :meth:`WorkflowRunTrace.Parse`).
 		:raises ValueError:   If parameter 'runID' is ``None``.
 		:raises TypeError:    If parameter 'runID' is not of type :class:`int`.
 		:raises ValueError:   If parameter 'runID' isn't positive.
@@ -547,7 +547,7 @@ class WorkflowRunReader(RESTClient):
 				raise GitHubError(f"Field 'jobs' is missing in the answer of '{jobsPath}'.")
 			jobs.extend(pageJobs)
 
-		return WorkflowRunTrace.FromJSON(run, jobs)
+		return WorkflowRunTrace.Parse(run, jobs)
 
 	def _AddErrorNotes(self, error: RESTError, status: int) -> None:
 		"""

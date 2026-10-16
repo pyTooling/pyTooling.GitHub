@@ -202,7 +202,7 @@ class Construction(Testcase):
 
 class Conversion(Testcase):
 	def test_Run(self) -> None:
-		pipeline = Pipeline.FromJSON(_run())
+		pipeline = Pipeline.Parse(_run())
 
 		self.assertEqual("Pipeline", pipeline.Name)
 		self.assertEqual(4711, pipeline.ID)
@@ -216,36 +216,36 @@ class Conversion(Testcase):
 		self.assertIs(pipeline, pipeline.Pipeline)
 
 	def test_RunNotCompletedHasNoEndTime(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(status="in_progress", conclusion=None))
+		pipeline = Pipeline.Parse(_run(status="in_progress", conclusion=None))
 
 		self.assertIsNone(pipeline.CompletedAt)
 		self.assertIsNone(pipeline.Duration)
 
 	def test_RunType(self) -> None:
 		with self.assertRaises(TypeError) as context:
-			_ = Pipeline.FromJSON("run")
+			_ = Pipeline.Parse("run")
 
 		self.assertEqual("Parameter 'run' is not of type 'dict'.", str(context.exception))
 
 	def test_MissingName(self) -> None:
 		with self.assertRaises(GitHubError) as context:
-			_ = Pipeline.FromJSON({"id": 1})
+			_ = Pipeline.Parse({"id": 1})
 
 		self.assertEqual("Field 'run.name' is missing.", str(context.exception))
 
 	def test_InvalidTimestamp(self) -> None:
 		with self.assertRaises(GitHubError) as context:
-			_ = Pipeline.FromJSON(_run(created_at="yesterday"))
+			_ = Pipeline.Parse(_run(created_at="yesterday"))
 
 		self.assertEqual("Field 'run.created_at' isn't an ISO 8601 timestamp.", str(context.exception))
 
 	def test_NaiveTimestampIsUTC(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(created_at="2026-09-17T10:00:00"))
+		pipeline = Pipeline.Parse(_run(created_at="2026-09-17T10:00:00"))
 
 		self.assertEqual(timezone.utc, pipeline.CreatedAt.tzinfo)
 
 	def test_Job(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 10, 20, 80)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 10, 20, 80)])
 		job =      pipeline.Jobs[0]
 
 		self.assertEqual("Build", job.Name)
@@ -256,7 +256,7 @@ class Conversion(Testcase):
 		self.assertEqual(60.0, job.Duration)
 
 	def test_JobNotStarted(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 10, None, None)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 10, None, None)])
 		job =      pipeline.Jobs[0]
 
 		self.assertIsNone(job.StartedAt)
@@ -272,7 +272,7 @@ class Conversion(Testcase):
 			{"name": "Compile", "number": 2, "status": "completed", "conclusion": "failure",
 			 "started_at": _time(25), "completed_at": _time(70)},
 		]
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 10, 20, 80, steps=steps)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 10, 20, 80, steps=steps)])
 		job =      pipeline.Jobs[0]
 
 		self.assertEqual(2, len(job.Steps))
@@ -283,7 +283,7 @@ class Conversion(Testcase):
 		self.assertIs(pipeline, job.Steps[1].Pipeline)
 
 	def test_CalledWorkflowGroupsItsJobs(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Prepare", 10, 20, 60),
 			_job("UnitTesting / Linux", 60, 70, 300),
 			_job("UnitTesting / Windows", 60, 90, 540),
@@ -298,7 +298,7 @@ class Conversion(Testcase):
 		self.assertIs(pipeline, workflow.Parent)
 
 	def test_CalledWorkflowsNest(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Docs / Sphinx / HTML", 60, 70, 180)])
+		pipeline = Pipeline.Parse(_run(), [_job("Docs / Sphinx / HTML", 60, 70, 180)])
 
 		docs = pipeline.Workflows["Docs"]
 		self.assertEqual("Docs", docs.Name)
@@ -313,7 +313,7 @@ class Conversion(Testcase):
 		self.assertIs(pipeline, job.Pipeline)
 
 	def test_CalledWorkflowSpansItsJobs(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("UnitTesting / Linux", 60, 70, 300),
 			_job("UnitTesting / Windows", 60, 90, 540),
 		])
@@ -325,7 +325,7 @@ class Conversion(Testcase):
 		self.assertEqual(470.0, workflow.Duration)
 
 	def test_CalledWorkflowWithARunningJobHasNoEndTime(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("UnitTesting / Linux", 60, 70, 300),
 			_job("UnitTesting / Windows", 60, 90, None),
 		])
@@ -333,7 +333,7 @@ class Conversion(Testcase):
 		self.assertIsNone(pipeline.Workflows["UnitTesting"].CompletedAt)
 
 	def test_IterateJobsReachesEveryJob(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Prepare", 10, 20, 60),
 			_job("UnitTesting / Linux", 60, 70, 300),
 			_job("Docs / Sphinx / HTML", 60, 70, 180),
@@ -343,14 +343,14 @@ class Conversion(Testcase):
 
 	def test_JobType(self) -> None:
 		with self.assertRaises(TypeError) as context:
-			_ = Pipeline.FromJSON(_run(), ["job"])
+			_ = Pipeline.Parse(_run(), ["job"])
 
 		self.assertEqual("Job 0 is not of type 'dict'.", str(context.exception))
 
 
 class Matrices(Testcase):
 	def test_MatrixGroupsItsInstances(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Unit Tests (ubuntu-26.04, 3.14)", 60, 70, 300),
 			_job("Unit Tests (ubuntu-26.04, 3.11)", 60, 70, 360),
 			_job("Unit Tests (windows-2025, 3.14)", 60, 90, 540),
@@ -365,7 +365,7 @@ class Matrices(Testcase):
 		self.assertIs(pipeline, matrix.Parent)
 
 	def test_InstanceCarriesItsDimensions(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Unit Tests (ubuntu-26.04, 3.14)", 60, 70, 300)])
+		pipeline = Pipeline.Parse(_run(), [_job("Unit Tests (ubuntu-26.04, 3.14)", 60, 70, 300)])
 		instance = pipeline.Matrices["Unit Tests"].Instances[0]
 
 		self.assertIsInstance(instance, MatrixJob)
@@ -374,7 +374,7 @@ class Matrices(Testcase):
 		self.assertEqual("Unit Tests (ubuntu-26.04, 3.14)", str(instance))
 
 	def test_MatrixDimensionsOfEveryInstance(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Unit Tests (ubuntu-26.04, 3.14)", 60, 70, 300),
 			_job("Unit Tests (windows-2025, 3.11)", 60, 90, 540),
 		])
@@ -385,7 +385,7 @@ class Matrices(Testcase):
 		)
 
 	def test_MatrixSpansItsInstances(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Unit Tests (a)", 60, 70, 300),
 			_job("Unit Tests (b)", 60, 90, 540),
 		])
@@ -396,7 +396,7 @@ class Matrices(Testcase):
 		self.assertEqual(470.0, matrix.Duration)
 
 	def test_MatrixInsideACalledWorkflow(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Docs / Sphinx (html, latex)", 60, 70, 180)])
+		pipeline = Pipeline.Parse(_run(), [_job("Docs / Sphinx (html, latex)", 60, 70, 180)])
 
 		workflow = pipeline.Workflows["Docs"]
 		self.assertEqual("Docs", workflow.Name)
@@ -407,7 +407,7 @@ class Matrices(Testcase):
 		self.assertIs(pipeline, matrix.Instances[0].Pipeline)
 
 	def test_IterateJobsReachesMatrixInstances(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Prepare", 10, 20, 60),
 			_job("Unit Tests (a)", 60, 70, 300),
 			_job("Docs / Sphinx (html)", 60, 70, 180),
@@ -416,21 +416,21 @@ class Matrices(Testcase):
 		self.assertEqual(3, len(list(pipeline.IterateJobs())))
 
 	def test_AJobWithoutBracketsIsNoMatrix(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Prepare", 10, 20, 60)])
+		pipeline = Pipeline.Parse(_run(), [_job("Prepare", 10, 20, 60)])
 
 		self.assertEqual(["Prepare"], [job.Name for job in pipeline.Jobs])
 		self.assertEqual({}, pipeline.Matrices)
 		self.assertNotIsInstance(pipeline.Jobs[0], MatrixJob)
 
 	def test_EmptyBracketsAreNotDimensions(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("(detached)", 10, 20, 60)])
+		pipeline = Pipeline.Parse(_run(), [_job("(detached)", 10, 20, 60)])
 
 		self.assertEqual(["(detached)"], [job.Name for job in pipeline.Jobs])
 		self.assertEqual({}, pipeline.Matrices)
 
 	def test_ASingleBracketedJobBecomesAOneInstanceMatrix(self) -> None:
 		"""Documented consequence: the bracketed suffix is a naming convention, not a field of the payload."""
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build (fast)", 10, 20, 60)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build (fast)", 10, 20, 60)])
 
 		self.assertEqual(1, len(pipeline.Matrices))
 		self.assertEqual("Build", pipeline.Matrices["Build"].Name)
@@ -439,7 +439,7 @@ class Matrices(Testcase):
 
 class Hierarchy(Testcase):
 	def test_GroupsShareTheirBehaviour(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Unit Tests (a)", 60, 70, 300)])
+		pipeline = Pipeline.Parse(_run(), [_job("Unit Tests (a)", 60, 70, 300)])
 
 		self.assertIsInstance(pipeline, Workflow)
 		self.assertIsInstance(pipeline, JobGroup)
@@ -447,7 +447,7 @@ class Hierarchy(Testcase):
 		self.assertNotIsInstance(pipeline.Matrices["Unit Tests"], Workflow)
 
 	def test_MatrixJobIsAJob(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Unit Tests (a)", 60, 70, 300)])
+		pipeline = Pipeline.Parse(_run(), [_job("Unit Tests (a)", 60, 70, 300)])
 		instance = pipeline.Matrices["Unit Tests"].Instances[0]
 
 		self.assertIsInstance(instance, Job)
@@ -477,25 +477,25 @@ class Times(Testcase):
 
 	def test_AStepStartingBeforeItsJob(self) -> None:
 		"""GitHub reports whole seconds, so a step is sometimes reported as starting before the job holding it."""
-		job = Job.FromJSON(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 65, 80)]))
+		job = Job.Parse(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 65, 80)]))
 
 		self.assertEqual(_time(65), job.StartedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 		self.assertEqual(_time(60), job.CreatedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 	def test_AStepCompletingAfterItsJob(self) -> None:
-		job = Job.FromJSON(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 70, 320)]))
+		job = Job.Parse(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 70, 320)]))
 
 		self.assertEqual(_time(320), job.CompletedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 	def test_AJobCreatedAfterItsFirstStepStarted(self) -> None:
 		"""The job was created at the latest when something of it ran."""
-		job = Job.FromJSON(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 55, 80)]))
+		job = Job.Parse(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 55, 80)]))
 
 		self.assertEqual(_time(55), job.CreatedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 		self.assertEqual(_time(55), job.StartedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 	def test_AJobWithConsistentSteps(self) -> None:
-		job = Job.FromJSON(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 75, 80)]))
+		job = Job.Parse(_job("Build", 60, 70, 300, steps=[self._step("Checkout", 75, 80)]))
 
 		self.assertEqual(_time(60), job.CreatedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 		self.assertEqual(_time(70), job.StartedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
@@ -503,14 +503,14 @@ class Times(Testcase):
 
 	def test_ARunningJobReportsNoCompletion(self) -> None:
 		"""A step that completed doesn't complete the job holding it."""
-		job = Job.FromJSON(_job("Build", 60, 70, None, steps=[self._step("Checkout", 70, 80)]))
+		job = Job.Parse(_job("Build", 60, 70, None, steps=[self._step("Checkout", 70, 80)]))
 
 		self.assertIsNone(job.CompletedAt)
 
 	def test_AGroupCoversTheWidenedTimes(self) -> None:
 		"""A group aggregates the jobs' times, so it covers a step running outside its job too."""
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 60, 70, 300, steps=[self._step("Checkout", 65, 320)])])
-		workflow = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 60, 70, 300, steps=[self._step("Checkout", 65, 320)])])
+		workflow = Pipeline.Parse(_run(), [
 			_job("Caller / Build", 60, 70, 300, steps=[self._step("Checkout", 65, 320)])
 		]).Workflows["Caller"]
 
@@ -521,7 +521,7 @@ class Times(Testcase):
 
 	def test_APipelineKeepsItsOwnTimes(self) -> None:
 		"""A run reports its times, while 'Contents*At' spans what it holds."""
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 60, 70, 300)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 60, 70, 300)])
 
 		self.assertEqual(_time(0), pipeline.CreatedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 		self.assertEqual(_time(10), pipeline.StartedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
@@ -530,13 +530,13 @@ class Times(Testcase):
 		self.assertEqual(_time(300), pipeline.ContentsCompletedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 	def test_AGroupHoldingARunningElementHasNoEnd(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Done", 60, 70, 100), _job("Running", 60, 70, None)])
+		pipeline = Pipeline.Parse(_run(), [_job("Done", 60, 70, 100), _job("Running", 60, 70, None)])
 
 		self.assertIsNone(pipeline.ContentsCompletedAt)
 
 	def test_AWorkflowHasOnlyTheOneSet(self) -> None:
 		"""A called workflow reports no time of its own, so its times are the span of what it holds."""
-		workflow = Pipeline.FromJSON(_run(), [_job("Caller / Build", 60, 70, 300)]).Workflows["Caller"]
+		workflow = Pipeline.Parse(_run(), [_job("Caller / Build", 60, 70, 300)]).Workflows["Caller"]
 
 		self.assertEqual(_time(60), workflow.CreatedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
 		self.assertEqual(workflow.ContentsCreatedAt, workflow.CreatedAt)
@@ -547,7 +547,7 @@ class Ordering(Testcase):
 	"""A group iterates what it holds in the order it was queued."""
 
 	def test_JobsAreOrderedByQueueTime(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Third", 300, 310, 400), _job("First", 60, 70, 100), _job("Second", 120, 130, 200)
 		])
 
@@ -555,7 +555,7 @@ class Ordering(Testcase):
 
 	def test_AGroupSortsBesideTheJobs(self) -> None:
 		"""A called workflow takes the place its first job was queued at, not a place after every job."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Late", 300, 310, 400), _job("Caller / Early", 60, 70, 100)
 		])
 
@@ -563,7 +563,7 @@ class Ordering(Testcase):
 
 	def test_AnElementWithoutATimeSortsLast(self) -> None:
 		"""It also keeps the order GitHub listed them in, because the sort is stable."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Unknown A", 0, None, None, created_at=None), _job("Timed", 120, 130, 200),
 			_job("Unknown B", 0, None, None, created_at=None)
 		])
@@ -587,7 +587,7 @@ class Groups(Testcase):
 		return {"total_count": len(runs), "workflow_runs": runs}
 
 	def test_EveryRunOfACommit(self) -> None:
-		group = PipelineGroup.FromJSON(self._Runs("success", "failure", "success"))
+		group = PipelineGroup.Parse(self._Runs("success", "failure", "success"))
 
 		self.assertEqual("41364cfc", group.SHA)
 		self.assertEqual(3, group.PipelineCount)
@@ -597,24 +597,24 @@ class Groups(Testcase):
 		self.assertIs(group, group.Pipelines[0].Parent)
 
 	def test_AcceptsTheWorkflowRunsArrayDirectly(self) -> None:
-		group = PipelineGroup.FromJSON(self._Runs("success")["workflow_runs"])
+		group = PipelineGroup.Parse(self._Runs("success")["workflow_runs"])
 
 		self.assertEqual(1, group.PipelineCount)
 
 	def test_OneFailureMakesTheCommitFail(self) -> None:
-		self.assertIs(Conclusion.Failure, PipelineGroup.FromJSON(self._Runs("success", "failure")).Conclusion)
-		self.assertIs(Conclusion.Success, PipelineGroup.FromJSON(self._Runs("success", "success")).Conclusion)
-		self.assertIs(Conclusion.Cancelled, PipelineGroup.FromJSON(self._Runs("cancelled", "success")).Conclusion)
-		self.assertIs(Conclusion.Failure, PipelineGroup.FromJSON(self._Runs("cancelled", "failure")).Conclusion)
+		self.assertIs(Conclusion.Failure, PipelineGroup.Parse(self._Runs("success", "failure")).Conclusion)
+		self.assertIs(Conclusion.Success, PipelineGroup.Parse(self._Runs("success", "success")).Conclusion)
+		self.assertIs(Conclusion.Cancelled, PipelineGroup.Parse(self._Runs("cancelled", "success")).Conclusion)
+		self.assertIs(Conclusion.Failure, PipelineGroup.Parse(self._Runs("cancelled", "failure")).Conclusion)
 
 	def test_ARunningPipelineLeavesTheVerdictOpen(self) -> None:
-		group = PipelineGroup.FromJSON(self._Runs("success", None))
+		group = PipelineGroup.Parse(self._Runs("success", None))
 
 		self.assertIsNone(group.Conclusion)
 		self.assertIsNone(group.CompletedAt)
 
 	def test_SpansItsPipelines(self) -> None:
-		group = PipelineGroup.FromJSON(self._Runs("success", "success", "success"))
+		group = PipelineGroup.Parse(self._Runs("success", "success", "success"))
 
 		self.assertEqual(datetime(2026, 9, 17, 10, 0, 10, tzinfo=timezone.utc), group.StartedAt)
 		self.assertEqual(datetime(2026, 9, 17, 10, 7, 0, tzinfo=timezone.utc), group.CompletedAt)
@@ -625,7 +625,7 @@ class Groups(Testcase):
 			0: [_job("Prepare", 10, 20, 60)],
 			1: [_job("Unit Tests (a)", 60, 70, 300), _job("Docs / Sphinx", 60, 70, 180)],
 		}
-		group = PipelineGroup.FromJSON(runs, jobs)
+		group = PipelineGroup.Parse(runs, jobs)
 
 		self.assertEqual({"Prepare", "Unit Tests", "Sphinx"}, {job.Name for job in group.IterateJobs()})
 
@@ -634,7 +634,7 @@ class Groups(Testcase):
 		runs[1]["head_sha"] = "deadbeef"
 
 		with self.assertRaises(GitHubError) as context:
-			_ = PipelineGroup.FromJSON(runs)
+			_ = PipelineGroup.Parse(runs)
 
 		self.assertEqual("The runs report different commits.", str(context.exception))
 
@@ -643,7 +643,7 @@ class Groups(Testcase):
 		del runs[0]["head_sha"]
 
 		with self.assertRaises(GitHubError) as context:
-			_ = PipelineGroup.FromJSON(runs)
+			_ = PipelineGroup.Parse(runs)
 
 		self.assertEqual(
 			"None of the runs reports a 'head_sha', and parameter 'sha' wasn't given.",
@@ -654,7 +654,7 @@ class Groups(Testcase):
 		runs = self._Runs("success")["workflow_runs"]
 		del runs[0]["head_sha"]
 
-		self.assertEqual("abcdef", PipelineGroup.FromJSON(runs, sha="abcdef").SHA)
+		self.assertEqual("abcdef", PipelineGroup.Parse(runs, sha="abcdef").SHA)
 
 	def test_ARunAtATagSharesTheCommit(self) -> None:
 		"""A release pipeline tags its own commit; the run at that tag publishes the release."""
@@ -664,7 +664,7 @@ class Groups(Testcase):
 			_run(id=2, name="Pipeline", event="workflow_dispatch", head_branch="v1.6.0", head_sha="2c36ead7",
 			     run_started_at=_time(960), updated_at=_time(1200)),
 		]
-		group = PipelineGroup.FromJSON(runs)
+		group = PipelineGroup.Parse(runs)
 
 		self.assertEqual(2, group.PipelineCount)
 
@@ -674,13 +674,13 @@ class Groups(Testcase):
 		self.assertIs(Event.WorkflowDispatch, byRef["v1.6.0"][0].Event)
 
 	def test_HeadBranchOfATagRunIsTheTag(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(event="workflow_dispatch", head_branch="v1.6.0"))
+		pipeline = Pipeline.Parse(_run(event="workflow_dispatch", head_branch="v1.6.0"))
 
 		self.assertEqual("v1.6.0", pipeline.GitReference)
 
 	def test_CalledWorkflowsNestToGitHubsLimit(self) -> None:
 		"""GitHub allows four levels of nested reusable workflows, and a job's name carries the whole caller chain."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / B / C / D / Deep", 60, 120, 240),
 			_job("A / B / Other", 60, 120, 180),
 		])
@@ -702,7 +702,7 @@ class Groups(Testcase):
 		self.assertEqual(["Deep", "D", "C", "B", "A", "Pipeline"], chain)
 
 	def test_NestedLevelsAreSharedNotDuplicated(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / B / C / Deep", 60, 120, 240),
 			_job("A / B / Other", 60, 120, 180),
 		])
@@ -715,7 +715,7 @@ class Groups(Testcase):
 		self.assertEqual(["C"], list(b.Workflows))
 
 	def test_AMatrixNestedInACalledWorkflow(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / B / C / Matrixed (x, 1)", 60, 300, 420),
 			_job("A / B / C / Matrixed (y, 2)", 60, 300, 540),
 		])
@@ -730,7 +730,7 @@ class Groups(Testcase):
 		)
 
 	def test_OuterLevelsSpanEveryJobBelowThem(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / B / C / D / Deep", 60, 120, 240),
 			_job("A / B / C / Matrixed (y)", 60, 300, 540),
 		])
@@ -744,15 +744,15 @@ class Groups(Testcase):
 
 
 class QualifiedNames(Testcase):
-	"""A name taken apart by 'FromJSON' is put back together the way GitHub reported it."""
+	"""A name taken apart by 'Parse' is put back together the way GitHub reported it."""
 
 	def test_AJobOutsideAnyWorkflow(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 60, 120, 240)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 60, 120, 240)])
 
 		self.assertEqual("Build", pipeline.Jobs[0].QualifiedName)
 
 	def test_ACalledWorkflowPrefixesItsJobs(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("A / B / C / Deep", 60, 120, 240)])
+		pipeline = Pipeline.Parse(_run(), [_job("A / B / C / Deep", 60, 120, 240)])
 
 		deep = pipeline.Workflows["A"].Workflows["B"].Workflows["C"].Jobs[0]
 		self.assertEqual("Deep", deep.Name)
@@ -760,14 +760,14 @@ class QualifiedNames(Testcase):
 
 	def test_AMatrixIsNotNamedTwice(self) -> None:
 		"""A matrix shares its name with the instances it produced, so the walk passes through it."""
-		pipeline = Pipeline.FromJSON(_run(), [_job("A / Matrixed (x, 1)", 60, 300, 420)])
+		pipeline = Pipeline.Parse(_run(), [_job("A / Matrixed (x, 1)", 60, 300, 420)])
 
 		instance = pipeline.Workflows["A"].Matrices["Matrixed"].Instances[0]
 		self.assertEqual("Matrixed", instance.Name)
 		self.assertEqual("A / Matrixed (x, 1)", instance.QualifiedName)
 
 	def test_AWorkflowNamesItsCallers(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [_job("A / B / C / Deep", 60, 120, 240)])
+		pipeline = Pipeline.Parse(_run(), [_job("A / B / C / Deep", 60, 120, 240)])
 
 		a = pipeline.Workflows["A"]
 		self.assertEqual("A", a.QualifiedName)
@@ -776,7 +776,7 @@ class QualifiedNames(Testcase):
 
 	def test_TheRunIsNotACallingWorkflow(self) -> None:
 		"""A 'Pipeline' is a run rather than a called workflow, so its name prefixes nothing."""
-		pipeline = Pipeline.FromJSON(_run(name="Caller"), [_job("A / Deep", 60, 120, 240)])
+		pipeline = Pipeline.Parse(_run(name="Caller"), [_job("A / Deep", 60, 120, 240)])
 
 		self.assertEqual("Caller", pipeline.QualifiedName)
 		self.assertEqual("A / Deep", pipeline.Workflows["A"].Jobs[0].QualifiedName)
@@ -810,7 +810,7 @@ class ContainedElements(Testcase):
 	"""A workflow contains jobs, matrices and further workflows, so it iterates all three."""
 
 	def test_AWorkflowIteratesEveryElementBelowIt(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / Plain", 60, 120, 240),
 			_job("A / Matrixed (x)", 60, 300, 420),
 			_job("A / B / Deep", 60, 120, 180),
@@ -822,7 +822,7 @@ class ContainedElements(Testcase):
 		self.assertListEqual([Job, Matrix, Workflow], [type(element) for element in a.IterateElements()])
 
 	def test_AWorkflowContainsWhatItIterates(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / Plain", 60, 120, 240),
 			_job("A / Matrixed (x)", 60, 300, 420),
 			_job("A / B / Deep", 60, 120, 180),
@@ -839,7 +839,7 @@ class ContainedElements(Testcase):
 
 	def test_ContainmentTakesAName(self) -> None:
 		"""An element is placed in its group under its own name, so containment is asked for that name."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / B / Deep", 60, 120, 240),
 			_job("A / Plain", 60, 120, 180),
 			_job("Top", 60, 120, 190),
@@ -856,7 +856,7 @@ class ContainedElements(Testcase):
 
 	def test_MatrixInstancesAreAskedForWithTheirValues(self) -> None:
 		"""Every instance of a matrix shares the matrix' name, so a job is named by 'str' rather than 'Name'."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Matrixed (x)", 60, 300, 420),
 			_job("Matrixed (y)", 60, 300, 540),
 		])
@@ -874,14 +874,14 @@ class ContainedElements(Testcase):
 			{"name": "Checkout", "number": 1, "status": "completed", "conclusion": "success",
 			 "started_at": _time(120), "completed_at": _time(130)},
 		]
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 60, 120, 240, steps=steps)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 60, 120, 240, steps=steps)])
 
 		self.assertTrue(pipeline.Jobs[0].ContainsStep("Checkout"))
 		self.assertNotIn("Upload", pipeline.Jobs[0])
 
 	def test_IdentityIsAnsweredByTheParent(self) -> None:
 		"""Containment asks the name; which container an element really sits in is 'Parent'."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / B / Deep", 60, 120, 240),
 			_job("C / B / Deep", 60, 120, 200),
 		])
@@ -894,7 +894,7 @@ class ContainedElements(Testcase):
 		self.assertIsNot(a, c.Workflows["B"].Parent)
 
 	def test_AMatrixIteratesItsInstances(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Matrixed (x)", 60, 300, 420),
 			_job("Matrixed (y)", 60, 300, 540),
 		])
@@ -905,7 +905,7 @@ class ContainedElements(Testcase):
 
 	def test_IterateJobsStillReachesEveryJob(self) -> None:
 		"""Iterating a workflow is one level deep; 'IterateJobs' is the whole subtree."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("A / Plain", 60, 120, 240),
 			_job("A / Matrixed (x)", 60, 300, 420),
 			_job("A / B / Deep", 60, 120, 180),
@@ -1011,7 +1011,7 @@ class ParameterChecks(Testcase):
 		for cls in (Step, Job, MatrixJob, Pipeline):
 			with self.subTest(cls=cls.__name__):
 				with self.assertRaises(TypeError) as context:
-					_ = cls.FromJSON("payload")
+					_ = cls.Parse("payload")
 
 				self.assertIn("is not of type 'dict'.", str(context.exception))
 
@@ -1082,7 +1082,7 @@ class ParameterChecks(Testcase):
 
 class WorkflowFile(Testcase):
 	def test_PathAndWorkflowID(self) -> None:
-		pipeline = Pipeline.FromJSON(_run(workflow_id=130786985, path=".github/workflows/Pipeline.yml"))
+		pipeline = Pipeline.Parse(_run(workflow_id=130786985, path=".github/workflows/Pipeline.yml"))
 
 		self.assertEqual(130786985, pipeline.WorkflowID)
 		self.assertEqual(".github/workflows/Pipeline.yml", pipeline.Path)
@@ -1136,12 +1136,12 @@ class BottomUpConstruction(Testcase):
 		self.assertEqual(1, instance.StepCount)
 		self.assertIs(instance, instance.Steps[0].Parent)
 
-	def test_FromJSONStillAttachesThem(self) -> None:
+	def test_ParseStillAttachesThem(self) -> None:
 		steps = [
 			{"name": "Set up job", "number": 1, "status": "completed", "conclusion": "success",
 			 "started_at": _time(21), "completed_at": _time(25)},
 		]
-		pipeline = Pipeline.FromJSON(_run(), [_job("Build", 10, 20, 80, steps=steps)])
+		pipeline = Pipeline.Parse(_run(), [_job("Build", 10, 20, 80, steps=steps)])
 		job =      pipeline.Jobs[0]
 
 		self.assertEqual(["Set up job"], [step.Name for step in job.IterateSteps()])
@@ -1191,7 +1191,7 @@ class GenericModel(Testcase):
 	def test_Outcome(self) -> None:
 		"""Every reported element carries the outcome its conclusion maps to; a group combines its elements'."""
 		steps = [{"name": "Test", "number": 1, "status": "completed", "conclusion": "failure"}]
-		pipeline = Pipeline.FromJSON(_run(conclusion="failure"), [
+		pipeline = Pipeline.Parse(_run(conclusion="failure"), [
 			_job("Caller / Build", 60, 70, 300),
 			_job("Caller / Test", 60, 70, 300, conclusion="failure", steps=steps),
 			_job("Deploy", 60, None, None, status="completed", conclusion="skipped"),
@@ -1202,11 +1202,11 @@ class GenericModel(Testcase):
 		self.assertIs(CI.Outcome.Failure, caller.Outcome)
 		self.assertIs(CI.Outcome.Failure, caller.Jobs[1].Steps[0].Outcome)
 		self.assertIs(CI.Outcome.Skip, pipeline.Jobs[0].Outcome)
-		self.assertIsNone(Pipeline.FromJSON(_run(status="in_progress", conclusion=None)).Outcome)
+		self.assertIsNone(Pipeline.Parse(_run(status="in_progress", conclusion=None)).Outcome)
 
 	def test_Needs(self) -> None:
 		"""The REST API reports no dependencies; they are added to the run's elements."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Prepare", 0, 10, 20), _job("Caller / Build", 60, 70, 300), _job("Test (3.14)", 60, 70, 300)
 		])
 		prepare = pipeline.Jobs[0]
@@ -1222,7 +1222,7 @@ class GenericModel(Testcase):
 
 	def test_Order(self) -> None:
 		"""A workflow's elements are in the order GitHub listed their first job, whatever their kind."""
-		pipeline = Pipeline.FromJSON(_run(), [
+		pipeline = Pipeline.Parse(_run(), [
 			_job("Caller / Build", 60, 70, 300, created_at=None), _job("Test (3.14)", 60, 70, 300, created_at=None),
 			_job("Prepare", 0, 10, 20, created_at=None)
 		])
@@ -1248,7 +1248,7 @@ class MatrixOfCalledWorkflows(Testcase):
 			jobs.append(_job(f"Ubuntu-fast (mcode, {version}) / Build", 20, 30 + position, 300 + position))
 			jobs.append(_job(f"Ubuntu-fast (mcode, {version}) / Test", 300, 310, 600 + position))
 
-		return Pipeline.FromJSON(_run(), jobs)
+		return Pipeline.Parse(_run(), jobs)
 
 	def test_Structure(self) -> None:
 		pipeline = self._Pipeline()
@@ -1284,7 +1284,7 @@ class MatrixOfCalledWorkflows(Testcase):
 
 	def test_MatrixJobsInside(self) -> None:
 		"""A matrix inside a called workflow of a matrix still becomes a matrix of jobs."""
-		pipeline = Pipeline.FromJSON(_run(), [_job("Tests (3.14) / Unit (ubuntu-26.04)", 20, 30, 300)])
+		pipeline = Pipeline.Parse(_run(), [_job("Tests (3.14) / Unit (ubuntu-26.04)", 20, 30, 300)])
 		instance = pipeline.Matrices["Tests"].GetElement("Tests (3.14)")
 
 		self.assertIsInstance(instance, MatrixWorkflow)

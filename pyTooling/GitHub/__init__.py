@@ -494,7 +494,7 @@ class PipelineGroup(CIPipelineGroup):
 		return byReference
 
 	@classmethod
-	def FromJSON(
+	def Parse(
 		cls,
 		runs: Union[JSONObject, Iterable[JSONObject]],
 		jobs: Nullable[dict[int, Iterable[JSONObject]]] = None,
@@ -523,7 +523,7 @@ class PipelineGroup(CIPipelineGroup):
 			if jobs is not None:
 				runJobs = jobs.get(run.get("id", None), None)
 
-			pipeline = Pipeline.FromJSON(run, runJobs)
+			pipeline = Pipeline.Parse(run, runJobs)
 			pipelines.append(pipeline)
 			if pipeline.SHA is not None:
 				shas.add(pipeline.SHA)
@@ -729,7 +729,7 @@ class Pipeline(CIPipeline, StatusMixin):
 		return self._sha
 
 	@classmethod
-	def FromJSON(
+	def Parse(
 		cls,
 		run:  JSONObject,
 		jobs: Nullable[Iterable[JSONObject]] = None,
@@ -817,12 +817,12 @@ class Pipeline(CIPipeline, StatusMixin):
 
 			jobName, dimensions = _splitMatrixJobName(leaf)
 			if dimensions is None:
-				Job.FromJSON(job, path, parent=group)
+				Job.Parse(job, path, parent=group)
 			else:
 				if (matrix := group.Matrices.get(jobName, None)) is None:
 					matrix = CIMatrix(jobName, parent=group)
 
-				MatrixJob.FromJSON(job, path, jobName, dimensions, parent=matrix)
+				MatrixJob.Parse(job, path, jobName, dimensions, parent=matrix)
 
 		return pipeline
 
@@ -1025,7 +1025,7 @@ class Job(CIJob, StatusMixin):
 		return (self._startedAt - self._createdAt).total_seconds()
 
 	@classmethod
-	def FromJSON(cls, json: JSONObject, path: str = "job", *, parent: Nullable[CIJobGroup] = None) -> Self:
+	def Parse(cls, json: JSONObject, path: str = "job", *, parent: Nullable[CIJobGroup] = None) -> Self:
 		"""
 		Build a job and its steps from the JSON object the GitHub REST API answers with.
 
@@ -1063,7 +1063,7 @@ class Job(CIJob, StatusMixin):
 		if (jsonSteps := json.get("steps", None)) is None:
 			steps = None
 		else:
-			steps = [Step.FromJSON(step, f"{path}.steps[{pos}]") for pos, step in enumerate(jsonSteps)]
+			steps = [Step.Parse(step, f"{path}.steps[{pos}]") for pos, step in enumerate(jsonSteps)]
 
 		return cls(
 			name, identifier, status, conclusion, createdAt, startedAt, completedAt, url, labels, runnerName,
@@ -1077,7 +1077,7 @@ class MatrixJob(Job, MatrixInstanceMixin):
 	One instance of a job produced by a matrix.
 
 	GitHub reports a matrix instance as an ordinary job whose name carries the dimensions' values in brackets, e.g.
-	``Unit Tests (ubuntu-26.04, 3.14)``. :meth:`Pipeline.FromJSON` reads those back into :attr:`Dimensions` and groups
+	``Unit Tests (ubuntu-26.04, 3.14)``. :meth:`Pipeline.Parse` reads those back into :attr:`Dimensions` and groups
 	the instances below a :class:`~pyTooling.CI.Matrix`. The values are in the order GitHub prints them. The
 	job's payload names no dimension - only the workflow file does -, so a dimension's name is the position of its
 	value, ``{"0": "ubuntu-26.04", "1": "3.14"}``, until the names are known.
@@ -1141,7 +1141,7 @@ class MatrixJob(Job, MatrixInstanceMixin):
 		return f"{self._name} ({', '.join(str(value) for value in self._dimensions.values())})"
 
 	@classmethod
-	def FromJSON(
+	def Parse(
 		cls,
 		json:       JSONObject,
 		path:       str                         = "job",
@@ -1188,7 +1188,7 @@ class MatrixJob(Job, MatrixInstanceMixin):
 		if (jsonSteps := json.get("steps", None)) is None:
 			steps = None
 		else:
-			steps = [Step.FromJSON(step, f"{path}.steps[{pos}]") for pos, step in enumerate(jsonSteps)]
+			steps = [Step.Parse(step, f"{path}.steps[{pos}]") for pos, step in enumerate(jsonSteps)]
 
 		return cls(
 			name, dimensions, identifier, status, conclusion, createdAt, startedAt, completedAt, url, labels,
@@ -1256,7 +1256,7 @@ class Step(CIStep, StatusMixin):
 		return self._number
 
 	@classmethod
-	def FromJSON(cls, json: JSONObject, path: str = "step", *, parent: Nullable[Job] = None) -> Self:
+	def Parse(cls, json: JSONObject, path: str = "step", *, parent: Nullable[Job] = None) -> Self:
 		"""
 		Build a step from the JSON object the GitHub REST API answers with.
 

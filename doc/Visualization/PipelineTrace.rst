@@ -36,7 +36,7 @@ A request failing transiently - HTTP 429, 500, 502, 503 or 504, a timeout, or an
 ``retries`` times (default: 3), after a pause of ``retryDelay`` seconds (default: 2), which doubles with every attempt
 or lasts as long as a ``Retry-After`` header demands, up to a minute. HTTP 401, 403 and 404 fail at once.
 
-:meth:`WorkflowRunTrace.FromJSON <pyTooling.GitHub.Tracing.WorkflowRunTrace.FromJSON>` does the conversion alone,
+:meth:`WorkflowRunTrace.Parse <pyTooling.GitHub.Tracing.WorkflowRunTrace.Parse>` does the conversion alone,
 for a run and jobs that were fetched another way. It is a class method, so converting needs no reader and therefore
 no token. It reads both payloads into a :class:`~pyTooling.GitHub.Pipeline` - see :ref:`DATA/PipelineRun` - and hands
 that to :meth:`~pyTooling.GitHub.Tracing.WorkflowRunTrace.FromPipeline`, which is the entry point when the model
