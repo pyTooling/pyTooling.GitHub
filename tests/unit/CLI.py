@@ -189,6 +189,19 @@ class PipelineCommand(Testcase):
 					githubRepository=None, githubPipelineID=None, traceFile=None, gantt=None, force=False
 				))
 
+	def test_Repository_Malformed(self) -> None:
+		"""A repository not of the form 'owner/name' is a usage error, reported before anything is read."""
+		application = Application()
+
+		for repository in ("pyTooling", "pyTooling/", "/pyTooling", "pyTooling/pyTooling/dev"):
+			with self.subTest(repository=repository):
+				with patch("pyTooling.GitHub.CLI.Pipeline.WorkflowRunReader") as reader:
+					with self.assertRaises(SystemExit) as context:
+						_ = application._ReadPipeline(Namespace(githubRepository=repository, githubPipelineID="1"))
+
+				self.assertEqual(2, context.exception.code)
+				reader.assert_not_called()
+
 	def test_TraceFile_UnsupportedFormat(self) -> None:
 		"""A misspelled format is reported before anything is read."""
 		application = Application()

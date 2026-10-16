@@ -25,7 +25,7 @@ standard library only:
    from pathlib import Path
    from pyTooling.GitHub.Tracing import WorkflowRunReader
 
-   reader = WorkflowRunReader("pyTooling/Actions", token=getenv("GITHUB_TOKEN"))
+   reader = WorkflowRunReader("pyTooling", "Actions", token=getenv("GITHUB_TOKEN"))
    trace = reader.ReadRun(34937615362)      # optionally: attempt=2
    trace.WriteJSONFile(Path("report/Pipeline.otlp.json"))
 

@@ -40,7 +40,7 @@ sub-span per step. The time a job waited for a runner is a separate timespan in 
    from os import getenv
    from pyTooling.GitHub.Tracing import WorkflowRunReader
 
-   reader = WorkflowRunReader("pyTooling/Actions", token=getenv("GITHUB_TOKEN"))
+   reader = WorkflowRunReader("pyTooling", "Actions", token=getenv("GITHUB_TOKEN"))
    trace = reader.ReadRun(34937615362)
    print("\\n".join(trace.Format()))
 
@@ -48,33 +48,20 @@ sub-span per step. The time a job waited for a runner is a separate timespan in 
 
    See :ref:`high-level help <VIS/PipelineTrace>` for explanations and usage examples.
 """
-from datetime                  import datetime
-from typing                    import Any, ClassVar, Iterable, Optional as Nullable, Self, Union
+from datetime              import datetime
+from typing                import Any, ClassVar, Iterable, Optional as Nullable, Self
 
-from pyTooling.CI              import Base, JobGroup, JSONObject, Matrix
-from pyTooling.GitHub          import Conclusion, GitHubError, Job, MatrixJob, Pipeline, Step
-from pyTooling.Common          import getFullyQualifiedName
-from pyTooling.Decorators      import export, readonly
-from pyTooling.GenericPath.URL import URL
-from pyTooling.MetaClasses     import ExtendedType
-from pyTooling.REST            import RESTClient, RESTError
-from pyTooling.Tracing         import Span, Trace
-from pyTooling.Tracing.CI      import Result
-from pyTooling.Tracing.CI      import JobSpan as CIJobSpan, MatrixSpan as CIMatrixSpan
-from pyTooling.Tracing.CI      import PipelineTrace as CIPipelineTrace, QueuedSpan as CIQueuedSpan
-from pyTooling.Tracing.CI      import StepSpan as CIStepSpan, WorkflowSpan as CIWorkflowSpan
-
-
-__all__ = ["GITHUB_API_URL"]
-
-GITHUB_API_URL = URL.Parse("https://api.github.com")
-"""Base URL of the GitHub REST API."""
-
-_GITHUB_HEADERS = {
-	"Accept":               "application/vnd.github+json",
-	"X-GitHub-Api-Version": "2022-11-28"
-}
-"""Headers every request to the GitHub REST API carries."""
+from pyTooling.CI          import Base, JobGroup, JSONObject, Matrix
+from pyTooling.GitHub      import Conclusion, GitHubError, Job, MatrixJob, Pipeline, RepositoryClient, Step
+from pyTooling.Common      import getFullyQualifiedName
+from pyTooling.Decorators  import export
+from pyTooling.MetaClasses import ExtendedType
+from pyTooling.REST        import RESTError
+from pyTooling.Tracing     import Span, Trace
+from pyTooling.Tracing.CI  import Result
+from pyTooling.Tracing.CI  import JobSpan as CIJobSpan, MatrixSpan as CIMatrixSpan
+from pyTooling.Tracing.CI  import PipelineTrace as CIPipelineTrace, QueuedSpan as CIQueuedSpan
+from pyTooling.Tracing.CI  import StepSpan as CIStepSpan, WorkflowSpan as CIWorkflowSpan
 
 
 @export
@@ -431,69 +418,13 @@ class WorkflowRunTrace(CIPipelineTrace, GitHubTimespanMixin):
 
 
 @export
-class WorkflowRunReader(RESTClient):
+class WorkflowRunReader(RepositoryClient):
 	"""
 	Reads workflow runs of a GitHub repository through the GitHub REST API and converts them into traces.
 
 	A token is needed for a private repository, and it raises the rate limit for a public one - inside a workflow,
 	``GITHUB_TOKEN`` with the ``actions: read`` permission suffices.
-
-	The requests themselves - the retries, the pagination and the token's boundary - are
-	:class:`~pyTooling.REST.RESTClient`'s.
 	"""
-	_repository: str  #: Repository as ``owner/name``.
-
-	def __init__(
-		self,
-		repository: str,
-		token:      Nullable[str] = None,
-		*,
-		apiURL:     Union[str, URL] = GITHUB_API_URL,
-		timeout:    float = 30.0,
-		retries:    int = 3,
-		retryDelay: float = 2.0
-	) -> None:
-		"""
-		Initializes a reader for the workflow runs of a repository.
-
-		:param repository:  The repository as ``owner/name``.
-		:param token:       Optional, token authorizing the requests. Default: anonymous requests.
-		:param apiURL:      Optional, base URL of the GitHub REST API, e.g. of a GitHub Enterprise Server.
-		                    Default: :data:`GITHUB_API_URL`.
-		:param timeout:     Optional, timeout of a single request in seconds. Default: ``30.0``.
-		:param retries:     Optional, how often a transiently failing request is tried again. ``0`` tries once.
-		                    Default: ``3``.
-		:param retryDelay:  Optional, pause in seconds before a request is tried again the first time. The pause doubles
-		                    with every further attempt. Default: ``2.0``.
-		:raises ValueError: If parameter 'repository' is ``None``.
-		:raises TypeError:  If parameter 'repository' is not of type :class:`str`.
-		:raises ValueError: If parameter 'repository' isn't of the form ``owner/name``.
-		:raises TypeError:  If a parameter of :class:`~pyTooling.REST.RESTClient` has the wrong type.
-		:raises ValueError: If a parameter of :class:`~pyTooling.REST.RESTClient` has an invalid value.
-		"""
-		super().__init__(apiURL, token, headers=_GITHUB_HEADERS, timeout=timeout, retries=retries, retryDelay=retryDelay)
-
-		if repository is None:
-			raise ValueError("Parameter 'repository' is None.")
-		elif not isinstance(repository, str):
-			ex = TypeError("Parameter 'repository' is not of type 'str'.")
-			ex.add_note(f"Got type '{getFullyQualifiedName(repository)}'.")
-			raise ex
-		elif len(parts := repository.split("/")) != 2 or "" in parts:
-			ex = ValueError("Parameter 'repository' isn't of the form 'owner/name'.")
-			ex.add_note(f"Got value '{repository}'.")
-			raise ex
-
-		self._repository = repository
-
-	@readonly
-	def Repository(self) -> str:
-		"""
-		Read-only property to access the repository (:attr:`_repository`).
-
-		:returns: The repository as ``owner/name``.
-		"""
-		return self._repository
 
 	def ReadRun(self, runID: int, attempt: Nullable[int] = None) -> Trace:
 		"""
@@ -531,7 +462,7 @@ class WorkflowRunReader(RESTClient):
 				ex.add_note(f"Got value '{attempt}'.")
 				raise ex
 
-		runPath = f"repos/{self._repository}/actions/runs/{runID}"
+		runPath = f"repos/{self._owner}/{self._repository}/actions/runs/{runID}"
 		if attempt is None:
 			run, _ =  self.GetJSONObject(runPath)
 			jobsPath = f"{runPath}/jobs?filter=latest&per_page=100"

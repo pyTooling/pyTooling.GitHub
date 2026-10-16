@@ -529,7 +529,7 @@ class Reader(Testcase):
 			f"{self._api}/jobs?filter=latest&per_page=100&page=2": _Response({"jobs": [_job("B", 1, 2, 3)]}),
 		})
 		with patcher:
-			trace = WorkflowRunReader("owner/repo", token="secret").ReadRun(4711)
+			trace = WorkflowRunReader("owner", "repo", token="secret").ReadRun(4711)
 
 		self.assertEqual({"A", "A (queued)", "B", "B (queued)"}, set(_children(trace)))
 		self.assertEqual(3, len(requests))
@@ -542,7 +542,7 @@ class Reader(Testcase):
 			f"{self._api}/attempts/2/jobs?per_page=100": _Response({"jobs": []}),
 		})
 		with patcher:
-			trace = WorkflowRunReader("owner/repo").ReadRun(4711, attempt=2)
+			trace = WorkflowRunReader("owner", "repo").ReadRun(4711, attempt=2)
 
 		self.assertEqual(2, trace["github.run.attempt"])
 		self.assertIsNone(requests[0].get_header("Authorization"), "Without a token, the request is anonymous.")
@@ -554,7 +554,7 @@ class Reader(Testcase):
 		})
 		with patcher:
 			with self.assertRaises(GitHubError) as context:
-				_ = WorkflowRunReader("owner/repo").ReadRun(4711)
+				_ = WorkflowRunReader("owner", "repo").ReadRun(4711)
 
 		self.assertIn("Field 'jobs' is missing", str(context.exception))
 
@@ -571,7 +571,7 @@ class Reader(Testcase):
 
 		with mock.patch("pyTooling.REST.urlopen", side_effect=urlopen):
 			with self.assertRaises(RESTError) as context:
-				_ = WorkflowRunReader("owner/repo", token="secret").ReadRun(4711)
+				_ = WorkflowRunReader("owner", "repo", token="secret").ReadRun(4711)
 
 		self.assertEqual(f"Request failed with HTTP 404: {self._api}", str(context.exception))
 		self.assertIn("Answer: Not Found", context.exception.__notes__)
@@ -604,7 +604,7 @@ class Reader(Testcase):
 
 		with mock.patch("pyTooling.REST.urlopen", side_effect=urlopen):
 			with mock.patch("pyTooling.REST.sleep") as sleep:
-				trace = WorkflowRunReader("owner/repo").ReadRun(4711)
+				trace = WorkflowRunReader("owner", "repo").ReadRun(4711)
 
 		self.assertEqual("Pipeline", trace.Name)
 		self.assertEqual(3, len(requests), "The run was requested twice, then its jobs.")
@@ -612,31 +612,38 @@ class Reader(Testcase):
 
 	def test_RetryParameters(self) -> None:
 		"""The reader hands the request parameters to the client it is."""
-		reader = WorkflowRunReader("owner/repo", retries=5, retryDelay=1)
+		reader = WorkflowRunReader("owner", "repo", retries=5, retryDelay=1)
 
 		self.assertEqual((5, 1.0), (reader.Retries, reader.RetryDelay))
-		self.assertEqual((3, 2.0), (WorkflowRunReader("owner/repo").Retries, WorkflowRunReader("owner/repo").RetryDelay))
+		defaults = WorkflowRunReader("owner", "repo")
+		self.assertEqual((3, 2.0), (defaults.Retries, defaults.RetryDelay))
 		with self.assertRaises(TypeError):
-			_ = WorkflowRunReader("owner/repo", retries="3")
+			_ = WorkflowRunReader("owner", "repo", retries="3")
 
 		with self.assertRaises(ValueError):
-			_ = WorkflowRunReader("owner/repo", retryDelay=-0.1)
+			_ = WorkflowRunReader("owner", "repo", retryDelay=-0.1)
 
 	def test_Repository(self) -> None:
-		with self.assertRaises(ValueError):
-			_ = WorkflowRunReader(None)
+		for arguments, exception, message in (
+			((None, "repo"),       ValueError, "Parameter 'owner' is None."),
+			(("owner", None),      ValueError, "Parameter 'repository' is None."),
+			((1, "repo"),          TypeError,  "Parameter 'owner' is not of type 'str'."),
+			(("", "repo"),         ValueError, "Parameter 'owner' is empty or contains a '/'."),
+			(("owner", "repo/x"),  ValueError, "Parameter 'repository' is empty or contains a '/'."),
+		):
+			with self.subTest(message=message):
+				with self.assertRaises(exception) as context:
+					_ = WorkflowRunReader(*arguments)
 
-		for repository in ("repo", "owner/", "owner/repo/extra"):
-			with self.subTest(repository=repository):
-				with self.assertRaises(ValueError):
-					_ = WorkflowRunReader(repository)
+				self.assertEqual(message, str(context.exception))
 
-		self.assertEqual("owner/repo", WorkflowRunReader("owner/repo").Repository)
-		reader = WorkflowRunReader("owner/repo", apiURL="https://ghe.example.com/api/v3/")
+		reader = WorkflowRunReader("owner", "repo")
+		self.assertEqual(("owner", "repo"), (reader.Owner, reader.Repository))
+		reader = WorkflowRunReader("owner", "repo", apiURL="https://ghe.example.com/api/v3/")
 		self.assertEqual("https://ghe.example.com/api/v3", str(reader.APIURL))
 
 	def test_RunID(self) -> None:
-		reader = WorkflowRunReader("owner/repo")
+		reader = WorkflowRunReader("owner", "repo")
 
 		with self.assertRaises(ValueError):
 			_ = reader.ReadRun(None)
