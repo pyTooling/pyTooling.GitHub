@@ -93,7 +93,8 @@ def _readNodes(json: JSONObject, field: str, path: str) -> list[JSONObject]:
 	:returns:            The nodes.
 	:raises GitHubError: If the field is missing.
 	:raises GitHubError: If the connection has no list of nodes.
-	:raises GitHubError: If the connection has a further page.
+	:raises GitHubError: If the connection has a further page. |br|
+	                     The note says to merge all pages into one list of nodes before parsing it.
 	"""
 	if (connection := json.get(field, None)) is None:
 		raise GitHubError(f"Field '{path}.{field}' is missing.")

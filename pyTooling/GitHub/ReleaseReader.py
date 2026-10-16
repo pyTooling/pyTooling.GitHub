@@ -202,7 +202,8 @@ class ReleaseReader(RepositoryClient):
 		:raises GitHubError: If GitHub's GraphQL API responds with errors. |br|
 		                     The notes report each error.
 		:raises GitHubError: If a response lacks a field or a page.
-		:raises GitHubError: If the REST API reports the assets of a release differently.
+		:raises GitHubError: If the REST API reports the assets of a release differently. |br|
+		                     The note says to read the repository again, as assets may have changed while reading.
 		"""
 		fetchedAt = datetime.now(timezone.utc)
 		variables: dict[str, Any] = {
@@ -307,7 +308,9 @@ class ReleaseReader(RepositoryClient):
 		:raises GitHubError: If the request fails. |br|
 		                     The notes report the cause.
 		:raises GitHubError: If the response reports errors. |br|
-		                     The notes report each error.
+		                     The notes report each error. For an unknown repository, they say to check the repository's
+		                     name and the token's permission; for an exceeded rate limit, to wait for its reset or use a
+		                     token with a higher limit.
 		:raises GitHubError: If the response is empty or has no data.
 		"""
 		try:
@@ -350,6 +353,9 @@ class ReleaseReader(RepositoryClient):
 	def _AddErrorNotes(self, error: RESTError, status: int) -> None:
 		"""
 		Add a note saying what a failing status means for GitHub's APIs.
+
+		The note names an invalid or expired token (401), an exceeded rate limit or a token that may not read the
+		repository (403, 429), or says to check the repository's name and the token's permission (404).
 
 		:param error:  The error the note is added to.
 		:param status: The HTTP status the request failed with.
