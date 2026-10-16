@@ -36,7 +36,7 @@ Read the releases and tags of a GitHub repository through GitHub's GraphQL API.
    from os import getenv
    from pyTooling.GitHub.ReleaseReader import ReleaseReader
 
-   repository = ReleaseReader("ghdl/ghdl", token=getenv("GITHUB_TOKEN")).Read()
+   repository = ReleaseReader("ghdl", "ghdl", token=getenv("GITHUB_TOKEN")).Read()
    release = repository["v5.0.1"]
    print(f"{release.TagName} published {release.PublishedAt:%d.%m.%Y %H:%M:%S} at commit {release.CommitSHA[:7]}")
 
@@ -152,6 +152,7 @@ class ReleaseReader(RepositoryClient):
 
 	def __init__(
 		self,
+		namespace:  str,
 		repository: str,
 		token:      str,
 		*,
@@ -163,7 +164,8 @@ class ReleaseReader(RepositoryClient):
 		"""
 		Initializes a reader for the releases and tags of a repository.
 
-		:param repository:  The repository as ``owner/name``.
+		:param namespace:   The namespace of the repository, the user or organization owning it.
+		:param repository:  The name of the repository.
 		:param token:       Token authorizing the requests.
 		:param apiURL:      Optional, base URL of the GitHub API. Default: :data:`~pyTooling.GitHub.GITHUB_API_URL`.
 		:param timeout:     Optional, timeout of a single request in seconds. Default: ``30.0``.
@@ -176,7 +178,9 @@ class ReleaseReader(RepositoryClient):
 		:raises TypeError:  If a parameter of :class:`~pyTooling.GitHub.RepositoryClient` has the wrong type.
 		:raises ValueError: If a parameter of :class:`~pyTooling.GitHub.RepositoryClient` has an invalid value.
 		"""
-		super().__init__(repository, token, apiURL=apiURL, timeout=timeout, retries=retries, retryDelay=retryDelay)
+		super().__init__(
+			namespace, repository, token, apiURL=apiURL, timeout=timeout, retries=retries, retryDelay=retryDelay
+		)
 
 		if token is None:
 			raise ValueError("Parameter 'token' is None.")
@@ -201,10 +205,9 @@ class ReleaseReader(RepositoryClient):
 		:raises GitHubError: If the REST API reports the assets of a release differently.
 		"""
 		fetchedAt = datetime.now(timezone.utc)
-		owner, name = self._repository.split("/")
 		variables: dict[str, Any] = {
-			"owner":          owner,
-			"name":           name,
+			"owner":          self._namespace,
+			"name":           self._repository,
 			"withReleases":   True,
 			"releasesCursor": None,
 			"withTags":       True,
@@ -215,7 +218,7 @@ class ReleaseReader(RepositoryClient):
 		repository: JSONObject
 		while variables["withReleases"] or variables["withTags"]:
 			if not isinstance(repository := self._Query(RELEASES_QUERY, variables).get("repository", None), dict):
-				raise GitHubError(f"GraphQL response has no repository '{self._repository}'.")
+				raise GitHubError(f"GraphQL response has no repository '{self._namespace}/{self._repository}'.")
 
 			for field, nodes, flag, cursor in (
 				("releases", releases, "withReleases", "releasesCursor"),
@@ -263,7 +266,7 @@ class ReleaseReader(RepositoryClient):
 				raise GitHubError(f"Field 'databaseId' of release '{tagName}' is missing.")
 
 			try:
-				restRelease, _ = self.GetJSONObject(f"repos/{self._repository}/releases/{databaseID}")
+				restRelease, _ = self.GetJSONObject(f"repos/{self._namespace}/{self._repository}/releases/{databaseID}")
 			except RESTError as cause:
 				ex = GitHubError(f"Request for asset labels of release '{tagName}' failed: {cause}")
 				for note in getattr(cause, "__notes__", []):
@@ -310,7 +313,7 @@ class ReleaseReader(RepositoryClient):
 		try:
 			response, _ = self._Request(HTTPMethod.POST, "graphql", {"query": query, "variables": variables})
 		except RESTError as cause:
-			ex = GitHubError(f"GraphQL request for repository '{self._repository}' failed: {cause}")
+			ex = GitHubError(f"GraphQL request for repository '{self._namespace}/{self._repository}' failed: {cause}")
 			for note in getattr(cause, "__notes__", []):
 				ex.add_note(note)
 			raise ex from cause
@@ -318,7 +321,7 @@ class ReleaseReader(RepositoryClient):
 		if response is None:
 			raise GitHubError("GraphQL response is empty.")
 		elif (errors := response.get("errors", None)) is not None:
-			ex = GitHubError(f"GraphQL request for repository '{self._repository}' failed.")
+			ex = GitHubError(f"GraphQL request for repository '{self._namespace}/{self._repository}' failed.")
 			types = set()
 			for error in errors if isinstance(errors, list) else [errors]:
 				if not isinstance(error, dict):

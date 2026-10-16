@@ -12,7 +12,7 @@ Releases and Tags
    from pyTooling.GitHub.Release       import SourceArchive
    from pyTooling.GitHub.ReleaseReader import ReleaseReader
 
-   repository = ReleaseReader("ghdl/ghdl", token=getenv("GITHUB_TOKEN")).Read()
+   repository = ReleaseReader("ghdl", "ghdl", token=getenv("GITHUB_TOKEN")).Read()
 
    release = repository["v5.0.1"]                # the release published at tag 'v5.0.1'
    print(f"{release.Name or release.TagName}: {release.PublishedAt:%d.%m.%Y %H:%M:%S} {release.CommitSHA[:7]}")

@@ -110,10 +110,12 @@ class RepositoryClient(RESTClient):
 	:class:`~pyTooling.REST.RESTClient`'s.
 	"""
 
-	_repository: str  #: Repository as ``owner/name``.
+	_namespace:  str  #: Namespace of the repository, the user or organization owning it.
+	_repository: str  #: Name of the repository.
 
 	def __init__(
 		self,
+		namespace:  str,
 		repository: str,
 		token:      Nullable[str] = None,
 		*,
@@ -125,7 +127,8 @@ class RepositoryClient(RESTClient):
 		"""
 		Initializes a client for one repository.
 
-		:param repository:  The repository as ``owner/name``.
+		:param namespace:   The namespace of the repository, the user or organization owning it.
+		:param repository:  The name of the repository.
 		:param token:       Optional, token authorizing the requests. Default: anonymous requests.
 		:param apiURL:      Optional, base URL of the GitHub REST API, e.g. of a GitHub Enterprise Server.
 		                    Default: :data:`GITHUB_API_URL`.
@@ -134,33 +137,44 @@ class RepositoryClient(RESTClient):
 		                    Default: ``3``.
 		:param retryDelay:  Optional, pause in seconds before a request is tried again the first time. The pause doubles
 		                    with every further attempt. Default: ``2.0``.
-		:raises ValueError: If parameter 'repository' is ``None``.
-		:raises TypeError:  If parameter 'repository' is not of type :class:`str`.
-		:raises ValueError: If parameter 'repository' isn't of the form ``owner/name``.
+		:raises ValueError: If parameter 'namespace' or 'repository' is ``None``.
+		:raises TypeError:  If parameter 'namespace' or 'repository' is not of type :class:`str`.
+		:raises ValueError: If parameter 'namespace' or 'repository' is empty or contains a ``/``.
 		:raises TypeError:  If a parameter of :class:`~pyTooling.REST.RESTClient` has the wrong type.
 		:raises ValueError: If a parameter of :class:`~pyTooling.REST.RESTClient` has an invalid value.
 		"""
 		super().__init__(apiURL, token, headers=_GITHUB_HEADERS, timeout=timeout, retries=retries, retryDelay=retryDelay)
 
-		if repository is None:
-			raise ValueError("Parameter 'repository' is None.")
-		elif not isinstance(repository, str):
-			ex = TypeError("Parameter 'repository' is not of type 'str'.")
-			ex.add_note(f"Got type '{getFullyQualifiedName(repository)}'.")
-			raise ex
-		elif len(parts := repository.split("/")) != 2 or "" in parts:
-			ex = ValueError("Parameter 'repository' isn't of the form 'owner/name'.")
-			ex.add_note(f"Got value '{repository}'.")
-			raise ex
+		for parameterName, text in (("namespace", namespace), ("repository", repository)):
+			if text is None:
+				raise ValueError(f"Parameter '{parameterName}' is None.")
+			elif not isinstance(text, str):
+				ex = TypeError(f"Parameter '{parameterName}' is not of type 'str'.")
+				ex.add_note(f"Got type '{getFullyQualifiedName(text)}'.")
+				raise ex
+			elif text == "" or "/" in text:
+				ex = ValueError(f"Parameter '{parameterName}' is empty or contains a '/'.")
+				ex.add_note(f"Got value '{text}'.")
+				raise ex
 
+		self._namespace =  namespace
 		self._repository = repository
+
+	@readonly
+	def Namespace(self) -> str:
+		"""
+		Read-only property to access the repository's namespace (:attr:`_namespace`).
+
+		:returns: The name of the user or organization owning the repository.
+		"""
+		return self._namespace
 
 	@readonly
 	def Repository(self) -> str:
 		"""
-		Read-only property to access the repository (:attr:`_repository`).
+		Read-only property to access the repository's name (:attr:`_repository`).
 
-		:returns: The repository as ``owner/name``.
+		:returns: The name of the repository, without its namespace.
 		"""
 		return self._repository
 

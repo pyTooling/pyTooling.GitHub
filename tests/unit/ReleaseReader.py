@@ -145,22 +145,23 @@ class Server:
 
 
 class Reading(Testcase):
-	def _Read(self, server: Server, repository: str) -> Any:
+	def _Read(self, server: Server, namespace: str, repository: str) -> Any:
 		"""
 		Read a repository from a fake GitHub API.
 
 		:param server:     The fake API.
-		:param repository: The repository as ``owner/name``.
+		:param namespace:  The repository's namespace.
+		:param repository: The repository's name.
 		:returns:          The repository's releases and tags.
 		"""
 		with server.Patch():
-			return ReleaseReader(repository, "secret").Read()
+			return ReleaseReader(namespace, repository, "secret").Read()
 
 	def test_GHDL(self) -> None:
 		"""One query reads the releases and tags; a release with assets costs one REST request for its labels."""
 		fixture =    _fixture("GHDL")
 		server =     Server(fixture["graphql"], fixture["rest"])
-		repository = self._Read(server, "ghdl/ghdl")
+		repository = self._Read(server, "ghdl", "ghdl")
 
 		self.assertEqual(4, len(repository))
 		self.assertEqual(6, len(repository.Tags))
@@ -185,7 +186,7 @@ class Reading(Testcase):
 
 	def test_OSVVM(self) -> None:
 		fixture =    _fixture("OSVVM")
-		repository = self._Read(Server(fixture["graphql"], fixture["rest"]), "OSVVM/OsvvmLibraries")
+		repository = self._Read(Server(fixture["graphql"], fixture["rest"]), "OSVVM", "OsvvmLibraries")
 
 		self.assertEqual(
 			"OsvvmLibraries - 2026.09 - all-in-one (ZIP)", repository["2026.09"].Assets["OsvvmLibraries-2026.09.zip"].Label
@@ -200,7 +201,7 @@ class Reading(Testcase):
 		"""Both connections are read page by page, and a tag of the first page finds its release on the second."""
 		fixture =    _fixture("pyTooling")
 		server =     Server(fixture["graphql"], fixture["rest"])
-		repository = self._Read(server, "pyTooling/pyTooling")
+		repository = self._Read(server, "pyTooling", "pyTooling")
 
 		firstPage = fixture["graphql"][0]["data"]["repository"]
 		self.assertEqual(2, len(server.requests))
@@ -221,7 +222,7 @@ class Reading(Testcase):
 		del pages[1]["data"]["repository"]["releases"]
 
 		server =     Server(pages, fixture["rest"])
-		repository = self._Read(server, "pyTooling/pyTooling")
+		repository = self._Read(server, "pyTooling", "pyTooling")
 
 		self.assertFalse(server.variables[1]["withReleases"])
 		self.assertTrue(server.variables[1]["withTags"])
@@ -240,7 +241,7 @@ class Reading(Testcase):
 		}}}})
 
 		server =     Server(pages, fixture["rest"])
-		repository = self._Read(server, "ghdl/ghdl")
+		repository = self._Read(server, "ghdl", "ghdl")
 
 		self.assertEqual(3, len(repository["nightly"].Assets))
 		self.assertEqual({"id": release["id"], "cursor": "Mg"}, server.variables[1])
@@ -253,7 +254,7 @@ class Reading(Testcase):
 		pages[0]["data"]["repository"]["releases"]["nodes"][0]["isDraft"] = True
 
 		server =     Server(pages, fixture["rest"])
-		repository = self._Read(server, "OSVVM/OsvvmLibraries")
+		repository = self._Read(server, "OSVVM", "OsvvmLibraries")
 
 		self.assertNotIn("2026.09", repository)
 		self.assertFalse(repository.Tags["2026.09"].HasRelease)
@@ -269,24 +270,23 @@ class Reading(Testcase):
 		rest["repos/OSVVM/OsvvmLibraries/releases/403085803"]["assets"].pop()
 
 		with self.assertRaises(GitHubError) as context:
-			_ = self._Read(Server(fixture["graphql"], rest), "OSVVM/OsvvmLibraries")
+			_ = self._Read(Server(fixture["graphql"], rest), "OSVVM", "OsvvmLibraries")
 
 		self.assertTrue(str(context.exception).startswith("REST response for release '2026.09' lacks asset '"))
 
 
 class Errors(Testcase):
-	def _Fail(self, urlopen: Callable[..., Any], repository: str = "pyTooling/DoesNotExist") -> GitHubError:
+	def _Fail(self, urlopen: Callable[..., Any]) -> GitHubError:
 		"""
-		Read a repository from a fake GitHub API expected to fail.
+		Read repository ``pyTooling/DoesNotExist`` from a fake GitHub API expected to fail.
 
-		:param urlopen:    The fake :func:`urlopen`.
-		:param repository: The repository as ``owner/name``.
-		:returns:          The exception raised.
+		:param urlopen: The fake :func:`urlopen`.
+		:returns:       The exception raised.
 		"""
 		with mock.patch("pyTooling.REST.urlopen", side_effect=urlopen):
 			with mock.patch("pyTooling.REST.sleep"):
 				with self.assertRaises(GitHubError) as context:
-					_ = ReleaseReader(repository, "secret").Read()
+					_ = ReleaseReader("pyTooling", "DoesNotExist", "secret").Read()
 
 		self.assertNotIn("secret", str(context.exception) + "".join(getattr(context.exception, "__notes__", [])))
 		return context.exception
@@ -366,7 +366,7 @@ class Errors(Testcase):
 
 		with mock.patch("pyTooling.REST.urlopen", side_effect=urlopen):
 			with mock.patch("pyTooling.REST.sleep") as sleep:
-				repository = ReleaseReader("pyTooling/pyTooling", "secret").Read()
+				repository = ReleaseReader("pyTooling", "pyTooling", "secret").Read()
 
 		self.assertEqual(4, len(repository))
 		sleep.assert_called_once_with(2.0)
@@ -391,15 +391,15 @@ class Errors(Testcase):
 	def test_Token(self) -> None:
 		"""GitHub's GraphQL API serves no anonymous requests."""
 		with self.assertRaises(ValueError) as context:
-			_ = ReleaseReader("owner/repo", None)
+			_ = ReleaseReader("owner", "repo", None)
 		self.assertEqual("Parameter 'token' is None.", str(context.exception))
 
 		with self.assertRaises(ValueError) as context:
-			_ = ReleaseReader("owner/repo", "")
+			_ = ReleaseReader("owner", "repo", "")
 		self.assertEqual("Parameter 'token' is empty.", str(context.exception))
 
 		with self.assertRaises(TypeError):
-			_ = ReleaseReader("owner/repo", 4711)
+			_ = ReleaseReader("owner", "repo", 4711)
 
 		with self.assertRaises(ValueError):
-			_ = ReleaseReader("owner", "secret")
+			_ = ReleaseReader("owner", "", "secret")

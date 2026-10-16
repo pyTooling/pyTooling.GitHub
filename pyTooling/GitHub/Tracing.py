@@ -40,7 +40,7 @@ sub-span per step. The time a job waited for a runner is a separate timespan in 
    from os import getenv
    from pyTooling.GitHub.Tracing import WorkflowRunReader
 
-   reader = WorkflowRunReader("pyTooling/Actions", token=getenv("GITHUB_TOKEN"))
+   reader = WorkflowRunReader("pyTooling", "Actions", token=getenv("GITHUB_TOKEN"))
    trace = reader.ReadRun(34937615362)
    print("\\n".join(trace.Format()))
 
@@ -462,7 +462,7 @@ class WorkflowRunReader(RepositoryClient):
 				ex.add_note(f"Got value '{attempt}'.")
 				raise ex
 
-		runPath = f"repos/{self._repository}/actions/runs/{runID}"
+		runPath = f"repos/{self._namespace}/{self._repository}/actions/runs/{runID}"
 		if attempt is None:
 			run, _ =  self.GetJSONObject(runPath)
 			jobsPath = f"{runPath}/jobs?filter=latest&per_page=100"
