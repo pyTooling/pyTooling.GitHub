@@ -44,17 +44,17 @@ Read the releases and tags of a GitHub repository through GitHub's GraphQL API.
 
    See :ref:`high-level help <DATA/Release>` for explanations and usage examples.
 """
-from datetime                    import datetime, timezone
-from http                        import HTTPMethod
-from textwrap                    import dedent
-from typing                      import Any, Optional as Nullable, Union
+from datetime                  import datetime, timezone
+from http                      import HTTPMethod
+from textwrap                  import dedent
+from typing                    import Any, Optional as Nullable, Union
 
-from pyTooling.Decorators        import export
-from pyTooling.GenericPath.URL   import URL
-from pyTooling.REST              import JSONObject, RESTError
+from pyTooling.Decorators      import export
+from pyTooling.GenericPath.URL import URL
+from pyTooling.REST            import JSONObject, RESTError
 
-from pyTooling.GitHub            import GITHUB_API_URL, GitHubError, RepositoryClient
-from pyTooling.GitHub.Repository import Repository
+from pyTooling.GitHub          import GITHUB_API_URL, GitHubError, RepositoryClient
+from pyTooling.GitHub.Release  import Repository
 
 
 __all__ = ["RELEASES_QUERY", "RELEASE_ASSETS_QUERY"]
@@ -188,7 +188,7 @@ class ReleaseReader(RepositoryClient):
 		Read the releases and tags of the repository.
 
 		Every page of releases, tags and assets is read, draft releases are skipped, the asset labels are added from the
-		REST API, and the result is parsed by :meth:`Repository.Parse <pyTooling.GitHub.Repository.Repository.Parse>`.
+		REST API, and the result is parsed by :meth:`Repository.Parse <pyTooling.GitHub.Release.Repository.Parse>`.
 		A request fails e.g. on an exhausted rate limit or an unreachable API, and GitHub's GraphQL API reports e.g. an
 		unknown repository as an error.
 
