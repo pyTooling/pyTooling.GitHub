@@ -33,10 +33,10 @@ A data model of a GitHub repository's releases and tags.
 
 .. tree::
 
-   - :class:`Repository`       | the releases and tags of a repository
-     - :class:`Release`        | a release, published at a tag
-       - :class:`ReleaseAsset` | a file attached to the release
-     - :class:`Tag`            | a tag and the commit it points to
+   - :class:`Repository` | the releases and tags of a repository
+     - :class:`Release`  | a release, published at a tag
+       - :class:`Asset`  | a file attached to the release
+     - :class:`Tag`      | a tag and the commit it points to
 
 :class:`~pyTooling.GitHub.ReleaseReader.ReleaseReader` reads the model through GitHub's GraphQL API.
 :meth:`Repository.Parse` reads the API's ``Repository`` object, :meth:`Repository.ToJSON` writes the model in the
@@ -108,7 +108,7 @@ def _readNodes(json: JSONObject, field: str, path: str) -> list[JSONObject]:
 
 
 @export
-class ReleaseAsset(metaclass=ExtendedType, slots=True):
+class Asset(metaclass=ExtendedType, slots=True):
 	"""A file attached to a release."""
 
 	_parent:      Nullable[Release]  #: Release the file is attached to.
@@ -213,8 +213,11 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 			ex = TypeError("Parameter 'parent' is not of type 'Release'.")
 			ex.add_note(f"Got type '{getFullyQualifiedName(parent)}'.")
 			raise ex
+		elif name in parent._assets:
+			raise ValueError(f"Release '{parent._tagName}' has an asset '{name}' already.")
 		else:
-			parent._AddAsset(self)
+			self._parent = parent
+			parent._assets[name] = self
 
 	@readonly
 	def Parent(self) -> Nullable[Release]:
@@ -346,7 +349,103 @@ class ReleaseAsset(metaclass=ExtendedType, slots=True):
 
 
 @export
-class Release(metaclass=ExtendedType, slots=True):
+class CommitReference(metaclass=ExtendedType, slots=True):
+	"""
+	Base-class of a tag and a release: an element of a repository named by a tag, which points to a commit.
+
+	An annotated tag is resolved to the commit it points to.
+	"""
+
+	_parent:    Nullable[Repository]  #: Repository the element belongs to.
+	_tagName:   str                   #: Name of the tag.
+	_commitSHA: Nullable[str]         #: Commit the tag points to.
+	_commitURL: Nullable[URL]         #: URL of that commit.
+
+	def __init__(
+		self,
+		tagName:   str,
+		commitSHA: Nullable[str] = None,
+		commitURL: Nullable[URL] = None
+	) -> None:
+		"""
+		Initializes the tag's name and the commit it points to.
+
+		:param tagName:     Name of the tag.
+		:param commitSHA:   Optional, commit the tag points to. Default: ``None``.
+		:param commitURL:   Optional, URL of that commit. Default: ``None``.
+		:raises ValueError: If parameter 'tagName' is ``None``.
+		:raises TypeError:  If parameter 'tagName' or 'commitSHA' is not of type :class:`str`.
+		:raises ValueError: If parameter 'tagName' or 'commitSHA' is empty.
+		:raises TypeError:  If parameter 'commitURL' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
+		"""
+		if tagName is None:
+			raise ValueError("Parameter 'tagName' is None.")
+
+		for parameterName, text in (("tagName", tagName), ("commitSHA", commitSHA)):
+			if text is not None and not isinstance(text, str):
+				ex = TypeError(f"Parameter '{parameterName}' is not of type 'str'.")
+				ex.add_note(f"Got type '{getFullyQualifiedName(text)}'.")
+				raise ex
+			elif text == "":
+				raise ValueError(f"Parameter '{parameterName}' is empty.")
+
+		if commitURL is not None and not isinstance(commitURL, URL):
+			ex = TypeError("Parameter 'commitURL' is not of type 'URL'.")
+			ex.add_note(f"Got type '{getFullyQualifiedName(commitURL)}'.")
+			raise ex
+
+		self._parent =    None
+		self._tagName =   tagName
+		self._commitSHA = commitSHA
+		self._commitURL = commitURL
+
+	@readonly
+	def Parent(self) -> Nullable[Repository]:
+		"""
+		Read-only property to access the repository the element belongs to (:attr:`_parent`).
+
+		:returns: The repository, or ``None`` if the element belongs to none.
+		"""
+		return self._parent
+
+	@readonly
+	def TagName(self) -> str:
+		"""
+		Read-only property to access the tag's name (:attr:`_tagName`).
+
+		:returns: The tag's name, unique among the repository's tags and among its releases.
+		"""
+		return self._tagName
+
+	@readonly
+	def CommitSHA(self) -> Nullable[str]:
+		"""
+		Read-only property to access the commit the tag points to (:attr:`_commitSHA`).
+
+		:returns: The commit's hash, or ``None`` if the tag doesn't exist or points to no commit, e.g. to a tree.
+		"""
+		return self._commitSHA
+
+	@readonly
+	def CommitURL(self) -> Nullable[URL]:
+		"""
+		Read-only property to access the URL of the commit the tag points to (:attr:`_commitURL`).
+
+		:returns: The commit's URL on github.com, or ``None`` if the tag doesn't exist or points to no commit.
+		"""
+		return self._commitURL
+
+	def __str__(self) -> str:
+		"""
+		Return a string representation of the element.
+
+		:returns: The tag's name.
+		"""
+		return self._tagName
+
+
+@export
+class Release(CommitReference):
 	"""
 	A release, published at a tag.
 
@@ -354,34 +453,33 @@ class Release(metaclass=ExtendedType, slots=True):
 
 	The release's commit is the one its **tag** points to - not GitHub's ``target_commitish``, which is usually a
 	branch's name. The time is when the release was **published**, not when it was created, which is the commit's time.
+
+	The release is a collection of its assets: ``name in release`` asks whether a file of that name is attached,
+	``release[name]`` returns it, and iterating yields the assets in the order GitHub reported them.
 	"""
 
-	_parent:       Nullable[Repository]     #: Repository the release belongs to.
-	_tagName:      str                      #: Name of the tag the release is published at.
-	_url:          _URL                     #: URL of the release page.
-	_name:         Nullable[str]            #: Title of the release.
-	_description:  str                      #: Release notes as Markdown.
-	_publishedAt:  Nullable[datetime]       #: Time the release was published.
-	_isPrerelease: bool                     #: True, if the release is a pre-release.
-	_isLatest:     bool                     #: True, if the release is the repository's latest release.
-	_commitSHA:    Nullable[str]            #: Commit the tag points to.
-	_commitURL:    Nullable[_URL]           #: URL of that commit.
-	_assets:       dict[str, ReleaseAsset]  #: Files attached to the release, by file name.
+	_url:          _URL                #: URL of the release page.
+	_name:         Nullable[str]       #: Title of the release.
+	_description:  str                 #: Release notes as Markdown.
+	_publishedAt:  Nullable[datetime]  #: Time the release was published.
+	_isPrerelease: bool                #: True, if the release is a pre-release.
+	_isLatest:     bool                #: True, if the release is the repository's latest release.
+	_assets:       dict[str, Asset]    #: Files attached to the release, by file name.
 
 	def __init__(
 		self,
 		tagName:      str,
 		url:          _URL,
-		name:         Nullable[str]                    = None,
-		description:  str                              = "",
-		publishedAt:  Nullable[datetime]               = None,
-		isPrerelease: bool                             = False,
-		isLatest:     bool                             = False,
-		commitSHA:    Nullable[str]                    = None,
-		commitURL:    Nullable[_URL]                   = None,
-		assets:       Nullable[Iterable[ReleaseAsset]] = None,
+		name:         Nullable[str]             = None,
+		description:  str                       = "",
+		publishedAt:  Nullable[datetime]        = None,
+		isPrerelease: bool                      = False,
+		isLatest:     bool                      = False,
+		commitSHA:    Nullable[str]             = None,
+		commitURL:    Nullable[_URL]            = None,
+		assets:       Nullable[Iterable[Asset]] = None,
 		*,
-		parent:       Nullable[Repository]             = None
+		parent:       Nullable[Repository]      = None
 	) -> None:
 		"""
 		Initializes a release.
@@ -410,36 +508,27 @@ class Release(metaclass=ExtendedType, slots=True):
 		:raises ValueError:  If parameter 'publishedAt' has no time zone.
 		:raises ValueError:  If parameter 'isPrerelease' or 'isLatest' is ``None``.
 		:raises TypeError:   If parameter 'isPrerelease' or 'isLatest' is not of type :class:`bool`.
-		:raises TypeError:   If an element of parameter 'assets' is not of type :class:`ReleaseAsset`.
+		:raises TypeError:   If an element of parameter 'assets' is not of type :class:`Asset`.
 		:raises ValueError:  If two elements of parameter 'assets' have the same name.
+		:raises ValueError:  If an element of parameter 'assets' is attached to a release already.
 		:raises TypeError:   If parameter 'parent' is not of type :class:`Repository`.
 		:raises ValueError:  If parameter 'parent' has a release of the same tag.
 		"""
-		if tagName is None:
-			raise ValueError("Parameter 'tagName' is None.")
-		elif not isinstance(tagName, str):
-			ex = TypeError("Parameter 'tagName' is not of type 'str'.")
-			ex.add_note(f"Got type '{getFullyQualifiedName(tagName)}'.")
-			raise ex
-		elif tagName == "":
-			raise ValueError("Parameter 'tagName' is empty.")
+		super().__init__(tagName, commitSHA, commitURL)
 
 		if url is None:
 			raise ValueError("Parameter 'url' is None.")
+		elif not isinstance(url, URL):
+			ex = TypeError("Parameter 'url' is not of type 'URL'.")
+			ex.add_note(f"Got type '{getFullyQualifiedName(url)}'.")
+			raise ex
 
-		for parameterName, link in (("url", url), ("commitURL", commitURL)):
-			if link is not None and not isinstance(link, URL):
-				ex = TypeError(f"Parameter '{parameterName}' is not of type 'URL'.")
-				ex.add_note(f"Got type '{getFullyQualifiedName(link)}'.")
-				raise ex
-
-		for parameterName, text in (("name", name), ("commitSHA", commitSHA)):
-			if text is not None and not isinstance(text, str):
-				ex = TypeError(f"Parameter '{parameterName}' is not of type 'str'.")
-				ex.add_note(f"Got type '{getFullyQualifiedName(text)}'.")
-				raise ex
-			elif text == "":
-				raise ValueError(f"Parameter '{parameterName}' is empty.")
+		if name is not None and not isinstance(name, str):
+			ex = TypeError("Parameter 'name' is not of type 'str'.")
+			ex.add_note(f"Got type '{getFullyQualifiedName(name)}'.")
+			raise ex
+		elif name == "":
+			raise ValueError("Parameter 'name' is empty.")
 
 		if description is None:
 			raise ValueError("Parameter 'description' is None.")
@@ -465,26 +554,27 @@ class Release(metaclass=ExtendedType, slots=True):
 				ex.add_note(f"Got type '{getFullyQualifiedName(flag)}'.")
 				raise ex
 
-		self._parent =       None
-		self._tagName =      tagName
 		self._url =          url
 		self._name =         name
 		self._description =  description
 		self._publishedAt =  publishedAt
 		self._isPrerelease = isPrerelease
 		self._isLatest =     isLatest
-		self._commitSHA =    commitSHA
-		self._commitURL =    commitURL
 		self._assets =       {}
 
 		if assets is not None:
 			for asset in assets:
-				if not isinstance(asset, ReleaseAsset):
-					ex = TypeError("Element of parameter 'assets' is not of type 'ReleaseAsset'.")
+				if not isinstance(asset, Asset):
+					ex = TypeError("Element of parameter 'assets' is not of type 'Asset'.")
 					ex.add_note(f"Got type '{getFullyQualifiedName(asset)}'.")
 					raise ex
+				elif asset._parent is not None:
+					raise ValueError(f"Asset '{asset._name}' is attached to release '{asset._parent._tagName}' already.")
+				elif asset._name in self._assets:
+					raise ValueError(f"Release '{tagName}' has an asset '{asset._name}' already.")
 
-				self._AddAsset(asset)
+				asset._parent = self
+				self._assets[asset._name] = asset
 
 		if parent is None:
 			pass
@@ -492,42 +582,11 @@ class Release(metaclass=ExtendedType, slots=True):
 			ex = TypeError("Parameter 'parent' is not of type 'Repository'.")
 			ex.add_note(f"Got type '{getFullyQualifiedName(parent)}'.")
 			raise ex
+		elif tagName in parent._releases:
+			raise ValueError(f"Repository '{parent}' has a release of tag '{tagName}' already.")
 		else:
-			parent._AddRelease(self)
-
-	def _AddAsset(self, asset: ReleaseAsset) -> None:
-		"""
-		Attach an asset to the release.
-
-		:param asset:       The asset.
-		:raises ValueError: If the asset is attached to a release already.
-		:raises ValueError: If the release has an asset of the same name.
-		"""
-		if asset._parent is not None:
-			raise ValueError(f"Asset '{asset._name}' is attached to release '{asset._parent._tagName}' already.")
-		elif asset._name in self._assets:
-			raise ValueError(f"Release '{self._tagName}' has an asset '{asset._name}' already.")
-
-		asset._parent = self
-		self._assets[asset._name] = asset
-
-	@readonly
-	def Parent(self) -> Nullable[Repository]:
-		"""
-		Read-only property to access the repository the release belongs to (:attr:`_parent`).
-
-		:returns: The repository, or ``None`` if the release belongs to none.
-		"""
-		return self._parent
-
-	@readonly
-	def TagName(self) -> str:
-		"""
-		Read-only property to access the name of the tag the release is published at (:attr:`_tagName`).
-
-		:returns: The tag's name, unique within the repository.
-		"""
-		return self._tagName
+			self._parent = parent
+			parent._releases[tagName] = self
 
 	@readonly
 	def URL(self) -> _URL:
@@ -589,27 +648,7 @@ class Release(metaclass=ExtendedType, slots=True):
 		return self._isLatest
 
 	@readonly
-	def CommitSHA(self) -> Nullable[str]:
-		"""
-		Read-only property to access the commit the release's tag points to (:attr:`_commitSHA`).
-
-		An annotated tag is resolved to the commit it points to.
-
-		:returns: The commit's hash, or ``None`` if the tag doesn't exist.
-		"""
-		return self._commitSHA
-
-	@readonly
-	def CommitURL(self) -> Nullable[_URL]:
-		"""
-		Read-only property to access the URL of the commit the release's tag points to (:attr:`_commitURL`).
-
-		:returns: The commit's URL on github.com, or ``None`` if the tag doesn't exist yet.
-		"""
-		return self._commitURL
-
-	@readonly
-	def Assets(self) -> dict[str, ReleaseAsset]:
+	def Assets(self) -> dict[str, Asset]:
 		"""
 		Read-only property to access the files attached to the release (:attr:`_assets`).
 
@@ -641,13 +680,40 @@ class Release(metaclass=ExtendedType, slots=True):
 
 		return self._parent._url / f"archive/refs/tags/{quote(self._tagName)}.{archive}"
 
-	def __str__(self) -> str:
+	def __len__(self) -> int:
 		"""
-		Return a string representation of the release.
+		Return the number of assets.
 
-		:returns: The name of the release's tag.
+		:returns: The number of files attached to the release.
 		"""
-		return self._tagName
+		return len(self._assets)
+
+	def __iter__(self) -> Iterator[Asset]:
+		"""
+		Iterate the assets, in the order GitHub reported them.
+
+		:returns: An iterator of the assets.
+		"""
+		return iter(self._assets.values())
+
+	def __contains__(self, name: str) -> bool:
+		"""
+		Check whether a file of a name is attached to the release.
+
+		:param name: The file name.
+		:returns:    ``True``, if the release has an asset of that name.
+		"""
+		return name in self._assets
+
+	def __getitem__(self, name: str) -> Asset:
+		"""
+		Return the asset of a file name.
+
+		:param name:      The file name.
+		:returns:         The asset.
+		:raises KeyError: If the release has no asset of that name.
+		"""
+		return self._assets[name]
 
 	@classmethod
 	def Parse(cls, release: JSONObject, path: str = "release") -> Self:
@@ -691,7 +757,7 @@ class Release(metaclass=ExtendedType, slots=True):
 		name =        release.get("name", None)
 		description = release.get("description", None)
 		assets =      [
-			ReleaseAsset.Parse(asset, f"{path}.releaseAssets.nodes[{position}]")
+			Asset.Parse(asset, f"{path}.releaseAssets.nodes[{position}]")
 			for position, asset in enumerate(_readNodes(release, "releaseAssets", path))
 		]
 
@@ -734,23 +800,19 @@ class Release(metaclass=ExtendedType, slots=True):
 
 
 @export
-class Tag(metaclass=ExtendedType, slots=True):
+class Tag(CommitReference):
 	"""
 	A tag of a repository and the commit it points to.
 
 	A tag exists without a release - a repository may tag every version and publish a release for a few of them.
 	"""
 
-	_parent:      Nullable[Repository]  #: Repository the tag belongs to.
-	_name:        str                   #: Name of the tag.
-	_commitSHA:   Nullable[str]         #: Commit the tag points to.
-	_commitURL:   Nullable[URL]         #: URL of that commit.
-	_committedAt: Nullable[datetime]    #: Time of that commit.
-	_isAnnotated: bool                  #: True, if the tag is a tag object of its own.
+	_committedAt: Nullable[datetime]  #: Time of the commit the tag points to.
+	_isAnnotated: bool                #: True, if the tag is a tag object of its own.
 
 	def __init__(
 		self,
-		name:        str,
+		tagName:     str,
 		commitSHA:   Nullable[str]        = None,
 		commitURL:   Nullable[URL]        = None,
 		committedAt: Nullable[datetime]   = None,
@@ -761,15 +823,15 @@ class Tag(metaclass=ExtendedType, slots=True):
 		"""
 		Initializes a tag.
 
-		:param name:        Name of the tag.
+		:param tagName:     Name of the tag.
 		:param commitSHA:   Optional, commit the tag points to. Default: ``None``.
 		:param commitURL:   Optional, URL of that commit. Default: ``None``.
 		:param committedAt: Optional, time of that commit, with a time zone. Default: ``None``.
 		:param isAnnotated: Optional, ``True``, if the tag is a tag object of its own. Default: ``False``.
 		:param parent:      Optional, reference to the repository the tag belongs to. Default: ``None``.
-		:raises ValueError: If parameter 'name' is ``None``.
-		:raises TypeError:  If parameter 'name' or 'commitSHA' is not of type :class:`str`.
-		:raises ValueError: If parameter 'name' or 'commitSHA' is empty.
+		:raises ValueError: If parameter 'tagName' is ``None``.
+		:raises TypeError:  If parameter 'tagName' or 'commitSHA' is not of type :class:`str`.
+		:raises ValueError: If parameter 'tagName' or 'commitSHA' is empty.
 		:raises TypeError:  If parameter 'commitURL' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
 		:raises TypeError:  If parameter 'committedAt' is not of type :class:`~datetime.datetime`.
 		:raises ValueError: If parameter 'committedAt' has no time zone.
@@ -778,21 +840,7 @@ class Tag(metaclass=ExtendedType, slots=True):
 		:raises TypeError:  If parameter 'parent' is not of type :class:`Repository`.
 		:raises ValueError: If parameter 'parent' has a tag of the same name.
 		"""
-		if name is None:
-			raise ValueError("Parameter 'name' is None.")
-
-		for parameterName, text in (("name", name), ("commitSHA", commitSHA)):
-			if text is not None and not isinstance(text, str):
-				ex = TypeError(f"Parameter '{parameterName}' is not of type 'str'.")
-				ex.add_note(f"Got type '{getFullyQualifiedName(text)}'.")
-				raise ex
-			elif text == "":
-				raise ValueError(f"Parameter '{parameterName}' is empty.")
-
-		if commitURL is not None and not isinstance(commitURL, URL):
-			ex = TypeError("Parameter 'commitURL' is not of type 'URL'.")
-			ex.add_note(f"Got type '{getFullyQualifiedName(commitURL)}'.")
-			raise ex
+		super().__init__(tagName, commitSHA, commitURL)
 
 		if committedAt is not None and not isinstance(committedAt, datetime):
 			ex = TypeError("Parameter 'committedAt' is not of type 'datetime'.")
@@ -810,10 +858,6 @@ class Tag(metaclass=ExtendedType, slots=True):
 			ex.add_note(f"Got type '{getFullyQualifiedName(isAnnotated)}'.")
 			raise ex
 
-		self._parent =      None
-		self._name =        name
-		self._commitSHA =   commitSHA
-		self._commitURL =   commitURL
 		self._committedAt = committedAt
 		self._isAnnotated = isAnnotated
 
@@ -823,46 +867,11 @@ class Tag(metaclass=ExtendedType, slots=True):
 			ex = TypeError("Parameter 'parent' is not of type 'Repository'.")
 			ex.add_note(f"Got type '{getFullyQualifiedName(parent)}'.")
 			raise ex
+		elif tagName in parent._tags:
+			raise ValueError(f"Repository '{parent}' has a tag '{tagName}' already.")
 		else:
-			parent._AddTag(self)
-
-	@readonly
-	def Parent(self) -> Nullable[Repository]:
-		"""
-		Read-only property to access the repository the tag belongs to (:attr:`_parent`).
-
-		:returns: The repository, or ``None`` if the tag belongs to none.
-		"""
-		return self._parent
-
-	@readonly
-	def Name(self) -> str:
-		"""
-		Read-only property to access the tag's name (:attr:`_name`).
-
-		:returns: The name, unique within the repository.
-		"""
-		return self._name
-
-	@readonly
-	def CommitSHA(self) -> Nullable[str]:
-		"""
-		Read-only property to access the commit the tag points to (:attr:`_commitSHA`).
-
-		An annotated tag is resolved to the commit it points to. A tag may point to another kind of object, e.g. a tree.
-
-		:returns: The commit's hash, or ``None`` if the tag points to no commit.
-		"""
-		return self._commitSHA
-
-	@readonly
-	def CommitURL(self) -> Nullable[URL]:
-		"""
-		Read-only property to access the URL of the commit the tag points to (:attr:`_commitURL`).
-
-		:returns: The commit's URL on github.com, or ``None`` if the tag points to no commit.
-		"""
-		return self._commitURL
+			self._parent = parent
+			parent._tags[tagName] = self
 
 	@readonly
 	def CommittedAt(self) -> Nullable[datetime]:
@@ -896,7 +905,7 @@ class Tag(metaclass=ExtendedType, slots=True):
 		if self._parent is None:
 			return None
 
-		return self._parent._releases.get(self._name, None)
+		return self._parent._releases.get(self._tagName, None)
 
 	@readonly
 	def HasRelease(self) -> bool:
@@ -905,15 +914,7 @@ class Tag(metaclass=ExtendedType, slots=True):
 
 		:returns: ``True``, if the repository the tag belongs to has a release of it.
 		"""
-		return self._parent is not None and self._name in self._parent._releases
-
-	def __str__(self) -> str:
-		"""
-		Return a string representation of the tag.
-
-		:returns: The tag's name.
-		"""
-		return self._name
+		return self._parent is not None and self._tagName in self._parent._releases
 
 	@classmethod
 	def Parse(cls, ref: JSONObject, path: str = "ref") -> Self:
@@ -993,7 +994,7 @@ class Tag(metaclass=ExtendedType, slots=True):
 		if self._isAnnotated:
 			target = {"__typename": "Tag", "target": target}
 
-		return {"name": self._name, "target": target}
+		return {"name": self._tagName, "target": target}
 
 
 @export
@@ -1039,8 +1040,10 @@ class Repository(metaclass=ExtendedType, slots=True):
 		:raises TypeError:  If parameter 'url' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
 		:raises TypeError:  If an element of parameter 'releases' is not of type :class:`Release`.
 		:raises ValueError: If two elements of parameter 'releases' have the same tag.
+		:raises ValueError: If an element of parameter 'releases' belongs to a repository already.
 		:raises TypeError:  If an element of parameter 'tags' is not of type :class:`Tag`.
 		:raises ValueError: If two elements of parameter 'tags' have the same name.
+		:raises ValueError: If an element of parameter 'tags' belongs to a repository already.
 		:raises TypeError:  If parameter 'fetchedAt' is not of type :class:`~datetime.datetime`.
 		:raises ValueError: If parameter 'fetchedAt' has no time zone.
 		"""
@@ -1085,8 +1088,13 @@ class Repository(metaclass=ExtendedType, slots=True):
 					ex = TypeError("Element of parameter 'releases' is not of type 'Release'.")
 					ex.add_note(f"Got type '{getFullyQualifiedName(release)}'.")
 					raise ex
+				elif release._parent is not None:
+					raise ValueError(f"Release '{release._tagName}' belongs to repository '{release._parent}' already.")
+				elif release._tagName in self._releases:
+					raise ValueError(f"Repository '{self}' has a release of tag '{release._tagName}' already.")
 
-				self._AddRelease(release)
+				release._parent = self
+				self._releases[release._tagName] = release
 
 		if tags is not None:
 			for tag in tags:
@@ -1094,40 +1102,13 @@ class Repository(metaclass=ExtendedType, slots=True):
 					ex = TypeError("Element of parameter 'tags' is not of type 'Tag'.")
 					ex.add_note(f"Got type '{getFullyQualifiedName(tag)}'.")
 					raise ex
+				elif tag._parent is not None:
+					raise ValueError(f"Tag '{tag._tagName}' belongs to repository '{tag._parent}' already.")
+				elif tag._tagName in self._tags:
+					raise ValueError(f"Repository '{self}' has a tag '{tag._tagName}' already.")
 
-				self._AddTag(tag)
-
-	def _AddRelease(self, release: Release) -> None:
-		"""
-		Attach a release to the repository.
-
-		:param release:     The release.
-		:raises ValueError: If the release belongs to a repository already.
-		:raises ValueError: If the repository has a release of the same tag.
-		"""
-		if release._parent is not None:
-			raise ValueError(f"Release '{release._tagName}' belongs to repository '{release._parent}' already.")
-		elif release._tagName in self._releases:
-			raise ValueError(f"Repository '{self}' has a release of tag '{release._tagName}' already.")
-
-		release._parent = self
-		self._releases[release._tagName] = release
-
-	def _AddTag(self, tag: Tag) -> None:
-		"""
-		Attach a tag to the repository.
-
-		:param tag:         The tag.
-		:raises ValueError: If the tag belongs to a repository already.
-		:raises ValueError: If the repository has a tag of the same name.
-		"""
-		if tag._parent is not None:
-			raise ValueError(f"Tag '{tag._name}' belongs to repository '{tag._parent}' already.")
-		elif tag._name in self._tags:
-			raise ValueError(f"Repository '{self}' has a tag '{tag._name}' already.")
-
-		tag._parent = self
-		self._tags[tag._name] = tag
+				tag._parent = self
+				self._tags[tag._tagName] = tag
 
 	@readonly
 	def Owner(self) -> str:

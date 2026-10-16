@@ -16,13 +16,13 @@ Releases and Tags
 
    release = repository["v5.0.1"]                # the release published at tag 'v5.0.1'
    print(f"{release.Name or release.TagName}: {release.PublishedAt:%d.%m.%Y %H:%M:%S} {release.CommitSHA[:7]}")
-   for asset in release.Assets.values():
+   for asset in release:                         # the files attached to the release
      print(f"  {asset.Label or asset.Name}: {asset.Size} bytes, {asset.DownloadURL}")
    print(release.SourceArchiveURL(SourceArchive.Tarball))
 
-   for tag in repository.Tags.values():         # every tag, with or without a release
+   for tag in repository.Tags.values():          # every tag, with or without a release
      if not tag.HasRelease:
-       print(f"{tag.Name} at {tag.CommitSHA[:7]}, committed {tag.CommittedAt}")
+       print(f"{tag.TagName} at {tag.CommitSHA[:7]}, committed {tag.CommittedAt}")
 
 
 .. _DATA/Release/Tree:
@@ -32,16 +32,20 @@ The Tree
 
 .. tree::
 
-   - :class:`~pyTooling.GitHub.Release.Repository`        | the releases and tags of a repository
-     - :class:`~pyTooling.GitHub.Release.Release`         | a release, published at a tag
-       - :class:`~pyTooling.GitHub.Release.ReleaseAsset`  | a file attached to the release
-     - :class:`~pyTooling.GitHub.Release.Tag`             | a tag and the commit it points to
+   - :class:`~pyTooling.GitHub.Release.Repository` | the releases and tags of a repository
+     - :class:`~pyTooling.GitHub.Release.Release`  | a release, published at a tag
+       - :class:`~pyTooling.GitHub.Release.Asset`  | a file attached to the release
+     - :class:`~pyTooling.GitHub.Release.Tag`      | a tag and the commit it points to
 
 Every element knows its ``Parent``. A repository is a collection of its **releases**: ``"v5.0.1" in repository`` asks
 whether a release is published at that tag, ``repository["v5.0.1"]`` returns it, and iterating yields the releases
 the newest first. Its :attr:`~pyTooling.GitHub.Release.Repository.Tags` hold every tag, and
 :attr:`Tag.HasRelease <pyTooling.GitHub.Release.Tag.HasRelease>` tells the tags without a release - OSVVM, for
-example, tags far more versions than it publishes releases of.
+example, tags far more versions than it publishes releases of. A release is a collection of its **assets** in the same
+way, by file name.
+
+A release and a tag share their base-class :class:`~pyTooling.GitHub.Release.CommitReference`: the tag's name
+(``TagName``) and the commit it points to (``CommitSHA``, ``CommitURL``).
 
 * **A release's commit is the commit its tag points to.** GitHub's ``target_commitish`` is usually a branch's name,
   e.g. ``main``, and no commit. An annotated tag is resolved through its tag object.
@@ -55,8 +59,8 @@ example, tags far more versions than it publishes releases of.
   the tag's name instead. The release notes are GitHub Flavored Markdown.
 * :attr:`~pyTooling.GitHub.Release.Release.IsLatest` is GitHub's *latest release*, which a maintainer may also set by
   hand; :attr:`~pyTooling.GitHub.Release.Repository.LatestRelease` returns it.
-* An asset's :attr:`~pyTooling.GitHub.Release.ReleaseAsset.Label` is the text GitHub's release page shows instead of
-  the file name, if the uploader set one. Its :attr:`~pyTooling.GitHub.Release.ReleaseAsset.Digest` is the checksum
+* An asset's :attr:`~pyTooling.GitHub.Release.Asset.Label` is the text GitHub's release page shows instead of
+  the file name, if the uploader set one. Its :attr:`~pyTooling.GitHub.Release.Asset.Digest` is the checksum
   GitHub computed on upload, e.g. ``sha256:8c7dd2e9...``; an asset uploaded before GitHub computed checksums has none.
 * GitHub's *Source code* archives are no assets: GitHub creates them on request.
   :meth:`~pyTooling.GitHub.Release.Release.SourceArchiveURL` returns the URL the release page links.

@@ -39,7 +39,7 @@ from typing                    import Any
 
 from pyTooling.GenericPath.URL import URL
 from pyTooling.GitHub          import GitHubError
-from pyTooling.GitHub.Release  import Release, ReleaseAsset, Repository, SnapshotVersion, SourceArchive, Tag
+from pyTooling.GitHub.Release  import Asset, Release, Repository, SnapshotVersion, SourceArchive, Tag
 from pyTooling.Testing         import Testcase
 
 
@@ -62,6 +62,16 @@ def _repository(name: str) -> dict[str, Any]:
 
 _URL = URL.Parse("https://github.com/owner/repo/releases/tag/v1.0.0")
 _UTC = datetime(2026, 10, 15, 12, 0, 0, tzinfo=timezone.utc)
+
+
+def _asset(name: str) -> Asset:
+	"""
+	Return an asset of one byte, attached to no release.
+
+	:param name: File name of the asset.
+	:returns:    The asset.
+	"""
+	return Asset(name, URL.Parse(f"https://github.com/owner/repo/releases/download/v1/{name}"), "application/zip", 1)
 
 
 class Parsing(Testcase):
@@ -141,7 +151,7 @@ class Parsing(Testcase):
 		self.assertIs(repository["2026.09"], repository.LatestRelease)
 		self.assertEqual(
 			["2025.06", "GhdlDebug_22_1114", "2022.05b_", "2020.12+doc"],
-			[tag.Name for tag in repository.Tags.values() if not tag.HasRelease]
+			[tag.TagName for tag in repository.Tags.values() if not tag.HasRelease]
 		)
 		self.assertTrue(repository.Tags["2020.12+doc"].IsAnnotated)
 		self.assertFalse(repository.Tags["2025.06a"].IsAnnotated)
@@ -250,18 +260,32 @@ class Parsing(Testcase):
 
 class Construction(Testcase):
 	def test_Release(self) -> None:
-		asset = ReleaseAsset("a.zip", URL.Parse("https://github.com/o/r/releases/download/v1/a.zip"), "application/zip", 7)
+		asset = Asset("a.zip", URL.Parse("https://github.com/o/r/releases/download/v1/a.zip"), "application/zip", 7)
 		release = Release(
 			"v1.0.0", _URL, "Version 1", "Notes", _UTC, isPrerelease=True, commitSHA="abc", assets=[asset]
 		)
 
 		self.assertEqual("v1.0.0", str(release))
+		self.assertEqual("v1.0.0", release.TagName)
+		self.assertEqual("abc", release.CommitSHA)
 		self.assertEqual("Version 1", release.Name)
 		self.assertEqual(_UTC, release.PublishedAt)
 		self.assertTrue(release.IsPrerelease)
 		self.assertIs(release, asset.Parent)
 		self.assertEqual("a.zip", str(asset))
 		self.assertIsNone(release.Parent)
+
+	def test_Release_Assets(self) -> None:
+		"""A release is a collection of its assets, by file name."""
+		release = Release("v1", _URL, assets=[_asset("a.zip"), _asset("b.tar.gz")])
+
+		self.assertEqual(2, len(release))
+		self.assertEqual(["a.zip", "b.tar.gz"], [asset.Name for asset in release])
+		self.assertIn("a.zip", release)
+		self.assertNotIn("c.zip", release)
+		self.assertIs(release.Assets["b.tar.gz"], release["b.tar.gz"])
+		with self.assertRaises(KeyError):
+			_ = release["c.zip"]
 
 	def test_Release_Parameters(self) -> None:
 		for arguments, exception, message in (
@@ -312,7 +336,7 @@ class Construction(Testcase):
 		):
 			with self.subTest(message=message):
 				with self.assertRaises(exception) as context:
-					_ = ReleaseAsset(*arguments)
+					_ = Asset(*arguments)
 
 				self.assertEqual(message, str(context.exception))
 
@@ -321,7 +345,7 @@ class Construction(Testcase):
 		repository = Repository("owner", "repo", URL.Parse("https://github.com/owner/repo"))
 		release = Release("v1", _URL, parent=repository)
 		tag = Tag("v1", "abc", parent=repository)
-		asset = ReleaseAsset("a.zip", URL.Parse("https://github.com/o/r/a.zip"), "application/zip", 1, parent=release)
+		asset = Asset("a.zip", URL.Parse("https://github.com/o/r/a.zip"), "application/zip", 1, parent=release)
 
 		self.assertIs(release, repository["v1"])
 		self.assertIs(tag, repository.Tags["v1"])
@@ -341,8 +365,20 @@ class Construction(Testcase):
 		self.assertEqual("Repository 'owner/repo' has a tag 'v1' already.", str(context.exception))
 
 		with self.assertRaises(ValueError) as context:
-			_ = ReleaseAsset("a.zip", URL.Parse("https://github.com/o/r/a.zip"), "application/zip", 1, parent=release)
+			_ = Asset("a.zip", URL.Parse("https://github.com/o/r/a.zip"), "application/zip", 1, parent=release)
 		self.assertEqual("Release 'v1' has an asset 'a.zip' already.", str(context.exception))
+
+		with self.assertRaises(ValueError) as context:
+			_ = Release("v2", _URL, assets=[asset])
+		self.assertEqual("Asset 'a.zip' is attached to release 'v1' already.", str(context.exception))
+
+		with self.assertRaises(ValueError) as context:
+			_ = Release("v2", _URL, assets=[_asset("b.zip"), _asset("b.zip")])
+		self.assertEqual("Release 'v2' has an asset 'b.zip' already.", str(context.exception))
+
+		with self.assertRaises(ValueError) as context:
+			_ = Repository("owner", "other", URL.Parse("https://github.com/owner/other"), tags=[tag])
+		self.assertEqual("Tag 'v1' belongs to repository 'owner/repo' already.", str(context.exception))
 
 		self.assertFalse(Tag("v2").HasRelease, "A tag of no repository has no release.")
 
@@ -368,8 +404,8 @@ class Construction(Testcase):
 
 	def test_Tag_Parameters(self) -> None:
 		for arguments, exception, message in (
-			((None,),                               ValueError, "Parameter 'name' is None."),
-			(("",),                                 ValueError, "Parameter 'name' is empty."),
+			((None,),                               ValueError, "Parameter 'tagName' is None."),
+			(("",),                                 ValueError, "Parameter 'tagName' is empty."),
 			(("v1", 1),                             TypeError,  "Parameter 'commitSHA' is not of type 'str'."),
 			(("v1", "abc", "https://github.com"),   TypeError,  "Parameter 'commitURL' is not of type 'URL'."),
 			(("v1", "abc", None, datetime(2026, 1, 1)), ValueError, "Parameter 'committedAt' has no time zone."),
