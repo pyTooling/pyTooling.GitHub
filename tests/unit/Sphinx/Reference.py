@@ -338,9 +338,9 @@ class Interfaces(Project):
 		self._workflow("Tag", TAG)
 		self._build({"Package": self.PAGE}, ghactions_ref="r1")
 
-		self.assertIn(
-			'href="https://github.com/owner/repo/blob/r1/.github/workflows/Tag.yml#L10">Tag.yml:10</a>',
-			self._field(self._html("Package"), "Permissions")
+		self.assertRegex(
+			self._field(self._html("Package"), "Permissions"),
+			r'href="https://github\.com/owner/repo/blob/r1/\.github/workflows/Tag\.yml#L10"[^>]*>Tag\.yml:10</a>'
 		)
 
 	def test_Contract(self) -> None:
@@ -651,9 +651,10 @@ class YAMLExcerpts(Project):
 		self._workflow("Package", PACKAGE)
 		self._build({"Package": self._page("   :job: Build\n")}, ghactions_ref="r1")
 
-		self.assertIn(
-			'href="https://github.com/owner/repo/blob/r1/.github/workflows/Package.yml#L43-L55">Package.yml, lines 43-55</a>',
-			self._html("Package")
+		self.assertRegex(
+			self._html("Package"),
+			r'href="https://github\.com/owner/repo/blob/r1/\.github/workflows/Package\.yml#L43-L55"[^>]*>'
+			r'Package\.yml, lines 43-55</a>'
 		)
 
 	def test_Caption(self) -> None:
