@@ -175,6 +175,7 @@ class PipelineCommand(Testcase):
 
 		self.assertIn("--github-repository", output)
 		self.assertIn("--github-pipeline-id", output)
+		self.assertIn("--token", output)
 		self.assertIn("--trace-file", output)
 		self.assertIn("--gantt", output)
 		self.assertIn("--force", output)
@@ -201,6 +202,28 @@ class PipelineCommand(Testcase):
 
 				self.assertEqual(2, context.exception.code)
 				reader.assert_not_called()
+
+	def test_Token_Option(self) -> None:
+		"""A token given with '--token' wins over the variable."""
+		application = Application()
+
+		with patch.dict(environ, {"GITHUB_TOKEN": "fromVariable"}):
+			with patch("pyTooling.GitHub.CLI.Pipeline.WorkflowRunReader") as reader:
+				args = Namespace(githubRepository="owner/name", githubPipelineID="1", token="fromOption")
+				_ = application._ReadPipeline(args)
+
+		reader.assert_called_once_with("owner", "name", "fromOption")
+
+	def test_Token_Variable(self) -> None:
+		"""Without '--token', the token is read from the variable."""
+		application = Application()
+
+		with patch.dict(environ, {"GITHUB_TOKEN": "fromVariable"}):
+			with patch("pyTooling.GitHub.CLI.Pipeline.WorkflowRunReader") as reader:
+				args = Namespace(githubRepository="owner/name", githubPipelineID="1", token=None)
+				_ = application._ReadPipeline(args)
+
+		reader.assert_called_once_with("owner", "name", "fromVariable")
 
 	def test_TraceFile_UnsupportedFormat(self) -> None:
 		"""A misspelled format is reported before anything is read."""

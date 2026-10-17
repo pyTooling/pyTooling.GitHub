@@ -107,6 +107,10 @@ class PipelineHandlers(metaclass=ExtendedType, mixin=True):
 		help=f"Identifier of the GitHub Actions workflow run. Default: ${ENVIRONMENT_RUN_ID}."
 	)
 	@LongValuedFlag(
+		"--token", dest="token", metaName="token", optional=True,
+		help=f"Token to read the workflow run with. Default: ${ENVIRONMENT_TOKEN}."
+	)
+	@LongValuedFlag(
 		"--trace-file", dest="traceFile", metaName="[format:]file", optional=True,
 		help=f"Write the trace. Format: {', '.join(TraceFormat)}. Default: {TraceFormat.DEFAULT}."
 	)
@@ -248,7 +252,8 @@ class PipelineHandlers(metaclass=ExtendedType, mixin=True):
 			self.Exit(2)
 
 		self.WriteVerbose(f"Reading run {runID} of '{repository}' ...")
-		reader = WorkflowRunReader(owner, name, getenv(self.ENVIRONMENT_TOKEN))
+		token = args.token if args.token is not None else getenv(self.ENVIRONMENT_TOKEN)
+		reader = WorkflowRunReader(owner, name, token)
 
 		return reader.ReadRun(int(runID))
 
