@@ -41,6 +41,7 @@ from sys               import version_info
 from tempfile          import TemporaryDirectory
 from textwrap          import dedent
 from typing            import Any
+from warnings          import catch_warnings, filterwarnings
 
 from pytest            import mark
 
@@ -198,7 +199,11 @@ class Project(Testcase):
 			warning=self._warnings, parallel=parallel
 		)
 		try:
-			app.build()
+			with catch_warnings():
+				# Sphinx forks its reading processes; in a multi-threaded process, like a pytest-xdist worker, Python warns
+				# about fork(), and pytest turns a DeprecationWarning into an error.
+				filterwarnings("ignore", r"This process .* is multi-threaded, use of fork\(\)", DeprecationWarning)
+				app.build()
 		finally:
 			app.cleanup()
 
