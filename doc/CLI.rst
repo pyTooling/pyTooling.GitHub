@@ -101,6 +101,8 @@ derived from, so a further output is a further option rather than a second reade
    * - ``--github-pipeline-id=<ID>``
      - The workflow run to read - the number in its URL, :file:`.../actions/runs/35479251694`. Default:
        :pycode:`$GITHUB_RUN_ID`, which a workflow sets.
+   * - ``--token=<token>``
+     - The token to read the run with. Default: :pycode:`$GITHUB_TOKEN`.
    * - ``--trace-file=[<format>:]<file>``
      - Write the trace. Default format: ``otlp-json``, currently the only one.
    * - ``--gantt=[<format>:]<file>``
@@ -108,8 +110,8 @@ derived from, so a further output is a further option rather than a second reade
    * - ``--force``
      - Overwrite files that exist. Without it, an existing file is an error.
 
-The token is read from :pycode:`$GITHUB_TOKEN`. Inside a workflow, the built-in token with the
-``actions: read`` permission suffices; outside one, it raises the rate limit and is required for a private
+The token is given with ``--token``, or read from :pycode:`$GITHUB_TOKEN`. Inside a workflow, the built-in token with
+the ``actions: read`` permission suffices; outside one, it raises the rate limit and is required for a private
 repository.
 
 .. hint::
