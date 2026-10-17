@@ -53,7 +53,7 @@ with WarningCollector() as warnings:
 			unittestRequirementsFile=Path("tests/requirements.txt"),
 			sourceFileWithVersion=packageInformationFile,
 			developmentStatus="alpha",
-			pythonVersions=("3.11", "3.12", "3.13", "3.14"),
+			pythonVersions=("3.11", "3.12", "3.13", "3.14", "3.15"),
 			additionalRequirements={
 				"diagram": ["matplotlib >= 3.10"],
 				"sphinx":  ["pyTooling.Sphinx ~= 0.1.0rc1"],
