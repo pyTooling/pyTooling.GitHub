@@ -290,7 +290,7 @@ class PipelineDotGraph(metaclass=ExtendedType, slots=True):
 
 		:param element: The job, matrix or called workflow to describe.
 		:returns:       The label's lines below the element's name, the style's parts, and the tooltip - the reusable
-		                workflow called and the condition, one per line, or an empty string.
+		                workflow called and the condition of each rule, one per line, or an empty string.
 		"""
 		lines =   []
 		style =   []
@@ -308,9 +308,10 @@ class PipelineDotGraph(metaclass=ExtendedType, slots=True):
 			else:
 				lines.append(f"matrix: {', '.join(matrix.Dimensions)}")
 
-		if (condition := element.Condition) is not None:
+		if element.RuleCount > 0:
 			style.append("dashed")
-			tooltip.append(f"if: {condition}")
+			for rule in element.Rules:
+				tooltip.append(f"if: {rule.Condition}")
 
 		return lines, style, "\n".join(tooltip)
 

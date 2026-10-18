@@ -1337,12 +1337,14 @@ class ToPipeline(Fixture):
 		params = pipeline.GetElement("Params")
 		self.assertIsInstance(params, DefinedJob)
 		self.assertIs(workflow.Jobs["Params"], params.Definition)
+		self.assertEqual(0, params.RuleCount)
 		self.assertEqual(["Compute"], [str(step) for step in params.Steps])
 		self.assertIs(workflow.Jobs["Params"].Steps[0], params.Steps[0].Definition)
 
 		build = pipeline.GetElement("Build")
 		self.assertIsInstance(build, DefinedMatrix)
-		self.assertEqual("inputs.dry_run == false", build.Condition)
+		self.assertEqual(1, build.RuleCount)
+		self.assertEqual("inputs.dry_run == false", build.Rules[0].Condition)
 		self.assertEqual(0, build.ElementCount)
 
 		static = pipeline.GetElement("Static")
@@ -1375,7 +1377,7 @@ class ToPipeline(Fixture):
 		steps = workflow.ToPipeline().GetElement("Job").Steps
 
 		self.assertEqual(["Checkout", "Run actions/setup-python@v6", 'Run echo "one"'], [str(step) for step in steps])
-		self.assertEqual("success()", steps[2].Condition)
+		self.assertEqual("success()", steps[2].Rules[0].Condition)
 
 	def test_Needs(self) -> None:
 		workflow = Workflow.FromFile(self._write("Package.yml", CALLABLE))

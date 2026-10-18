@@ -72,7 +72,7 @@ from typing                   import Any, ClassVar, Generic, Hashable, Iterable,
 from typing                   import Self, TypeVar, Union
 
 from pyTooling.CI             import CIError, DependencyMixin, JobGroup, Matrix as CIMatrix, MatrixInstanceMixin
-from pyTooling.CI             import MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow
+from pyTooling.CI             import MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow, Rule
 from pyTooling.CI             import Job as CIJob, Pipeline as CIPipeline, Step as CIStep, Workflow as CIWorkflow
 from pyTooling.Common         import getFullyQualifiedName, StringEnum
 from pyTooling.Decorators     import export, readonly
@@ -3262,7 +3262,7 @@ class DefinedWorkflow(CIWorkflow, CallMixin, DefinitionMixin[Job]):
 		Initializes a called workflow built from the job calling it, named by the job's key.
 
 		The job's ``uses`` is the workflow's :attr:`~pyTooling.CI.Workflow.Reference`, its ``if`` the
-		workflow's :attr:`~pyTooling.CI.ConditionMixin.Condition`.
+		:attr:`~pyTooling.CI.Rule.Condition` of the workflow's one rule in :attr:`~pyTooling.CI.RulesMixin.Rules`.
 
 		:param definition:     The job calling the workflow.
 		:param calledWorkflow: Optional, the workflow file the called workflow's elements are built from. Default:
@@ -3279,8 +3279,9 @@ class DefinedWorkflow(CIWorkflow, CallMixin, DefinitionMixin[Job]):
 			raise ex
 
 		super().__init__(
-			definition._name, reference=str(definition._uses), condition=definition._condition, keyValuePairs=keyValuePairs,
-			parent=parent
+			definition._name, reference=str(definition._uses),
+			rules=None if definition._condition is None else [Rule(definition._condition)],
+			keyValuePairs=keyValuePairs, parent=parent
 		)
 		DefinitionMixin.__init__(self, definition)
 		CallMixin.__init__(self, calledWorkflow)
@@ -3319,7 +3320,11 @@ class DefinedMatrix(CIMatrix, DefinitionMixin[Job]):
 			ex.add_note(f"Got job '{definition._name}'.")
 			raise ex
 
-		super().__init__(definition._name, condition=definition._condition, keyValuePairs=keyValuePairs, parent=parent)
+		super().__init__(
+			definition._name,
+			rules=None if definition._condition is None else [Rule(definition._condition)],
+			keyValuePairs=keyValuePairs, parent=parent
+		)
 		DefinitionMixin.__init__(self, definition)
 
 
@@ -3360,7 +3365,8 @@ class DefinedMatrixWorkflow(CIMatrixWorkflow, CallMixin, DefinitionMixin[Job]):
 			raise ValueError("Parameter 'dimensions' is None.")
 
 		super().__init__(
-			definition._name, dimensions, reference=str(definition._uses), condition=definition._condition,
+			definition._name, dimensions, reference=str(definition._uses),
+			rules=None if definition._condition is None else [Rule(definition._condition)],
 			keyValuePairs=keyValuePairs, parent=parent
 		)
 		DefinitionMixin.__init__(self, definition)
@@ -3389,7 +3395,11 @@ class DefinedJob(CIJob, DefinitionMixin[Job]):
 		"""
 		self._CheckDefinition(definition)
 
-		super().__init__(definition._name, condition=definition._condition, keyValuePairs=keyValuePairs, parent=parent)
+		super().__init__(
+			definition._name,
+			rules=None if definition._condition is None else [Rule(definition._condition)],
+			keyValuePairs=keyValuePairs, parent=parent
+		)
 		DefinitionMixin.__init__(self, definition)
 
 
@@ -3422,7 +3432,9 @@ class DefinedMatrixJob(CIMatrixJob, DefinitionMixin[Job]):
 			raise ValueError("Parameter 'dimensions' is None.")
 
 		super().__init__(
-			definition._name, dimensions, condition=definition._condition, keyValuePairs=keyValuePairs, parent=parent
+			definition._name, dimensions,
+			rules=None if definition._condition is None else [Rule(definition._condition)],
+			keyValuePairs=keyValuePairs, parent=parent
 		)
 		DefinitionMixin.__init__(self, definition)
 
@@ -3462,5 +3474,9 @@ class DefinedStep(CIStep, DefinitionMixin[Step]):
 		else:
 			name = f"Step at line {definition._line}"
 
-		super().__init__(name, condition=definition._condition, keyValuePairs=keyValuePairs, parent=parent)
+		super().__init__(
+			name,
+			rules=None if definition._condition is None else [Rule(definition._condition)],
+			keyValuePairs=keyValuePairs, parent=parent
+		)
 		DefinitionMixin.__init__(self, definition)
