@@ -15,7 +15,7 @@ Version 0.x (2026)
    .. rubric:: New Features
 
    * First release: pyTooling's GitHub Actions support becomes a package of its own (formerly developed as part of
-     :doc:`pyTooling <pyTool:index>` v10.0.0).
+     :doc:`pyTooling <pyTool:index>`, never part of a pyTooling release).
    * Data models: :ref:`pipeline runs <DATA/PipelineRun>` read from the GitHub REST API, :ref:`workflow files
      <DATA/Workflow>` and :ref:`action files <DATA/Action>`.
    * Data model: a repository's :ref:`releases and tags <DATA/Release>`, read through GitHub's GraphQL API and
