@@ -1,0 +1,5 @@
+{
+ "NotFound": {"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"locations":[{"line":6,"column":3}],"message":"Could not resolve to a Repository with the name 'pyTooling/DoesNotExist'."}]},
+ "BadCredentials": {"message": "Bad credentials", "documentation_url": "https://docs.github.com/rest", "status": "401"},
+ "UndefinedField": {"errors":[{"path":["query","repository","release","releaseAssets","nodes","label"],"extensions":{"code":"undefinedField","typeName":"ReleaseAsset","fieldName":"label"},"locations":[{"line":1,"column":109}],"message":"Field 'label' doesn't exist on type 'ReleaseAsset'"}]}
+}
