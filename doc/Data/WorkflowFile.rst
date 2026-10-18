@@ -185,7 +185,8 @@ expanding the workflows its jobs call as far as a resolver reads them and ``dept
    * - ``needs``
      - :attr:`~pyTooling.CI.DependencyMixin.Needs` between the elements
    * - ``if``
-     - :attr:`~pyTooling.CI.ConditionMixin.Condition`
+     - a :class:`~pyTooling.CI.Rule` in :attr:`~pyTooling.CI.RulesMixin.Rules`, the ``if`` text as its
+       :attr:`~pyTooling.CI.Rule.Condition`
 
 * An element is named by its job's key, as the file names it in ``needs``. A step is named as GitHub displays it:
   by its ``name``, or ``Run`` followed by its action or the first line of its script.
