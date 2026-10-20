@@ -253,7 +253,7 @@ class Conversion(Testcase):
 		self.assertEqual(["ubuntu-26.04"], job.Labels)
 		self.assertEqual("GitHub Actions", job.RunnerGroupName)
 		self.assertEqual(10.0, job.QueuedDuration)
-		self.assertEqual(60.0, job.Duration)
+		self.assertEqual(60.0, job.DurationInSeconds)
 
 	def test_JobNotStarted(self) -> None:
 		pipeline = Pipeline.Parse(_run(), [_job("Build", 10, None, None)])
@@ -322,7 +322,7 @@ class Conversion(Testcase):
 		self.assertEqual(datetime(2026, 9, 17, 10, 1, 0, tzinfo=timezone.utc), workflow.CreatedAt)
 		self.assertEqual(datetime(2026, 9, 17, 10, 1, 10, tzinfo=timezone.utc), workflow.StartedAt)
 		self.assertEqual(datetime(2026, 9, 17, 10, 9, 0, tzinfo=timezone.utc), workflow.CompletedAt)
-		self.assertEqual(470.0, workflow.Duration)
+		self.assertEqual(470.0, workflow.DurationInSeconds)
 
 	def test_CalledWorkflowWithARunningJobHasNoEndTime(self) -> None:
 		pipeline = Pipeline.Parse(_run(), [
@@ -393,7 +393,7 @@ class Matrices(Testcase):
 
 		self.assertEqual(datetime(2026, 9, 17, 10, 1, 10, tzinfo=timezone.utc), matrix.StartedAt)
 		self.assertEqual(datetime(2026, 9, 17, 10, 9, 0, tzinfo=timezone.utc), matrix.CompletedAt)
-		self.assertEqual(470.0, matrix.Duration)
+		self.assertEqual(470.0, matrix.DurationInSeconds)
 
 	def test_MatrixInsideACalledWorkflow(self) -> None:
 		pipeline = Pipeline.Parse(_run(), [_job("Docs / Sphinx (html, latex)", 60, 70, 180)])
