@@ -265,4 +265,4 @@ class PipelineHandlers(metaclass=ExtendedType, mixin=True):
 		"""
 		self.WriteNormal(f"Pipeline:  {trace.Name}")
 		self.WriteNormal(f"Began:     {trace.StartTime}")
-		self.WriteNormal(f"Wall time: {trace.Duration:.0f} s")
+		self.WriteNormal(f"Wall time: {trace.DurationInSeconds:.0f} s")

@@ -239,7 +239,7 @@ class Conversion(Testcase):
 		trace = WorkflowRunTrace.Parse(_run(), [])
 
 		self.assertEqual("Pipeline", trace.Name)
-		self.assertEqual(600.0, trace.Duration)
+		self.assertEqual(600.0, trace.DurationInSeconds)
 		self.assertEqual("pipeline", trace[CI.Span.Kind])
 		self.assertEqual("Pipeline", trace["cicd.pipeline.name"])
 		self.assertEqual("4711", trace["cicd.pipeline.run.id"])
@@ -262,12 +262,12 @@ class Conversion(Testcase):
 
 		queued = children["Build (queued)"]
 		self.assertEqual("queued", queued[CI.Span.Kind])
-		self.assertEqual(3.0, queued.Duration)
+		self.assertEqual(3.0, queued.DurationInSeconds)
 		self.assertListEqual(["ubuntu-26.04"], queued["github.runner.labels"])
 
 		job = children["Build"]
 		self.assertEqual("job", job[CI.Span.Kind])
-		self.assertEqual(6.0, job.Duration)
+		self.assertEqual(6.0, job.DurationInSeconds)
 		self.assertEqual("Build", job["cicd.pipeline.task.name"])
 		self.assertEqual("success", job["cicd.pipeline.task.run.result"])
 		self.assertEqual("GitHub Actions 1000184490", job["cicd.worker.name"])
@@ -332,7 +332,7 @@ class Conversion(Testcase):
 		spans = list(trace.IterateSubSpans())
 
 		self.assertListEqual(["Release"], [span.Name for span in spans])
-		self.assertEqual(0.0, spans[0].Duration)
+		self.assertEqual(0.0, spans[0].DurationInSeconds)
 		self.assertEqual("skip", spans[0]["cicd.pipeline.task.run.result"])
 		self.assertNotIn("cicd.worker.name", spans[0])
 		self.assertNotIn("github.runner.labels", spans[0])
@@ -341,7 +341,7 @@ class Conversion(Testcase):
 		"""GitHub's whole-second timestamps occasionally put the end a second before the begin."""
 		trace = WorkflowRunTrace.Parse(_run(), [_job("Build", 4, 5, 4)])
 
-		self.assertEqual(0.0, _children(trace)["Build"].Duration)
+		self.assertEqual(0.0, _children(trace)["Build"].DurationInSeconds)
 
 	def test_Steps(self) -> None:
 		steps = [
@@ -358,7 +358,7 @@ class Conversion(Testcase):
 
 		self.assertListEqual(["Set up job", "Compile"], [span.Name for span in stepSpans])
 		self.assertEqual("step", stepSpans[1][CI.Span.Kind])
-		self.assertEqual(3.0, stepSpans[1].Duration)
+		self.assertEqual(3.0, stepSpans[1].DurationInSeconds)
 		self.assertEqual(2, stepSpans[1]["github.step.number"])
 		self.assertEqual("failure", stepSpans[1]["cicd.pipeline.task.run.result"])
 
@@ -387,7 +387,7 @@ class Conversion(Testcase):
 		group = children["UnitTesting"]
 		self.assertEqual("workflow", group[CI.Span.Kind])
 		self.assertEqual(parseISO8601Timestamp(_time(10)), group.StartTime)
-		self.assertEqual(80.0, group.Duration)
+		self.assertEqual(80.0, group.DurationInSeconds)
 		self.assertListEqual(
 			["Linux (queued)", "Linux", "Windows (queued)", "Windows"], [span.Name for span in group.IterateSubSpans()]
 		)
