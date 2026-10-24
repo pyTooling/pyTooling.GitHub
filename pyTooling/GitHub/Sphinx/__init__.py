@@ -104,8 +104,7 @@ from pyTooling.Decorators            import export, readonly
 from pyTooling.Sphinx                import BaseDirective
 
 if TYPE_CHECKING:  # pragma: no cover
-	from pyTooling.GitHub.WorkflowFile import Input, Output, Parameter, Secret, ValueT, Workflow
-	from pyTooling.GitHub.WorkflowFile import WorkflowResolver
+	from pyTooling.GitHub.WorkflowFile import Input, Output, Parameter, Secret, ValueT, Workflow, WorkflowResolver
 
 
 __all__ = ["NO_DEFAULT", "WARNING_TYPE", "LEADING_FIELDS"]
@@ -858,8 +857,8 @@ def setup(sphinx: Sphinx) -> dict[str, Any]:
 	"""
 	from pyTooling.GitHub                  import __version__
 	from pyTooling.GitHub.Sphinx.Graph     import PipelineGraph, resolveLinks
-	from pyTooling.GitHub.Sphinx.Reference import AutoInputs, Dependencies, Interface, ParameterTable, YAMLExcerpt
-	from pyTooling.GitHub.Sphinx.Reference import checkUndocumentedInputs
+	from pyTooling.GitHub.Sphinx.Reference import AutoInputs, Dependencies, Interface, ParameterTable, YAMLExcerpt, \
+	                                              checkUndocumentedInputs
 
 	sphinx.setup_extension("pyTooling.Sphinx")
 

@@ -42,8 +42,8 @@ from pyTooling.Common         import parseISO8601Timestamp
 from pyTooling.Exceptions     import ToolingException
 from pyTooling.REST           import RESTError
 from pyTooling.Tracing        import Span, Trace
-from pyTooling.Tracing.CI     import CI, JobSpan, OTLP, PipelineTrace, Result, SpanKind, StepSpan
-from pyTooling.Tracing.CI     import TaskSpan, WorkflowSpan
+from pyTooling.Tracing.CI     import CI, JobSpan, OTLP, PipelineTrace, Result, SpanKind, StepSpan, TaskSpan, \
+                                     WorkflowSpan
 from pyTooling.GitHub.Tracing import GitHub, WorkflowRunReader, WorkflowRunTrace
 from pyTooling.Tracing.Render import GanttLayout, ciSpanFilter
 from pyTooling.Testing        import Testcase
