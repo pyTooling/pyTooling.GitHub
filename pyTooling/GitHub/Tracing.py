@@ -58,10 +58,9 @@ from pyTooling.Decorators  import export
 from pyTooling.MetaClasses import ExtendedType
 from pyTooling.REST        import JSONObject, RESTError
 from pyTooling.Tracing     import Span, Trace
-from pyTooling.Tracing.CI  import Result
-from pyTooling.Tracing.CI  import JobSpan as CIJobSpan, MatrixSpan as CIMatrixSpan
-from pyTooling.Tracing.CI  import PipelineTrace as CIPipelineTrace, QueuedSpan as CIQueuedSpan
-from pyTooling.Tracing.CI  import StepSpan as CIStepSpan, WorkflowSpan as CIWorkflowSpan
+from pyTooling.Tracing.CI  import Result, JobSpan as CIJobSpan, MatrixSpan as CIMatrixSpan, \
+                                  PipelineTrace as CIPipelineTrace, QueuedSpan as CIQueuedSpan, \
+                                  StepSpan as CIStepSpan, WorkflowSpan as CIWorkflowSpan
 
 
 @export

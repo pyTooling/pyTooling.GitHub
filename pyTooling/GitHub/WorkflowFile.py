@@ -68,12 +68,12 @@ from functools                import cached_property
 from itertools                import product
 from json                     import dumps as json_dumps
 from pathlib                  import Path, PurePosixPath
-from typing                   import Any, ClassVar, Generic, Hashable, Iterable, Iterator, Mapping, Optional as Nullable
-from typing                   import Self, TypeVar, Union
+from typing                   import Any, ClassVar, Generic, Hashable, Iterable, Iterator, Mapping, \
+                                     Optional as Nullable, Self, TypeVar, Union
 
-from pyTooling.CI             import CIError, DependencyMixin, JobGroup, Matrix as CIMatrix, MatrixInstanceMixin
-from pyTooling.CI             import MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow, Rule
-from pyTooling.CI             import Job as CIJob, Pipeline as CIPipeline, Step as CIStep, Workflow as CIWorkflow
+from pyTooling.CI             import CIError, DependencyMixin, JobGroup, Matrix as CIMatrix, MatrixInstanceMixin, \
+                                     MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow, Rule, Job as CIJob, \
+                                     Pipeline as CIPipeline, Step as CIStep, Workflow as CIWorkflow
 from pyTooling.Common         import getFullyQualifiedName, StringEnum
 from pyTooling.Decorators     import export, readonly
 from pyTooling.MetaClasses    import ExtendedType, abstractclass

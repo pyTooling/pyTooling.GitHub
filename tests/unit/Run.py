@@ -35,8 +35,8 @@ from datetime              import datetime, timezone
 from typing                import Any, Optional as Nullable
 
 from pyTooling             import CI
-from pyTooling.GitHub      import PipelineGroup, Pipeline, MatrixJob, Job, Step
-from pyTooling.GitHub      import Status, Conclusion, Event, GitHubError, StatusMixin
+from pyTooling.GitHub      import PipelineGroup, Pipeline, MatrixJob, Job, Step, Status, Conclusion, Event, \
+                                  GitHubError, StatusMixin
 from pyTooling.CI          import Base, JobGroup, Matrix, MatrixWorkflow, QualifiedNameMixin, Workflow
 from pyTooling.MetaClasses import AbstractClassError, ExtendedType, UnfulfilledExpectationError
 from pyTooling.Testing     import Testcase

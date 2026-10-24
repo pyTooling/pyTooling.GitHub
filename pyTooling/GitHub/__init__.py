@@ -71,10 +71,9 @@ __issue_tracker_url__ = "https://GitHub.com/pyTooling/pyTooling.GitHub/issues"
 from datetime                  import datetime, timezone
 from typing                    import Optional as Nullable, Any, ClassVar, Hashable, Iterable, Mapping, Self, Union
 
-from pyTooling.CI              import CIError, MatrixInstanceMixin, Outcome
-from pyTooling.CI              import Job as CIJob, JobGroup as CIJobGroup, Matrix as CIMatrix
-from pyTooling.CI              import MatrixWorkflow as CIMatrixWorkflow, Pipeline as CIPipeline
-from pyTooling.CI              import PipelineGroup as CIPipelineGroup, Step as CIStep, Workflow as CIWorkflow
+from pyTooling.CI              import CIError, MatrixInstanceMixin, Outcome, Job as CIJob, JobGroup as CIJobGroup, \
+                                      Matrix as CIMatrix, MatrixWorkflow as CIMatrixWorkflow, Pipeline as CIPipeline, \
+                                      PipelineGroup as CIPipelineGroup, Step as CIStep, Workflow as CIWorkflow
 from pyTooling.Common          import getFullyQualifiedName, parseISO8601Timestamp, StringEnum
 from pyTooling.Decorators      import export, readonly
 from pyTooling.GenericPath.URL import URL
