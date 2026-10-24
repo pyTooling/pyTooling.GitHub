@@ -69,8 +69,7 @@ When a document was read, an input of its workflow without an entry is a ``ghact
 """
 from __future__                      import annotations
 
-from typing                          import TYPE_CHECKING, Any, Callable, Iterable, Optional as Nullable
-from typing                          import TypeVar
+from typing                          import TYPE_CHECKING, Any, Callable, Iterable, Optional as Nullable, TypeVar
 
 from docutils                        import nodes
 from docutils.parsers.rst            import directives
