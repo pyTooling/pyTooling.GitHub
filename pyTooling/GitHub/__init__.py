@@ -977,7 +977,7 @@ class Job(CIJob, StatusMixin):
 				ex.add_note(f"Got type '{getFullyQualifiedName(value)}'.")
 				raise ex
 
-		self._labels = []
+		self._labels = labelList = []
 		if labels is not None:
 			for label in labels:
 				if not isinstance(label, str):
@@ -985,7 +985,7 @@ class Job(CIJob, StatusMixin):
 					ex.add_note(f"Got type '{getFullyQualifiedName(label)}'.")
 					raise ex
 
-				self._labels.append(label)
+				labelList.append(label)
 
 		stepList = []
 		if steps is not None:
