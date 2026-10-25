@@ -1210,7 +1210,7 @@ class Job(Base[Workflow]):
 		self._secrets =         {} if secrets is None else dict(secrets)
 		self._inheritsSecrets = inheritsSecrets
 		self._matrix =          matrix
-		self._steps =           []
+		self._steps =           stepList = []
 		self._outputs =         {} if outputs is None else dict(outputs)
 		self._container =       container
 		self._services =        {} if services is None else dict(services)
@@ -1239,7 +1239,7 @@ class Job(Base[Workflow]):
 					ex.add_note(f"Got type '{getFullyQualifiedName(step)}'.")
 					raise ex
 
-				self._steps.append(step)
+				stepList.append(step)
 				step.Parent = self
 
 		if parent is not None:
@@ -1651,7 +1651,7 @@ class Action(Base[None]):
 		self._displayName = displayName
 		self._using =       using
 		self._image =       image
-		self._steps =       []
+		self._steps =       stepList = []
 
 		if steps is not None:
 			for step in steps:
@@ -1660,7 +1660,7 @@ class Action(Base[None]):
 					ex.add_note(f"Got type '{getFullyQualifiedName(step)}'.")
 					raise ex
 
-				self._steps.append(step)
+				stepList.append(step)
 				step.Parent = self
 
 	@Base.Parent.setter
