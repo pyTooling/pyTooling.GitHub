@@ -136,9 +136,12 @@ class RepositoryClient(RESTClient):
 		                    Default: ``3``.
 		:param retryDelay:  Optional, pause in seconds before a request is tried again the first time. The pause doubles
 		                    with every further attempt. Default: ``2.0``.
-		:raises ValueError: If parameter 'owner' or 'repository' is ``None``.
-		:raises TypeError:  If parameter 'owner' or 'repository' is not of type :class:`str`.
-		:raises ValueError: If parameter 'owner' or 'repository' is empty or contains a ``/``.
+		:raises ValueError: If parameter 'owner' is ``None``.
+		:raises TypeError:  If parameter 'owner' is not of type :class:`str`.
+		:raises ValueError: If parameter 'owner' is empty or contains a ``/``.
+		:raises ValueError: If parameter 'repository' is ``None``.
+		:raises TypeError:  If parameter 'repository' is not of type :class:`str`.
+		:raises ValueError: If parameter 'repository' is empty or contains a ``/``.
 		:raises TypeError:  If a parameter of :class:`~pyTooling.REST.RESTClient` has the wrong type.
 		:raises ValueError: If a parameter of :class:`~pyTooling.REST.RESTClient` has an invalid value.
 		"""
