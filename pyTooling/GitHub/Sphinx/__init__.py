@@ -109,15 +109,17 @@ if TYPE_CHECKING:  # pragma: no cover
 
 __all__ = ["NO_DEFAULT", "WARNING_TYPE", "LEADING_FIELDS"]
 
-#: The text of the field *Default Value* when an input has no default.
 NO_DEFAULT = "— — — —"
+"""The text of the field *Default Value* when an input has no default."""
 
-#: The type of the warnings this domain emits; the drift warnings have the subtype ``drift``, so
-#: ``suppress_warnings = ["ghactions.drift"]`` silences them.
 WARNING_TYPE = "ghactions"
+"""
+The type of the warnings this domain emits; the drift warnings have the subtype ``drift``, so
+``suppress_warnings = ["ghactions.drift"]`` silences them.
+"""
 
-#: The fields a *Description* taken from the workflow file follows.
 LEADING_FIELDS = ("Type", "Required", "Default Value", "Possible Values")
+"""The fields a *Description* taken from the workflow file follows."""
 
 _logger = getLogger(__name__)
 

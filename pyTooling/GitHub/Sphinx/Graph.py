@@ -78,7 +78,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 __all__ = ["GRAPH_ATTRIBUTES", "CSS_CLASS", "LINK_MARKER"]
 
-#: Attributes every pipeline graph is drawn with.
 GRAPH_ATTRIBUTES = (
 	"compound=true;",
 	"newrank=true;",
@@ -90,13 +89,16 @@ GRAPH_ATTRIBUTES = (
 	'      fontname="sans-serif", fontsize="10"];',
 	'edge [color="#5f6b7a", arrowsize="0.7"];',
 )
+"""Attributes every pipeline graph is drawn with."""
 
-#: CSS class of a pipeline graph's ``graphviz`` node, which is also how :func:`resolveLinks` finds it.
 CSS_CLASS = "ghactions-pipeline-graph"
+"""CSS class of a pipeline graph's ``graphviz`` node, which is also how :func:`resolveLinks` finds it."""
 
-#: A DOT comment, and the whitespace before it, standing where a job's link belongs, until :func:`resolveLinks`
-#: replaces it by the link or removes it.
 LINK_MARKER = re_compile(r"(?P<space>\s*)/\*ghactions-link:(?P<stem>[^*]*)\*/")
+"""
+A DOT comment, and the whitespace before it, standing where a job's link belongs, until :func:`resolveLinks`
+replaces it by the link or removes it.
+"""
 
 _logger = getLogger(__name__)
 
