@@ -43,15 +43,8 @@ Gantt Charts (Optional)
 When installed as ``pyTooling.GitHub[diagram]``, which :ref:`VIS/PipelineTrace/Gantt` and the program's ``--gantt``
 option need:
 
-.. The extra isn't on PyPI yet, which 'dependency-table' reads extras from. Replace this table by
-   '.. dependency-table:: diagram' and an entry in 'conf.py' once a release contains the extra.
-
-+-------------+---------+------------------------------+----------------------------------------------------------+
-| Package     | Version | License                      | Dependencies                                             |
-+=============+=========+==============================+==========================================================+
-| matplotlib  | ≥3.10   | PSF-2.0 (matplotlib license) | contourpy, cycler, fonttools, kiwisolver, numpy,         |
-|             |         |                              | packaging, pillow, pyparsing, python-dateutil            |
-+-------------+---------+------------------------------+----------------------------------------------------------+
+.. dependency-table:: diagram
+   :caption: Dependencies added by the ``diagram`` extra.
 
 
 .. _DEP/sphinx:
@@ -62,14 +55,8 @@ Sphinx Domain ``ghactions`` (Optional)
 When installed as ``pyTooling.GitHub[sphinx]``, which the :ref:`ghactions domain <GHA>` needs. pyTooling.Sphinx requires
 Python 3.12 or newer, because Sphinx 9.1 does.
 
-.. The extra isn't on PyPI yet, which 'dependency-table' reads extras from. Replace this table by
-   '.. dependency-table:: sphinx' and an entry in 'conf.py' once a release contains the extra.
-
-+------------------+------------+------------------------------+-----------------------------------------------------+
-| Package          | Version    | License                      | Dependencies                                        |
-+==================+============+==============================+=====================================================+
-| pyTooling.Sphinx | ~=0.1.0rc2 | Apache-2.0                   | pyTooling[pypi], sphinx, xmlschema                  |
-+------------------+------------+------------------------------+-----------------------------------------------------+
+.. dependency-table:: sphinx
+   :caption: Dependencies added by the ``sphinx`` extra.
 
 
 .. _DEP/testing:
