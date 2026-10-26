@@ -47,19 +47,19 @@ the data was read, so a consumer can store the model and read it back without an
 
    See :ref:`high-level help <DATA/Release>` for explanations and usage examples.
 """
-from __future__                import annotations
+from __future__            import annotations
 
-from datetime                  import datetime
-from typing                    import Iterable, Iterator, Optional as Nullable, Self
-from urllib.parse              import quote
+from datetime              import datetime
+from typing                import Iterable, Iterator, Optional as Nullable, Self
+from urllib.parse          import quote
 
-from pyTooling.Common          import getFullyQualifiedName, StringEnum
-from pyTooling.Decorators      import export, readonly
-from pyTooling.GenericPath.URL import URL
-from pyTooling.MetaClasses     import ExtendedType
-from pyTooling.REST            import JSONObject
+from pyTooling.Common      import getFullyQualifiedName, StringEnum
+from pyTooling.Decorators  import export, readonly
+from pyTooling.URI         import URL
+from pyTooling.MetaClasses import ExtendedType
+from pyTooling.REST        import JSONObject
 
-from pyTooling.GitHub          import GitHubError, _parseISO8601Timestamp, _parseURL
+from pyTooling.GitHub      import GitHubError, _parseISO8601Timestamp, _parseURL
 
 
 # A class with a property named like a class - ``URL`` - can't name that class in an annotation: the class body's
@@ -148,7 +148,7 @@ class Asset(metaclass=ExtendedType, slots=True):
 		:raises TypeError:  If parameter 'contentType' is not of type :class:`str`.
 		:raises ValueError: If parameter 'contentType' is empty.
 		:raises ValueError: If parameter 'downloadURL' is ``None``.
-		:raises TypeError:  If parameter 'downloadURL' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
+		:raises TypeError:  If parameter 'downloadURL' is not of type :class:`~pyTooling.URI.URL`.
 		:raises ValueError: If parameter 'size' is ``None``.
 		:raises TypeError:  If parameter 'size' is not of type :class:`int`.
 		:raises ValueError: If parameter 'size' is negative.
@@ -382,7 +382,7 @@ class CommitReference(metaclass=ExtendedType, slots=True):
 		:raises ValueError: If parameter 'tagName' is empty.
 		:raises TypeError:  If parameter 'commitSHA' is not of type :class:`str`.
 		:raises ValueError: If parameter 'commitSHA' is empty.
-		:raises TypeError:  If parameter 'commitURL' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
+		:raises TypeError:  If parameter 'commitURL' is not of type :class:`~pyTooling.URI.URL`.
 		"""
 		if tagName is None:
 			raise ValueError("Parameter 'tagName' is None.")
@@ -505,8 +505,8 @@ class Release(CommitReference):
 		:raises TypeError:   If parameter 'tagName' is not of type :class:`str`.
 		:raises ValueError:  If parameter 'tagName' is empty.
 		:raises ValueError:  If parameter 'url' is ``None``.
-		:raises TypeError:   If parameter 'url' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
-		:raises TypeError:   If parameter 'commitURL' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
+		:raises TypeError:   If parameter 'url' is not of type :class:`~pyTooling.URI.URL`.
+		:raises TypeError:   If parameter 'commitURL' is not of type :class:`~pyTooling.URI.URL`.
 		:raises TypeError:   If parameter 'name' is not of type :class:`str`.
 		:raises ValueError:  If parameter 'name' is empty.
 		:raises TypeError:   If parameter 'commitSHA' is not of type :class:`str`.
@@ -845,7 +845,7 @@ class Tag(CommitReference):
 		:raises ValueError: If parameter 'tagName' is empty.
 		:raises TypeError:  If parameter 'commitSHA' is not of type :class:`str`.
 		:raises ValueError: If parameter 'commitSHA' is empty.
-		:raises TypeError:  If parameter 'commitURL' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
+		:raises TypeError:  If parameter 'commitURL' is not of type :class:`~pyTooling.URI.URL`.
 		:raises TypeError:  If parameter 'committedAt' is not of type :class:`~datetime.datetime`.
 		:raises ValueError: If parameter 'committedAt' has no time zone.
 		:raises ValueError: If parameter 'isAnnotated' is ``None``.
@@ -1053,7 +1053,7 @@ class Repository(metaclass=ExtendedType, slots=True):
 		:raises TypeError:  If parameter 'name' is not of type :class:`str`.
 		:raises ValueError: If parameter 'name' is empty or contains a ``/``.
 		:raises ValueError: If parameter 'url' is ``None``.
-		:raises TypeError:  If parameter 'url' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
+		:raises TypeError:  If parameter 'url' is not of type :class:`~pyTooling.URI.URL`.
 		:raises TypeError:  If an element of parameter 'releases' is not of type :class:`Release`.
 		:raises ValueError: If two elements of parameter 'releases' have the same tag.
 		:raises ValueError: If an element of parameter 'releases' belongs to a repository already.
