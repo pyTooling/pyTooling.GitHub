@@ -99,15 +99,16 @@ def _job(
 	:param fields:    Fields overriding the defaults.
 	:returns:         The job, as the GitHub REST API returns it.
 	"""
+	jobID = abs(hash(name)) % 1_000_000
 	job = {
-		"id": abs(hash(name)) % 1_000_000, "name": name, "status": "completed" if completed is not None else "in_progress",
+		"id": jobID, "name": name, "status": "completed" if completed is not None else "in_progress",
 		"conclusion": "success" if completed is not None else None,
 		"created_at": None if created is None else _time(created),
 		"started_at": None if started is None else _time(started),
 		"completed_at": None if completed is None else _time(completed),
 		"labels": ["ubuntu-26.04"],
 		"runner_name": "GitHub Actions 1000184490", "runner_group_name": "GitHub Actions",
-		"html_url": f"https://github.com/owner/repo/actions/runs/4711/job/{name}", "steps": [],
+		"html_url": f"https://github.com/owner/repo/actions/runs/4711/job/{jobID}", "steps": [],
 	}
 	job.update(fields)
 	return job
