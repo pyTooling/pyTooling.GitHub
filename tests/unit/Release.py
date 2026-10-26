@@ -31,16 +31,16 @@
 """
 Unit tests for :mod:`pyTooling.GitHub.Release`.
 """
-from copy                      import deepcopy
-from datetime                  import datetime, timedelta, timezone
-from json                      import dumps as json_dumps, loads as json_loads
-from pathlib                   import Path
-from typing                    import Any
+from copy                     import deepcopy
+from datetime                 import datetime, timedelta, timezone
+from json                     import dumps as json_dumps, loads as json_loads
+from pathlib                  import Path
+from typing                   import Any
 
-from pyTooling.GenericPath.URL import URL
-from pyTooling.GitHub          import GitHubError
-from pyTooling.GitHub.Release  import Asset, Release, Repository, SnapshotVersion, SourceArchive, Tag
-from pyTooling.Testing         import Testcase
+from pyTooling.URI            import URL
+from pyTooling.GitHub         import GitHubError
+from pyTooling.GitHub.Release import Asset, Release, Repository, SnapshotVersion, SourceArchive, Tag
+from pyTooling.Testing        import Testcase
 
 
 if __name__ == "__main__":  # pragma: no cover
