@@ -144,11 +144,11 @@ class Asset(metaclass=ExtendedType, slots=True):
 		:raises ValueError: If parameter 'name' is ``None``.
 		:raises TypeError:  If parameter 'name' is not of type :class:`str`.
 		:raises ValueError: If parameter 'name' is empty.
+		:raises ValueError: If parameter 'downloadURL' is ``None``.
+		:raises TypeError:  If parameter 'downloadURL' is not of type :class:`~pyTooling.URI.URL`.
 		:raises ValueError: If parameter 'contentType' is ``None``.
 		:raises TypeError:  If parameter 'contentType' is not of type :class:`str`.
 		:raises ValueError: If parameter 'contentType' is empty.
-		:raises ValueError: If parameter 'downloadURL' is ``None``.
-		:raises TypeError:  If parameter 'downloadURL' is not of type :class:`~pyTooling.URI.URL`.
 		:raises ValueError: If parameter 'size' is ``None``.
 		:raises TypeError:  If parameter 'size' is not of type :class:`int`.
 		:raises ValueError: If parameter 'size' is negative.
@@ -506,11 +506,8 @@ class Release(CommitReference):
 		:raises ValueError:  If parameter 'tagName' is empty.
 		:raises ValueError:  If parameter 'url' is ``None``.
 		:raises TypeError:   If parameter 'url' is not of type :class:`~pyTooling.URI.URL`.
-		:raises TypeError:   If parameter 'commitURL' is not of type :class:`~pyTooling.URI.URL`.
 		:raises TypeError:   If parameter 'name' is not of type :class:`str`.
 		:raises ValueError:  If parameter 'name' is empty.
-		:raises TypeError:   If parameter 'commitSHA' is not of type :class:`str`.
-		:raises ValueError:  If parameter 'commitSHA' is empty.
 		:raises ValueError:  If parameter 'description' is ``None``.
 		:raises TypeError:   If parameter 'description' is not of type :class:`str`.
 		:raises TypeError:   If parameter 'publishedAt' is not of type :class:`~datetime.datetime`.
@@ -519,6 +516,9 @@ class Release(CommitReference):
 		:raises TypeError:   If parameter 'isPrerelease' is not of type :class:`bool`.
 		:raises ValueError:  If parameter 'isLatest' is ``None``.
 		:raises TypeError:   If parameter 'isLatest' is not of type :class:`bool`.
+		:raises TypeError:   If parameter 'commitSHA' is not of type :class:`str`.
+		:raises ValueError:  If parameter 'commitSHA' is empty.
+		:raises TypeError:   If parameter 'commitURL' is not of type :class:`~pyTooling.URI.URL`.
 		:raises TypeError:   If an element of parameter 'assets' is not of type :class:`Asset`.
 		:raises ValueError:  If two elements of parameter 'assets' have the same name.
 		:raises ValueError:  If an element of parameter 'assets' is attached to a release already.

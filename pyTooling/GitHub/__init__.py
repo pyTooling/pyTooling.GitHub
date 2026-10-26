@@ -964,10 +964,10 @@ class Job(CIJob, StatusMixin):
 		:param keyValuePairs:   Optional, mapping (dictionary) of key-value-pairs. Default: ``None``.
 		:param parent:          Optional, reference to the group containing the job. Default: ``None``.
 		:raises TypeError:      If parameter 'identifier' is not of type :class:`int`.
-		:raises TypeError:      If an element of parameter 'steps' is not of type :class:`Step`.
 		:raises TypeError:      If an element of parameter 'labels' is not of type :class:`str`.
 		:raises TypeError:      If parameter 'runnerName' is not of type :class:`str`.
 		:raises TypeError:      If parameter 'runnerGroupName' is not of type :class:`str`.
+		:raises TypeError:      If an element of parameter 'steps' is not of type :class:`Step`.
 		"""
 		if identifier is not None and not isinstance(identifier, int):
 			ex = TypeError("Parameter 'identifier' is not of type 'int'.")

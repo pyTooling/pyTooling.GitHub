@@ -1147,10 +1147,10 @@ class Job(Base[Workflow]):
 		:raises TypeError:      If parameter 'name' is not of type :class:`str`.
 		:raises ValueError:     If parameter 'name' is empty.
 		:raises TypeError:      If parameter 'displayName' is not of type :class:`str`.
-		:raises TypeError:      If parameter 'condition' is not of type :class:`str`.
-		:raises TypeError:      If parameter 'container' is not of type :class:`str`.
 		:raises TypeError:      If an element of parameter 'needs' is not of type :class:`str`.
+		:raises TypeError:      If parameter 'condition' is not of type :class:`str`.
 		:raises TypeError:      If an element of parameter 'runsOn' is not of type :class:`str`.
+		:raises TypeError:      If parameter 'container' is not of type :class:`str`.
 		:raises TypeError:      If parameter 'uses' is not of type :class:`UsesReference`.
 		:raises TypeError:      If parameter 'inheritsSecrets' is not of type :class:`bool`.
 		:raises TypeError:      If an element of parameter 'permissions' is not of type :class:`Permission`.
