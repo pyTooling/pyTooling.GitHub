@@ -104,21 +104,22 @@ from pyTooling.Decorators            import export, readonly
 from pyTooling.Sphinx                import BaseDirective
 
 if TYPE_CHECKING:  # pragma: no cover
-	from pyTooling.GitHub.WorkflowFile import Input, Output, Parameter, Secret, ValueT, Workflow
-	from pyTooling.GitHub.WorkflowFile import WorkflowResolver
+	from pyTooling.GitHub.WorkflowFile import Input, Output, Parameter, Secret, ValueT, Workflow, WorkflowResolver
 
 
 __all__ = ["NO_DEFAULT", "WARNING_TYPE", "LEADING_FIELDS"]
 
-#: The text of the field *Default Value* when an input has no default.
 NO_DEFAULT = "— — — —"
+"""The text of the field *Default Value* when an input has no default."""
 
-#: The type of the warnings this domain emits; the drift warnings have the subtype ``drift``, so
-#: ``suppress_warnings = ["ghactions.drift"]`` silences them.
 WARNING_TYPE = "ghactions"
+"""
+The type of the warnings this domain emits; the drift warnings have the subtype ``drift``, so
+``suppress_warnings = ["ghactions.drift"]`` silences them.
+"""
 
-#: The fields a *Description* taken from the workflow file follows.
 LEADING_FIELDS = ("Type", "Required", "Default Value", "Possible Values")
+"""The fields a *Description* taken from the workflow file follows."""
 
 _logger = getLogger(__name__)
 
@@ -858,8 +859,8 @@ def setup(sphinx: Sphinx) -> dict[str, Any]:
 	"""
 	from pyTooling.GitHub                  import __version__
 	from pyTooling.GitHub.Sphinx.Graph     import PipelineGraph, resolveLinks
-	from pyTooling.GitHub.Sphinx.Reference import AutoInputs, Dependencies, Interface, ParameterTable, YAMLExcerpt
-	from pyTooling.GitHub.Sphinx.Reference import checkUndocumentedInputs
+	from pyTooling.GitHub.Sphinx.Reference import AutoInputs, Dependencies, Interface, ParameterTable, YAMLExcerpt, \
+	                                              checkUndocumentedInputs
 
 	sphinx.setup_extension("pyTooling.Sphinx")
 

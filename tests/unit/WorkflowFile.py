@@ -38,10 +38,10 @@ from typing                        import Any
 
 from pyTooling.CI                  import Matrix as CIMatrix, NeedDependencyCycleError, Pipeline as CIPipeline
 from pyTooling.GitHub              import Pipeline as GitHubPipeline
-from pyTooling.GitHub.WorkflowFile import AccessLevel, Base, InputType, Workflow, WorkflowError, WorkflowResolver
-from pyTooling.GitHub.WorkflowFile import Input, Job, Matrix, Output, Permission, PermissionScope, Secret
-from pyTooling.GitHub.WorkflowFile import UsesReference, DefinedJob, DefinedMatrix, DefinedMatrixJob
-from pyTooling.GitHub.WorkflowFile import DefinedMatrixWorkflow, DefinedPipeline, DefinedWorkflow, Action, Step
+from pyTooling.GitHub.WorkflowFile import AccessLevel, Base, InputType, Workflow, WorkflowError, WorkflowResolver, \
+                                          Input, Job, Matrix, Output, Permission, PermissionScope, Secret, \
+                                          UsesReference, DefinedJob, DefinedMatrix, DefinedMatrixJob, \
+                                          DefinedMatrixWorkflow, DefinedPipeline, DefinedWorkflow, Action, Step
 from pyTooling.Graph               import Graph
 from pyTooling.Testing             import Testcase
 

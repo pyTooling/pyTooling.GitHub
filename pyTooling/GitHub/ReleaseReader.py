@@ -44,17 +44,17 @@ Read the releases and tags of a GitHub repository through GitHub's GraphQL API.
 
    See :ref:`high-level help <DATA/Release>` for explanations and usage examples.
 """
-from datetime                  import datetime, timezone
-from http                      import HTTPMethod
-from textwrap                  import dedent
-from typing                    import Any, Optional as Nullable, Union
+from datetime                 import datetime, timezone
+from http                     import HTTPMethod
+from textwrap                 import dedent
+from typing                   import Any, Optional as Nullable, Union
 
-from pyTooling.Decorators      import export
-from pyTooling.GenericPath.URL import URL
-from pyTooling.REST            import JSONObject, RESTError
+from pyTooling.Decorators     import export
+from pyTooling.URI            import URL
+from pyTooling.REST           import JSONObject, RESTError
 
-from pyTooling.GitHub          import GITHUB_API_URL, GitHubError, RepositoryClient
-from pyTooling.GitHub.Release  import Repository
+from pyTooling.GitHub         import GITHUB_API_URL, GitHubError, RepositoryClient
+from pyTooling.GitHub.Release import Repository
 
 
 __all__ = ["RELEASES_QUERY", "RELEASE_ASSETS_QUERY"]

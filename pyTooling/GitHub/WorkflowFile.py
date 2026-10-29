@@ -68,12 +68,12 @@ from functools                import cached_property
 from itertools                import product
 from json                     import dumps as json_dumps
 from pathlib                  import Path, PurePosixPath
-from typing                   import Any, ClassVar, Generic, Hashable, Iterable, Iterator, Mapping, Optional as Nullable
-from typing                   import Self, TypeVar, Union
+from typing                   import Any, ClassVar, Generic, Hashable, Iterable, Iterator, Mapping, \
+                                     Optional as Nullable, Self, TypeVar, Union
 
-from pyTooling.CI             import CIError, DependencyMixin, JobGroup, Matrix as CIMatrix, MatrixInstanceMixin
-from pyTooling.CI             import MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow, Rule
-from pyTooling.CI             import Job as CIJob, Pipeline as CIPipeline, Step as CIStep, Workflow as CIWorkflow
+from pyTooling.CI             import CIError, DependencyMixin, JobGroup, Matrix as CIMatrix, MatrixInstanceMixin, \
+                                     MatrixJob as CIMatrixJob, MatrixWorkflow as CIMatrixWorkflow, Rule, Job as CIJob, \
+                                     Pipeline as CIPipeline, Step as CIStep, Workflow as CIWorkflow
 from pyTooling.Common         import getFullyQualifiedName, StringEnum
 from pyTooling.Decorators     import export, readonly
 from pyTooling.MetaClasses    import ExtendedType, abstractclass
@@ -1147,10 +1147,10 @@ class Job(Base[Workflow]):
 		:raises TypeError:      If parameter 'name' is not of type :class:`str`.
 		:raises ValueError:     If parameter 'name' is empty.
 		:raises TypeError:      If parameter 'displayName' is not of type :class:`str`.
-		:raises TypeError:      If parameter 'condition' is not of type :class:`str`.
-		:raises TypeError:      If parameter 'container' is not of type :class:`str`.
 		:raises TypeError:      If an element of parameter 'needs' is not of type :class:`str`.
+		:raises TypeError:      If parameter 'condition' is not of type :class:`str`.
 		:raises TypeError:      If an element of parameter 'runsOn' is not of type :class:`str`.
+		:raises TypeError:      If parameter 'container' is not of type :class:`str`.
 		:raises TypeError:      If parameter 'uses' is not of type :class:`UsesReference`.
 		:raises TypeError:      If parameter 'inheritsSecrets' is not of type :class:`bool`.
 		:raises TypeError:      If an element of parameter 'permissions' is not of type :class:`Permission`.
@@ -1210,7 +1210,7 @@ class Job(Base[Workflow]):
 		self._secrets =         {} if secrets is None else dict(secrets)
 		self._inheritsSecrets = inheritsSecrets
 		self._matrix =          matrix
-		self._steps =           []
+		self._steps =           stepList = []
 		self._outputs =         {} if outputs is None else dict(outputs)
 		self._container =       container
 		self._services =        {} if services is None else dict(services)
@@ -1239,7 +1239,7 @@ class Job(Base[Workflow]):
 					ex.add_note(f"Got type '{getFullyQualifiedName(step)}'.")
 					raise ex
 
-				self._steps.append(step)
+				stepList.append(step)
 				step.Parent = self
 
 		if parent is not None:
@@ -1651,7 +1651,7 @@ class Action(Base[None]):
 		self._displayName = displayName
 		self._using =       using
 		self._image =       image
-		self._steps =       []
+		self._steps =       stepList = []
 
 		if steps is not None:
 			for step in steps:
@@ -1660,7 +1660,7 @@ class Action(Base[None]):
 					ex.add_note(f"Got type '{getFullyQualifiedName(step)}'.")
 					raise ex
 
-				self._steps.append(step)
+				stepList.append(step)
 				step.Parent = self
 
 	@Base.Parent.setter

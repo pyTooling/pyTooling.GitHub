@@ -56,30 +56,29 @@ is an error rather than a comparison that never matches. A conclusion is reporte
 The model carries no dependency on what is done with it. Converting a :class:`Pipeline` into a software execution
 trace, a graph or a report is a consumer of this model.
 """
-from __future__                import annotations
+from __future__            import annotations
 
 __author__ =            "Patrick Lehmann"
 __email__ =             "Paebbels@gmail.com"
 __copyright__ =         "2026-2026, Patrick Lehmann"
 __license__ =           "Apache License, Version 2.0"
-__version__ =           "0.1.0rc2"
+__version__ =           "0.1.0"
 __keywords__ =          ["GitHub", "GitHub Actions", "Workflow", "Pipeline", "CI", "Trace", "OpenTelemetry", "OTLP", "Sphinx"]
 __project_url__ =       "https://github.com/pyTooling/pyTooling.GitHub"
 __documentation_url__ = "https://pyTooling.github.io/pyTooling.GitHub"
 __issue_tracker_url__ = "https://GitHub.com/pyTooling/pyTooling.GitHub/issues"
 
-from datetime                  import datetime, timezone
-from typing                    import Optional as Nullable, Any, ClassVar, Hashable, Iterable, Mapping, Self, Union
+from datetime              import datetime, timezone
+from typing                import Optional as Nullable, Any, ClassVar, Hashable, Iterable, Mapping, Self, Union
 
-from pyTooling.CI              import CIError, JSONObject, MatrixInstanceMixin, Outcome
-from pyTooling.CI              import Job as CIJob, JobGroup as CIJobGroup, Matrix as CIMatrix
-from pyTooling.CI              import MatrixWorkflow as CIMatrixWorkflow, Pipeline as CIPipeline
-from pyTooling.CI              import PipelineGroup as CIPipelineGroup, Step as CIStep, Workflow as CIWorkflow
-from pyTooling.Common          import getFullyQualifiedName, parseISO8601Timestamp, StringEnum
-from pyTooling.Decorators      import export, readonly
-from pyTooling.GenericPath.URL import URL
-from pyTooling.MetaClasses     import ExtendedType
-from pyTooling.REST            import RESTClient
+from pyTooling.CI          import CIError, MatrixInstanceMixin, Outcome, Job as CIJob, JobGroup as CIJobGroup, \
+                                  Matrix as CIMatrix, MatrixWorkflow as CIMatrixWorkflow, Pipeline as CIPipeline, \
+                                  PipelineGroup as CIPipelineGroup, Step as CIStep, Workflow as CIWorkflow
+from pyTooling.Common      import getFullyQualifiedName, parseISO8601Timestamp, StringEnum
+from pyTooling.Decorators  import export, readonly
+from pyTooling.URI         import URL
+from pyTooling.MetaClasses import ExtendedType
+from pyTooling.REST        import JSONObject, RESTClient
 
 
 __all__ = ["CONCLUSION_TO_OUTCOME", "GITHUB_API_URL"]
@@ -137,9 +136,12 @@ class RepositoryClient(RESTClient):
 		                    Default: ``3``.
 		:param retryDelay:  Optional, pause in seconds before a request is tried again the first time. The pause doubles
 		                    with every further attempt. Default: ``2.0``.
-		:raises ValueError: If parameter 'owner' or 'repository' is ``None``.
-		:raises TypeError:  If parameter 'owner' or 'repository' is not of type :class:`str`.
-		:raises ValueError: If parameter 'owner' or 'repository' is empty or contains a ``/``.
+		:raises ValueError: If parameter 'owner' is ``None``.
+		:raises TypeError:  If parameter 'owner' is not of type :class:`str`.
+		:raises ValueError: If parameter 'owner' is empty or contains a ``/``.
+		:raises ValueError: If parameter 'repository' is ``None``.
+		:raises TypeError:  If parameter 'repository' is not of type :class:`str`.
+		:raises ValueError: If parameter 'repository' is empty or contains a ``/``.
 		:raises TypeError:  If a parameter of :class:`~pyTooling.REST.RESTClient` has the wrong type.
 		:raises ValueError: If a parameter of :class:`~pyTooling.REST.RESTClient` has an invalid value.
 		"""
@@ -347,7 +349,7 @@ def _parseURL(value: Nullable[str], field: str) -> Nullable[URL]:
 
 	:param value: Optional, the field's value. Default: ``None``.
 	:param field: Name of the field, kept for symmetry with :func:`_parseISO8601Timestamp` and for the message this
-	              will report once :meth:`~pyTooling.GenericPath.URL.URL.Parse` rejects what isn't a URL.
+	              will report once :meth:`~pyTooling.URI.URL.Parse` rejects what isn't a URL.
 	:returns:     The URL, or ``None`` if the field was absent or empty.
 	"""
 	if value is None or value == "":
@@ -409,7 +411,7 @@ class StatusMixin(metaclass=ExtendedType, mixin=True, expects=("_outcome",)):
 		:param url:        Optional, URL of the element on github.com. Default: ``None``.
 		:raises TypeError: If parameter 'status' is not of type :class:`Status`.
 		:raises TypeError: If parameter 'conclusion' is not of type :class:`Conclusion`.
-		:raises TypeError: If parameter 'url' is not of type :class:`~pyTooling.GenericPath.URL.URL`.
+		:raises TypeError: If parameter 'url' is not of type :class:`~pyTooling.URI.URL`.
 		"""
 		if status is not None and not isinstance(status, Status):
 			ex = TypeError("Parameter 'status' is not of type 'Status'.")
@@ -962,10 +964,10 @@ class Job(CIJob, StatusMixin):
 		:param keyValuePairs:   Optional, mapping (dictionary) of key-value-pairs. Default: ``None``.
 		:param parent:          Optional, reference to the group containing the job. Default: ``None``.
 		:raises TypeError:      If parameter 'identifier' is not of type :class:`int`.
-		:raises TypeError:      If an element of parameter 'steps' is not of type :class:`Step`.
 		:raises TypeError:      If an element of parameter 'labels' is not of type :class:`str`.
 		:raises TypeError:      If parameter 'runnerName' is not of type :class:`str`.
 		:raises TypeError:      If parameter 'runnerGroupName' is not of type :class:`str`.
+		:raises TypeError:      If an element of parameter 'steps' is not of type :class:`Step`.
 		"""
 		if identifier is not None and not isinstance(identifier, int):
 			ex = TypeError("Parameter 'identifier' is not of type 'int'.")
@@ -978,7 +980,7 @@ class Job(CIJob, StatusMixin):
 				ex.add_note(f"Got type '{getFullyQualifiedName(value)}'.")
 				raise ex
 
-		self._labels = []
+		self._labels = labelList = []
 		if labels is not None:
 			for label in labels:
 				if not isinstance(label, str):
@@ -986,7 +988,7 @@ class Job(CIJob, StatusMixin):
 					ex.add_note(f"Got type '{getFullyQualifiedName(label)}'.")
 					raise ex
 
-				self._labels.append(label)
+				labelList.append(label)
 
 		stepList = []
 		if steps is not None:

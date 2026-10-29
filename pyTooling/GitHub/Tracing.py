@@ -51,17 +51,16 @@ sub-span per step. The time a job waited for a runner is a separate timespan in 
 from datetime              import datetime
 from typing                import Any, ClassVar, Iterable, Optional as Nullable, Self
 
-from pyTooling.CI          import Base, JobGroup, JSONObject, Matrix
+from pyTooling.CI          import Base, JobGroup, Matrix
 from pyTooling.GitHub      import Conclusion, GitHubError, Job, MatrixJob, Pipeline, RepositoryClient, Step
 from pyTooling.Common      import getFullyQualifiedName
 from pyTooling.Decorators  import export
 from pyTooling.MetaClasses import ExtendedType
-from pyTooling.REST        import RESTError
+from pyTooling.REST        import JSONObject, RESTError
 from pyTooling.Tracing     import Span, Trace
-from pyTooling.Tracing.CI  import Result
-from pyTooling.Tracing.CI  import JobSpan as CIJobSpan, MatrixSpan as CIMatrixSpan
-from pyTooling.Tracing.CI  import PipelineTrace as CIPipelineTrace, QueuedSpan as CIQueuedSpan
-from pyTooling.Tracing.CI  import StepSpan as CIStepSpan, WorkflowSpan as CIWorkflowSpan
+from pyTooling.Tracing.CI  import Result, JobSpan as CIJobSpan, MatrixSpan as CIMatrixSpan, \
+                                  PipelineTrace as CIPipelineTrace, QueuedSpan as CIQueuedSpan, \
+                                  StepSpan as CIStepSpan, WorkflowSpan as CIWorkflowSpan
 
 
 @export

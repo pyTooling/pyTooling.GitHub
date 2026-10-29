@@ -69,8 +69,7 @@ When a document was read, an input of its workflow without an entry is a ``ghact
 """
 from __future__                      import annotations
 
-from typing                          import TYPE_CHECKING, Any, Callable, Iterable, Optional as Nullable
-from typing                          import TypeVar
+from typing                          import TYPE_CHECKING, Any, Callable, Iterable, Optional as Nullable, TypeVar
 
 from docutils                        import nodes
 from docutils.parsers.rst            import directives
@@ -90,19 +89,21 @@ if TYPE_CHECKING:  # pragma: no cover
 
 __all__ = ["KINDS", "SECTIONS", "MAX_DEFAULT_LENGTH"]
 
-#: The kinds of parameters ``ghactions:parameter-table`` summarizes, in the order it shows them by default: kind |rarr|
-#: the columns.
 KINDS = {
 	"inputs":  ("Parameter Name", "Required", "Type", "Default"),
 	"secrets": ("Token Name",     "Required", "Type", "Default"),
 	"outputs": ("Result Name",    "Description"),
 }
+"""
+The kinds of parameters ``ghactions:parameter-table`` summarizes, in the order it shows them by default: kind |rarr|
+the columns.
+"""
 
-#: The parts of a workflow file ``ghactions:yaml`` shows by option ``:section:``.
 SECTIONS = ("inputs", "outputs", "secrets", "jobs")
+"""The parts of a workflow file ``ghactions:yaml`` shows by option ``:section:``."""
 
-#: The length a default is shortened to in a summary table; a multi-line default is shortened to its first line.
 MAX_DEFAULT_LENGTH = 120
+"""The length a default is shortened to in a summary table; a multi-line default is shortened to its first line."""
 
 _logger = getLogger(__name__)
 
